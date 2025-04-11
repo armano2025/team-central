@@ -1,23 +1,21 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="צוות בראונשטיין">
-  <link rel="apple-touch-icon" href="IMG_6982.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>צוות בראונשטיין</title>
+  <link rel="apple-touch-icon" href="IMG_6982.png" />
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px 10px;
-      background-color: #f5f5f5;
       direction: rtl;
+      background-color: #f4f4f4;
+      padding: 40px 20px;
     }
 
     img.logo {
-      width: 120px;
+      max-width: 180px;
       margin-bottom: 30px;
     }
 
@@ -26,45 +24,35 @@
       margin-bottom: 40px;
     }
 
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 200px;
-      height: 200px;
-      margin: 15px;
-      padding: 20px;
+    a.button {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 15px;
       background-color: #3498db;
       color: white;
       text-align: center;
       text-decoration: none;
       font-size: 1.2em;
-      border-radius: 50%;
-      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
       transition: background-color 0.3s;
-      line-height: 1.4;
     }
 
-    .button:hover {
+    a.button:hover {
       background-color: #2980b9;
-    }
-
-    .button-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
     }
   </style>
 </head>
 <body>
-  <img src="IMG_6982.png" alt="לוגו" class="logo">
+
+  <img src="IMG_9789.jpeg" alt="לוגו של בראונשטיין" class="logo" />
   <h1>צוות בראונשטיין</h1>
 
-  <div class="button-container">
-    <a class="button" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1" target="_blank">הפקת<br>חשבונית</a>
-    <a class="button" href="https://forms.gle/tfSaC93dagWhVKr4A" target="_blank">דיווח<br>שעות עבודה</a>
-    <a class="button" href="https://origami.ms/brawns-team" target="_blank">לוח<br>זמנים יומי</a>
-  </div>
+  <a class="button" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1">הפקת חשבונית</a>
+  <a class="button" href="https://forms.gle/tfSaC93dagWhVKr4A">דיווח שעות עבודה</a>
+  <a class="button" href="https://meaningfullearning.origami.ms/-/למידה-משמעותית/שיעורים---יומן">לוח זמנים יומי</a>
+
 </body>
 </html>

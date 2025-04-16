@@ -39,13 +39,16 @@
     button:hover {
       background-color: #2980b9;
     }
+    #sendButton {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
   <h1>שליחת הודעה</h1>
 
-  <form>
+  <form onsubmit="return false;">
     <label for="day">יום</label>
     <select id="day" name="day">
       <option>ראשון</option>
@@ -89,8 +92,28 @@
     <label for="message">הודעה לשליחה</label>
     <textarea id="message" name="message" rows="5" placeholder="כתוב כאן את ההודעה..."></textarea>
 
-    <button type="submit">שלח הודעה</button>
+    <label for="password">סיסמה</label>
+    <input type="password" id="password" placeholder="הכנס סיסמה">
+
+    <button id="checkPassword" onclick="verifyPassword()">אשר סיסמה</button>
+
+    <button id="sendButton">שלח הודעה</button>
   </form>
+
+  <script>
+    function verifyPassword() {
+      const input = document.getElementById("password").value;
+      const sendBtn = document.getElementById("sendButton");
+
+      if (input === "Admin1948") {
+        sendBtn.style.display = "block";
+        alert("אימות הצליח. כפתור השליחה הופעל.");
+      } else {
+        sendBtn.style.display = "none";
+        alert("סיסמה שגויה");
+      }
+    }
+  </script>
 
 </body>
 </html>

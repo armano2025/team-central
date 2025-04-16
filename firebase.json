@@ -8,6 +8,10 @@
     ],
     "rewrites": [
       {
+        "source": "/ai-tools.html",
+        "destination": "/ai-tools.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

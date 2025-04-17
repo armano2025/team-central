@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>שליחת הודעה - תגיות</title>
+  <title>שליחת הודעה - כל הפרמטרים</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,7 +14,7 @@
     }
     .multiselect {
       max-width: 400px;
-      margin: auto;
+      margin: 20px auto;
       text-align: right;
     }
     .select-box {
@@ -24,7 +24,6 @@
       border-radius: 8px;
       padding: 10px;
       background-color: #fff;
-      margin-bottom: 10px;
     }
     .select-box input {
       border: none;
@@ -94,14 +93,19 @@
 
 <h1>שליחת הודעה</h1>
 
-<div class="multiselect">
-  <label>יום</label>
-  <div class="select-box" onclick="toggleOptions('day')">
-    <span id="tags-day"></span>
-    <input type="text" id="input-day" onkeyup="filterOptions('day')" placeholder="הקלד לבחירה...">
-  </div>
-  <ul id="options-day" class="options" style="display:none;"></ul>
-</div>
+<script>
+  const fields = {
+    day: ["ראשון", "שני", "שלישי", "רביעי", "חמישי"],
+    subject: ["מתמטיקה", "אנגלית", "פיזיקה", "דקדוק"],
+    teacher: ["חן", "שי", "נועה", "אלי", "דנה"],
+    grade: ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "י״א", "י״ב", "חינוך ביתי", "סטודנט"],
+    status: ["מנוי פעיל", "מנוי לא פעיל"],
+    subscription: ["על בסיס מקום פנוי", "ביומן הקבוע", "תלמיד שורש"]
+  };
+  const selected = {};
+</script>
+
+<div id="tag-fields"></div>
 
 <label>הודעה לשליחה</label>
 <textarea id="message" rows="4" placeholder="כתוב כאן את ההודעה..."></textarea>
@@ -115,25 +119,35 @@
 <button id="sendButton">שלח הודעה</button>
 
 <script>
-  const data = {
-    "day": ["ראשון", "שני", "שלישי", "רביעי", "חמישי"]
-  };
-  const selected = { "day": [] };
+  function createTagMultiselect(field, label) {
+    selected[field] = [];
+    const wrapper = document.createElement("div");
+    wrapper.className = "multiselect";
+    wrapper.innerHTML = `
+      <label>${label}</label>
+      <div class="select-box" onclick="toggleOptions('${field}')">
+        <span id="tags-${field}"></span>
+        <input type="text" id="input-${field}" onkeyup="filterOptions('${field}')" placeholder="הקלד לבחירה...">
+      </div>
+      <ul id="options-${field}" class="options" style="display:none;"></ul>
+    `;
+    return wrapper;
+  }
 
   function toggleOptions(id) {
-    const list = document.getElementById('options-' + id);
-    list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    const list = document.getElementById("options-" + id);
+    list.style.display = list.style.display === "none" ? "block" : "none";
     renderOptions(id);
   }
 
   function filterOptions(id) {
-    renderOptions(id, document.getElementById('input-' + id).value);
+    renderOptions(id, document.getElementById("input-" + id).value);
   }
 
   function renderOptions(id, filter = "") {
-    const list = document.getElementById('options-' + id);
+    const list = document.getElementById("options-" + id);
     list.innerHTML = "";
-    const filtered = data[id].filter(opt => opt.includes(filter) && !selected[id].includes(opt));
+    const filtered = fields[id].filter(opt => opt.includes(filter) && !selected[id].includes(opt));
     filtered.forEach(opt => {
       const li = document.createElement("li");
       li.textContent = opt;
@@ -179,10 +193,20 @@
   }
 
   document.addEventListener("click", function(e) {
-    if (!e.target.closest(".multiselect")) {
-      document.getElementById("options-day").style.display = "none";
-    }
+    Object.keys(fields).forEach(f => {
+      if (!e.target.closest(".multiselect")) {
+        document.getElementById("options-" + f).style.display = "none";
+      }
+    });
   });
+
+  const tagFieldsContainer = document.getElementById("tag-fields");
+  tagFieldsContainer.appendChild(createTagMultiselect("day", "יום"));
+  tagFieldsContainer.appendChild(createTagMultiselect("subject", "מקצוע"));
+  tagFieldsContainer.appendChild(createTagMultiselect("teacher", "מורה"));
+  tagFieldsContainer.appendChild(createTagMultiselect("grade", "כיתה"));
+  tagFieldsContainer.appendChild(createTagMultiselect("status", "סטטוס"));
+  tagFieldsContainer.appendChild(createTagMultiselect("subscription", "סוג מנוי"));
 </script>
 
 </body>

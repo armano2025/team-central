@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>לוגים - שליחת הודעות</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      padding: 40px 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: right;
+    }
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .timestamp {
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<h1>לוגים - הודעות שנשלחו</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>תאריך</th>
+      <th>פרמטרים</th>
+      <th>הודעה</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2025-04-17<br><span class="timestamp">13:42</span></td>
+      <td>
+        יום: ראשון, שלישי<br>
+        מקצוע: מתמטיקה<br>
+        מורה: שי<br>
+        כיתה: ו׳<br>
+        סטטוס: מנוי פעיל<br>
+        סוג מנוי: תלמיד שורש
+      </td>
+      <td>שלום לכולם! תזכורת לשיעור היום ב-16:00.</td>
+    </tr>
+    <tr>
+      <td>2025-04-17<br><span class="timestamp">10:18</span></td>
+      <td>
+        יום: שני<br>
+        מקצוע: אנגלית<br>
+        מורה: דנה<br>
+        כיתה: ד׳, ה׳<br>
+        סטטוס: מנוי לא פעיל<br>
+        סוג מנוי: ביומן הקבוע
+      </td>
+      <td>השיעור של היום נדחה למחר. תודה על ההבנה!</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

@@ -3,24 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>שליחת הודעה</title>
+  <title>שליחת הודעה - תגיות</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       direction: rtl;
-      background-color: #f4f4f4;
       padding: 40px 20px;
+      background-color: #f4f4f4;
       text-align: center;
     }
-    h1 {
-      margin-bottom: 20px;
+    .multiselect {
+      max-width: 400px;
+      margin: auto;
+      text-align: right;
     }
-    label {
-      display: block;
-      margin-top: 20px;
+    .select-box {
+      display: flex;
+      flex-wrap: wrap;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      background-color: #fff;
+      margin-bottom: 10px;
+    }
+    .select-box input {
+      border: none;
+      outline: none;
+      flex-grow: 1;
+      padding: 5px;
+      font-size: 1em;
+    }
+    .tag {
+      background-color: #3498db;
+      color: white;
+      border-radius: 15px;
+      padding: 5px 10px;
+      margin: 5px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .tag button {
+      background: none;
+      border: none;
+      color: white;
       font-weight: bold;
+      margin-right: 5px;
+      cursor: pointer;
     }
-    select, textarea, input, button {
+    ul.options {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      text-align: right;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+    ul.options li {
+      padding: 8px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+    ul.options li:hover {
+      background-color: #eee;
+    }
+    textarea, button, input[type="password"] {
       width: 90%;
       max-width: 400px;
       padding: 10px;
@@ -29,91 +77,113 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-    button {
+    #sendButton {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      display: none;
+    }
+    #checkPassword {
       background-color: #3498db;
       color: white;
       border: none;
-      cursor: pointer;
-      margin-top: 30px;
-    }
-    button:hover {
-      background-color: #2980b9;
-    }
-    #sendButton {
-      display: none;
     }
   </style>
 </head>
 <body>
 
-  <h1>שליחת הודעה</h1>
+<h1>שליחת הודעה</h1>
 
-  <form onsubmit="return false;">
-    <label for="day">יום</label>
-    <select id="day" name="day">
-      <option>ראשון</option>
-      <option>שני</option>
-      <option>שלישי</option>
-      <option>רביעי</option>
-      <option>חמישי</option>
-    </select>
+<div class="multiselect">
+  <label>יום</label>
+  <div class="select-box" onclick="toggleOptions('day')">
+    <span id="tags-day"></span>
+    <input type="text" id="input-day" onkeyup="filterOptions('day')" placeholder="הקלד לבחירה...">
+  </div>
+  <ul id="options-day" class="options" style="display:none;"></ul>
+</div>
 
-    <label for="subject">מקצוע</label>
-    <select id="subject" name="subject">
-      <option>מתמטיקה</option>
-      <option>אנגלית</option>
-      <option>פיזיקה</option>
-      <option>דקדוק</option>
-    </select>
+<label>הודעה לשליחה</label>
+<textarea id="message" rows="4" placeholder="כתוב כאן את ההודעה..."></textarea>
 
-    <label for="teacher">מורה</label>
-    <input type="text" id="teacher" name="teacher" placeholder="הכנס שם מורה">
+<div id="auth">
+  <label>סיסמה</label>
+  <input type="password" id="password" placeholder="הכנס סיסמה">
+  <button id="checkPassword" onclick="verifyPassword()">אשר סיסמה</button>
+</div>
 
-    <label for="grade">כיתה</label>
-    <select id="grade" name="grade">
-      <option>א</option><option>ב</option><option>ג</option><option>ד</option><option>ה</option><option>ו</option>
-      <option>ז</option><option>ח</option><option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
-      <option>חינוך ביתי</option><option>סטודנט</option>
-    </select>
+<button id="sendButton">שלח הודעה</button>
 
-    <label for="status">סטטוס</label>
-    <select id="status" name="status">
-      <option>מנוי פעיל</option>
-      <option>מנוי לא פעיל</option>
-    </select>
+<script>
+  const data = {
+    "day": ["ראשון", "שני", "שלישי", "רביעי", "חמישי"]
+  };
+  const selected = { "day": [] };
 
-    <label for="subscription">סוג מנוי</label>
-    <select id="subscription" name="subscription">
-      <option>על בסיס מקום פנוי</option>
-      <option>ביומן הקבוע</option>
-      <option>תלמיד שורש</option>
-    </select>
+  function toggleOptions(id) {
+    const list = document.getElementById('options-' + id);
+    list.style.display = list.style.display === 'none' ? 'block' : 'none';
+    renderOptions(id);
+  }
 
-    <label for="message">הודעה לשליחה</label>
-    <textarea id="message" name="message" rows="5" placeholder="כתוב כאן את ההודעה..."></textarea>
+  function filterOptions(id) {
+    renderOptions(id, document.getElementById('input-' + id).value);
+  }
 
-    <label for="password">סיסמה</label>
-    <input type="password" id="password" placeholder="הכנס סיסמה">
+  function renderOptions(id, filter = "") {
+    const list = document.getElementById('options-' + id);
+    list.innerHTML = "";
+    const filtered = data[id].filter(opt => opt.includes(filter) && !selected[id].includes(opt));
+    filtered.forEach(opt => {
+      const li = document.createElement("li");
+      li.textContent = opt;
+      li.onclick = () => selectOption(id, opt);
+      list.appendChild(li);
+    });
+  }
 
-    <button id="checkPassword" onclick="verifyPassword()">אשר סיסמה</button>
+  function selectOption(id, opt) {
+    selected[id].push(opt);
+    renderTags(id);
+    document.getElementById("input-" + id).value = "";
+    renderOptions(id);
+  }
 
-    <button id="sendButton">שלח הודעה</button>
-  </form>
+  function removeOption(id, opt) {
+    selected[id] = selected[id].filter(o => o !== opt);
+    renderTags(id);
+  }
 
-  <script>
-    function verifyPassword() {
-      const input = document.getElementById("password").value;
-      const sendBtn = document.getElementById("sendButton");
+  function renderTags(id) {
+    const container = document.getElementById("tags-" + id);
+    container.innerHTML = "";
+    selected[id].forEach(opt => {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.innerHTML = `<button onclick="removeOption('${id}', '${opt}')">&times;</button>${opt}`;
+      container.appendChild(tag);
+    });
+  }
 
-      if (input === "Admin1948") {
-        sendBtn.style.display = "block";
-        alert("אימות הצליח. כפתור השליחה הופעל.");
-      } else {
-        sendBtn.style.display = "none";
-        alert("סיסמה שגויה");
-      }
+  function verifyPassword() {
+    const input = document.getElementById("password").value;
+    const sendBtn = document.getElementById("sendButton");
+    const authSection = document.getElementById("auth");
+
+    if (input === "Admin1948") {
+      sendBtn.style.display = "block";
+      authSection.style.display = "none";
+    } else {
+      alert("סיסמה שגויה");
     }
-  </script>
+  }
+
+  document.addEventListener("click", function(e) {
+    if (!e.target.closest(".multiselect")) {
+      document.getElementById("options-day").style.display = "none";
+    }
+  });
+</script>
 
 </body>
 </html>

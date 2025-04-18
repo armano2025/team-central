@@ -1,213 +1,39 @@
-<!DOCTYPE html>
-<html lang="he">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>שליחת הודעה - כל הפרמטרים</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      direction: rtl;
-      padding: 40px 20px;
-      background-color: #f4f4f4;
-      text-align: center;
-    }
-    .multiselect {
-      max-width: 400px;
-      margin: 20px auto;
-      text-align: right;
-    }
-    .select-box {
-      display: flex;
-      flex-wrap: wrap;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      background-color: #fff;
-    }
-    .select-box input {
-      border: none;
-      outline: none;
-      flex-grow: 1;
-      padding: 5px;
-      font-size: 1em;
-    }
-    .tag {
-      background-color: #3498db;
-      color: white;
-      border-radius: 15px;
-      padding: 5px 10px;
-      margin: 5px;
-      display: inline-flex;
-      align-items: center;
-    }
-    .tag button {
-      background: none;
-      border: none;
-      color: white;
-      font-weight: bold;
-      margin-right: 5px;
-      cursor: pointer;
-    }
-    ul.options {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      text-align: right;
-      max-height: 150px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      border-top: none;
-    }
-    ul.options li {
-      padding: 8px;
-      background-color: #fff;
-      cursor: pointer;
-    }
-    ul.options li:hover {
-      background-color: #eee;
-    }
-    textarea, button, input[type="password"] {
-      width: 90%;
-      max-width: 400px;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 1em;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    #sendButton {
-      background-color: #27ae60;
-      color: white;
-      border: none;
-      display: none;
-    }
-    #checkPassword {
-      background-color: #3498db;
-      color: white;
-      border: none;
-    }
-  </style>
-</head>
-<body>
-
-<h1>שליחת הודעה</h1>
-
-<script>
-  const fields = {
-    day: ["ראשון", "שני", "שלישי", "רביעי", "חמישי"],
-    subject: ["מתמטיקה", "אנגלית", "פיזיקה", "דקדוק"],
-    teacher: ["חן", "שי", "נועה", "אלי", "דנה"],
-    grade: ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "י״א", "י״ב", "חינוך ביתי", "סטודנט"],
-    status: ["מנוי פעיל", "מנוי לא פעיל"],
-    subscription: ["על בסיס מקום פנוי", "ביומן הקבוע", "תלמיד שורש"]
-  };
-  const selected = {};
-</script>
-
-<div id="tag-fields"></div>
-
-<label>הודעה לשליחה</label>
-<textarea id="message" rows="4" placeholder="כתוב כאן את ההודעה..."></textarea>
-
-<div id="auth">
-  <label>סיסמה</label>
-  <input type="password" id="password" placeholder="הכנס סיסמה">
-  <button id="checkPassword" onclick="verifyPassword()">אשר סיסמה</button>
-</div>
-
-<button id="sendButton">שלח הודעה</button>
-
-<script>
-  function createTagMultiselect(field, label) {
-    selected[field] = [];
-    const wrapper = document.createElement("div");
-    wrapper.className = "multiselect";
-    wrapper.innerHTML = `
-      <label>${label}</label>
-      <div class="select-box" onclick="toggleOptions('${field}')">
-        <span id="tags-${field}"></span>
-        <input type="text" id="input-${field}" onkeyup="filterOptions('${field}')" placeholder="הקלד לבחירה...">
-      </div>
-      <ul id="options-${field}" class="options" style="display:none;"></ul>
-    `;
-    return wrapper;
+async function submitMessage() {
+  const password = document.getElementById("password").value;
+  if (password !== "Admin1948") {
+    alert("סיסמה שגויה");
+    return;
   }
 
-  function toggleOptions(id) {
-    const list = document.getElementById("options-" + id);
-    list.style.display = list.style.display === "none" ? "block" : "none";
-    renderOptions(id);
-  }
+  const message = document.getElementById("message").value;
 
-  function filterOptions(id) {
-    renderOptions(id, document.getElementById("input-" + id).value);
-  }
-
-  function renderOptions(id, filter = "") {
-    const list = document.getElementById("options-" + id);
-    list.innerHTML = "";
-    const filtered = fields[id].filter(opt => opt.includes(filter) && !selected[id].includes(opt));
-    filtered.forEach(opt => {
-      const li = document.createElement("li");
-      li.textContent = opt;
-      li.onclick = () => selectOption(id, opt);
-      list.appendChild(li);
-    });
-  }
-
-  function selectOption(id, opt) {
-    selected[id].push(opt);
-    renderTags(id);
-    document.getElementById("input-" + id).value = "";
-    renderOptions(id);
-  }
-
-  function removeOption(id, opt) {
-    selected[id] = selected[id].filter(o => o !== opt);
-    renderTags(id);
-  }
-
-  function renderTags(id) {
-    const container = document.getElementById("tags-" + id);
-    container.innerHTML = "";
-    selected[id].forEach(opt => {
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.innerHTML = `<button onclick="removeOption('${id}', '${opt}')">&times;</button>${opt}`;
-      container.appendChild(tag);
-    });
-  }
-
-  function verifyPassword() {
-    const input = document.getElementById("password").value;
-    const sendBtn = document.getElementById("sendButton");
-    const authSection = document.getElementById("auth");
-
-    if (input === "Admin1948") {
-      sendBtn.style.display = "block";
-      authSection.style.display = "none";
-    } else {
-      alert("סיסמה שגויה");
-    }
-  }
-
-  document.addEventListener("click", function(e) {
-    Object.keys(fields).forEach(f => {
-      if (!e.target.closest(".multiselect")) {
-        document.getElementById("options-" + f).style.display = "none";
-      }
-    });
+  const filters = {};
+  const fields = ["Day", "Subject", "Teacher", "Grade", "Status", "Subscription Type"];
+  fields.forEach(field => {
+    const selected = Array.from(document.getElementById(field).selectedOptions).map(o => o.value);
+    filters[field] = selected;
   });
 
-  const tagFieldsContainer = document.getElementById("tag-fields");
-  tagFieldsContainer.appendChild(createTagMultiselect("day", "יום"));
-  tagFieldsContainer.appendChild(createTagMultiselect("subject", "מקצוע"));
-  tagFieldsContainer.appendChild(createTagMultiselect("teacher", "מורה"));
-  tagFieldsContainer.appendChild(createTagMultiselect("grade", "כיתה"));
-  tagFieldsContainer.appendChild(createTagMultiselect("status", "סטטוס"));
-  tagFieldsContainer.appendChild(createTagMultiselect("subscription", "סוג מנוי"));
-</script>
+  const payload = {
+    filters: filters,
+    message: message
+  };
 
-</body>
-</html>
+  try {
+    const response = await fetch("https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (response.ok) {
+      alert("הבקשה נשלחה בהצלחה!");
+    } else {
+      alert("קרתה שגיאה בשליחה");
+    }
+  } catch (error) {
+    alert("שגיאה כללית: " + error.message);
+  }
+}

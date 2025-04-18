@@ -1,39 +1,168 @@
-async function submitMessage() {
-  const password = document.getElementById("password").value;
-  if (password !== "Admin1948") {
-    alert("סיסמה שגויה");
-    return;
-  }
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>שליחת הודעה</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      text-align: center;
+      background-color: #f4f4f4;
+      padding: 40px 20px;
+    }
 
-  const message = document.getElementById("message").value;
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
 
-  const filters = {};
-  const fields = ["Day", "Subject", "Teacher", "Grade", "Status", "Subscription Type"];
-  fields.forEach(field => {
-    const selected = Array.from(document.getElementById(field).selectedOptions).map(o => o.value);
-    filters[field] = selected;
-  });
+    .form-section {
+      margin-bottom: 15px;
+    }
 
-  const payload = {
-    filters: filters,
-    message: message
-  };
+    select, textarea, input[type="password"] {
+      width: 90%;
+      max-width: 400px;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
 
-  try {
-    const response = await fetch("https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho", {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: {
-        "Content-Type": "application/json"
-      }
+    select[multiple] {
+      height: 100px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #sendBtn {
+      display: none;
+      background-color: #27ae60;
+    }
+
+    #sendBtn:hover {
+      background-color: #219150;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>שליחת הודעה</h1>
+
+  <div id="filters"></div>
+
+  <div class="form-section">
+    <label for="message">הודעה לשליחה</label><br />
+    <textarea id="message" placeholder="כתוב כאן את ההודעה..."></textarea>
+  </div>
+
+  <div class="form-section">
+    <label for="password">סיסמה</label><br />
+    <input type="password" id="password" placeholder="הכנס סיסמה" />
+  </div>
+
+  <button onclick="verifyPassword()">אשר סיסמה</button>
+  <br />
+  <button id="sendBtn" onclick="submitMessage()">שלח הודעה</button>
+
+  <script>
+    const fields = ["Day", "Subject", "Teacher", "Grade", "Status", "Subscription Type"];
+
+    const filtersDiv = document.getElementById("filters");
+
+    fields.forEach(field => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "form-section";
+
+      const label = document.createElement("label");
+      label.innerText = field;
+
+      const select = document.createElement("select");
+      select.id = field;
+      select.setAttribute("multiple", true);
+      select.placeholder = "הקלד לבחירה...";
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(document.createElement("br"));
+      wrapper.appendChild(select);
+      filtersDiv.appendChild(wrapper);
+
+      // Load options dynamically from Google Sheets or static list as fallback
+      const options = {
+        Day: ["ראשון", "שני", "שלישי", "רביעי", "חמישי"],
+        Subject: ["מתמטיקה", "אנגלית", "פיסיקה", "דקדוק"],
+        Teacher: ["שי שמחוני", "לירז עברי", "תם בן יוסף"],
+        Grade: ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "י\"א", "י\"ב", "חינוך ביתי", "סטודנט"],
+        Status: ["מנוי פעיל", "מנוי לא פעיל"],
+        "Subscription Type": ["על בסיס מקום פנוי", "ביומן הקבוע", "תלמיד שורש"]
+      };
+
+      options[field].forEach(opt => {
+        const option = document.createElement("option");
+        option.value = opt;
+        option.innerText = opt;
+        select.appendChild(option);
+      });
     });
 
-    if (response.ok) {
-      alert("הבקשה נשלחה בהצלחה!");
-    } else {
-      alert("קרתה שגיאה בשליחה");
+    function verifyPassword() {
+      const password = document.getElementById("password").value;
+      if (password !== "Admin1948") {
+        alert("סיסמה שגויה");
+        return;
+      }
+      document.getElementById("sendBtn").style.display = "inline-block";
     }
-  } catch (error) {
-    alert("שגיאה כללית: " + error.message);
-  }
-}
+
+    async function submitMessage() {
+      const message = document.getElementById("message").value;
+      const filters = {};
+
+      fields.forEach(field => {
+        const selected = Array.from(document.getElementById(field).selectedOptions).map(o => o.value);
+        filters[field] = selected;
+      });
+
+      const payload = {
+        filters,
+        message
+      };
+
+      try {
+        const response = await fetch("https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          alert("ההודעה נשלחה בהצלחה!");
+        } else {
+          alert("שליחה נכשלה!");
+        }
+      } catch (error) {
+        alert("שגיאה בשליחה: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

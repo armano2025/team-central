@@ -6,17 +6,18 @@
   <title>מערכת דיוור חכמה</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e0f2f1);
+      color: #333;
       direction: rtl;
-      background: linear-gradient(to bottom, #f0f4f8, #d9e2ec);
-      padding: 30px 20px;
+      padding: 20px;
       max-width: 600px;
       margin: auto;
     }
 
     h1 {
       text-align: center;
-      color: #1a237e;
+      color: #00695c;
     }
 
     .filter-group {
@@ -27,41 +28,44 @@
       font-weight: bold;
       display: block;
       margin-bottom: 6px;
-      color: #333;
+      color: #004d40;
     }
 
     select, textarea, input[type="password"] {
       width: 100%;
       padding: 10px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
+      border: 1px solid #bbb;
+      border-radius: 10px;
       font-size: 1em;
-      margin-bottom: 10px;
-      background-color: #fff;
+      box-sizing: border-box;
+    }
+
+    select {
+      background-color: #ffffff;
     }
 
     button {
       width: 100%;
       padding: 14px;
-      background-color: #00b894;
+      margin-top: 20px;
+      background-color: #26a69a;
       color: white;
       font-size: 16px;
-      font-weight: bold;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #009f7a;
+      background-color: #00796b;
     }
 
-    .footer {
-      margin-top: 20px;
-      font-size: 0.9em;
-      text-align: center;
-      color: #666;
+    .form-section {
+      background: #ffffffcc;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
@@ -69,81 +73,81 @@
 
   <h1>מערכת דיוור חכמה</h1>
 
-  <div class="filter-group">
-    <label>יום</label>
-    <select multiple id="day">
-      <option>ראשון</option>
-      <option>שני</option>
-      <option>שלישי</option>
-      <option>רביעי</option>
-      <option>חמישי</option>
-    </select>
-  </div>
+  <div class="form-section">
 
-  <div class="filter-group">
-    <label>מקצוע</label>
-    <select multiple id="subject">
-      <option>מתמטיקה</option>
-      <option>אנגלית</option>
-      <option>פיסיקה</option>
-      <option>דקדוק</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>יום</label>
+      <select multiple id="day">
+        <option>ראשון</option>
+        <option>שני</option>
+        <option>שלישי</option>
+        <option>רביעי</option>
+        <option>חמישי</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>כיתה</label>
-    <select multiple id="grade">
-      <option>א</option><option>ב</option><option>ג</option><option>ד</option>
-      <option>ה</option><option>ו</option><option>ז</option><option>ח</option>
-      <option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
-      <option>חינוך ביתי</option><option>סטודנט</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>מקצוע</label>
+      <select multiple id="subject">
+        <option>מתמטיקה</option>
+        <option>אנגלית</option>
+        <option>פיסיקה</option>
+        <option>דקדוק</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>מורה</label>
-    <select multiple id="teacher">
-      <option>שי שמחוני</option>
-      <option>חן בראונשטיין</option>
-      <option>רפאל</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>כיתה</label>
+      <select multiple id="grade">
+        <option>א</option><option>ב</option><option>ג</option><option>ד</option>
+        <option>ה</option><option>ו</option><option>ז</option><option>ח</option>
+        <option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
+        <option>חינוך ביתי</option><option>סטודנט</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>סטטוס</label>
-    <select multiple id="status">
-      <option>מנוי פעיל</option>
-      <option>מנוי לא פעיל</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>מורה</label>
+      <select multiple id="teacher">
+        <option>שי שמחוני</option>
+        <option>חן בראונשטיין</option>
+        <option>רפאל</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>סוג מנוי</label>
-    <select multiple id="subtype">
-      <option>על בסיס מקום פנוי</option>
-      <option>ביומן הקבוע</option>
-      <option>תלמיד שורש</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>סטטוס</label>
+      <select multiple id="status">
+        <option>מנוי פעיל</option>
+        <option>מנוי לא פעיל</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>הודעה לשליחה</label>
-    <textarea id="message" rows="5" placeholder="כתוב כאן את ההודעה שלך..."></textarea>
-  </div>
+    <div class="filter-group">
+      <label>סוג מנוי</label>
+      <select multiple id="subtype">
+        <option>על בסיס מקום פנוי</option>
+        <option>ביומן הקבוע</option>
+        <option>תלמיד שורש</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>סיסמה</label>
-    <input type="password" id="password" placeholder="הכנס סיסמה" />
-  </div>
+    <div class="filter-group">
+      <label>הודעה לשליחה</label>
+      <textarea id="message" rows="4" placeholder="הקלד את ההודעה כאן..."></textarea>
+    </div>
 
-  <button onclick="sendData()">שלח הודעה</button>
+    <div class="filter-group">
+      <label>סיסמה</label>
+      <input type="password" id="password" placeholder="הקלד סיסמה" />
+    </div>
 
-  <div class="footer">
-    כל הזכויות שמורות © צוות בראונשטיין
+    <button onclick="sendData()">שלח הודעה</button>
+
   </div>
 
   <script>
-    const WEBHOOK_URL = "https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec";
     const PASSWORD = "Admin1948";
 
     function getSelectedValues(id) {
@@ -151,10 +155,8 @@
     }
 
     function sendData() {
-      const password = document.getElementById("password").value;
-      const message = document.getElementById("message").value;
-
-      if (password !== PASSWORD) {
+      const pwd = document.getElementById("password").value;
+      if (pwd !== PASSWORD) {
         alert("סיסמה שגויה");
         return;
       }
@@ -170,8 +172,8 @@
 
       const payload = {
         filters: filters,
-        message: message,
-        password: password
+        message: document.getElementById("message").value,
+        password: pwd
       };
 
       fetch(WEBHOOK_URL, {

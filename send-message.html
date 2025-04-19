@@ -9,12 +9,11 @@
       font-family: Arial, sans-serif;
       direction: rtl;
       padding: 20px;
-      background-color: #eef4f8;
+      background-color: #f4f4f4;
     }
 
     h1 {
       text-align: center;
-      color: #2c3e50;
     }
 
     .filter-group {
@@ -32,15 +31,14 @@
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 16px;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     button {
       width: 100%;
       margin-top: 20px;
       padding: 14px;
-      background-color: #3498db;
+      background-color: #2ecc71;
       color: white;
       border: none;
       font-size: 16px;
@@ -49,7 +47,7 @@
     }
 
     button:hover {
-      background-color: #2980b9;
+      background-color: #27ae60;
     }
   </style>
 </head>
@@ -60,16 +58,21 @@
   <div class="filter-group">
     <label>יום</label>
     <select multiple id="day">
-      <option>ראשון</option><option>שני</option><option>שלישי</option>
-      <option>רביעי</option><option>חמישי</option>
+      <option>ראשון</option>
+      <option>שני</option>
+      <option>שלישי</option>
+      <option>רביעי</option>
+      <option>חמישי</option>
     </select>
   </div>
 
   <div class="filter-group">
     <label>מקצוע</label>
     <select multiple id="subject">
-      <option>מתמטיקה</option><option>אנגלית</option>
-      <option>פיסיקה</option><option>דקדוק</option>
+      <option>מתמטיקה</option>
+      <option>אנגלית</option>
+      <option>פיסיקה</option>
+      <option>דקדוק</option>
     </select>
   </div>
 
@@ -86,14 +89,17 @@
   <div class="filter-group">
     <label>מורה</label>
     <select multiple id="teacher">
-      <option>חן בראונשטיין</option><option>שי שמחוני</option><option>רפאל</option>
+      <option>שי שמחוני</option>
+      <option>חן בראונשטיין</option>
+      <option>רפאל</option>
     </select>
   </div>
 
   <div class="filter-group">
     <label>סטטוס</label>
     <select multiple id="status">
-      <option>מנוי פעיל</option><option>מנוי לא פעיל</option>
+      <option>מנוי פעיל</option>
+      <option>מנוי לא פעיל</option>
     </select>
   </div>
 
@@ -108,7 +114,7 @@
 
   <div class="filter-group">
     <label>הודעה לשליחה</label>
-    <textarea id="message" rows="5"></textarea>
+    <textarea id="message" rows="4"></textarea>
   </div>
 
   <div class="filter-group">
@@ -123,38 +129,30 @@
     const PASSWORD = "Admin1948";
 
     function getSelectedValues(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(option => option.value);
+      return Array.from(document.getElementById(id).selectedOptions).map(opt => opt.value).join(",");
     }
 
     function sendData() {
-      const password = document.getElementById("password").value;
-      const message = document.getElementById("message").value;
+      const password = document.getElementById("password").value.trim();
+      const message = document.getElementById("message").value.trim();
 
       if (password !== PASSWORD) {
         alert("סיסמה שגויה");
         return;
       }
 
-      const filters = {
-        Day: getSelectedValues("day"),
-        Subject: getSelectedValues("subject"),
-        Grade: getSelectedValues("grade"),
-        Teacher: getSelectedValues("teacher"),
-        Status: getSelectedValues("status"),
-        SubscriptionType: getSelectedValues("subtype")
-      };
-
-      const payload = {
-        filters: filters,
+      const params = new URLSearchParams({
+        day: getSelectedValues("day"),
+        subject: getSelectedValues("subject"),
+        grade: getSelectedValues("grade"),
+        teacher: getSelectedValues("teacher"),
+        status: getSelectedValues("status"),
+        subtype: getSelectedValues("subtype"),
         message: message,
         password: password
-      };
-
-      fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
       });
+
+      fetch(WEBHOOK_URL + "?" + params.toString());
 
       alert("ההודעה נשלחת...");
     }

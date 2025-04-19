@@ -57,10 +57,6 @@
     button:hover {
       background-color: #27ae60;
     }
-
-    #messageSection {
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -124,17 +120,17 @@
     </select>
   </div>
 
-  <button onclick="applyFilters()">אשר סינון</button>
-
-  <div id="messageSection">
+  <div class="filter-group">
     <label>הודעה לשליחה</label>
     <textarea id="message" rows="5"></textarea>
+  </div>
 
+  <div class="filter-group">
     <label>סיסמה</label>
     <input type="password" id="password" />
-
-    <button id="sendBtn" onclick="sendMessage()">שלח הודעה</button>
   </div>
+
+  <button onclick="sendData()">שלח הודעה</button>
 
   <script>
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec";
@@ -144,12 +140,10 @@
       return Array.from(document.getElementById(id).selectedOptions).map(option => option.value);
     }
 
-    function applyFilters() {
-      document.getElementById("messageSection").style.display = "block";
-    }
-
-    function sendMessage() {
+    function sendData() {
       const password = document.getElementById("password").value;
+      const message = document.getElementById("message").value;
+
       if (password !== PASSWORD) {
         alert("סיסמה שגויה");
         return;
@@ -163,8 +157,6 @@
         "Status": getSelectedValues("status"),
         "Subscription Type": getSelectedValues("subtype")
       };
-
-      const message = document.getElementById("message").value;
 
       const payload = {
         filters: filters,

@@ -6,14 +6,17 @@
   <title>מערכת דיוור חכמה</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       direction: rtl;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
       padding: 20px;
-      background-color: #f4f4f4;
+      color: #333;
     }
 
     h1 {
       text-align: center;
+      color: #00796b;
+      margin-bottom: 30px;
     }
 
     .filter-group {
@@ -23,39 +26,40 @@
     label {
       font-weight: bold;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      color: #004d40;
     }
 
-    select {
+    select, textarea, input[type="password"] {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 12px;
       border: 1px solid #ccc;
-    }
-
-    textarea, input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
       font-size: 1em;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      background-color: #f9f9f9;
+    }
+
+    select[multiple] {
+      height: 120px;
     }
 
     button {
       width: 100%;
-      margin-top: 20px;
       padding: 14px;
-      background-color: #2ecc71;
-      color: white;
-      border: none;
       font-size: 16px;
-      border-radius: 8px;
+      border: none;
+      border-radius: 30px;
+      background-color: #00796b;
+      color: white;
       cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
     }
 
     button:hover {
-      background-color: #27ae60;
+      background-color: #004d40;
     }
   </style>
 </head>
@@ -122,18 +126,18 @@
 
   <div class="filter-group">
     <label>הודעה לשליחה</label>
-    <textarea id="message" rows="5"></textarea>
+    <textarea id="message" rows="5" placeholder="כתוב כאן את ההודעה..."></textarea>
   </div>
 
   <div class="filter-group">
     <label>סיסמה</label>
-    <input type="password" id="password" />
+    <input type="password" id="password" placeholder="הקלד את הסיסמה לשליחה" />
   </div>
 
   <button onclick="sendData()">שלח הודעה</button>
 
   <script>
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec";
+    const WEBHOOK_URL = "https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho";
     const PASSWORD = "Admin1948";
 
     function getSelectedValues(id) {

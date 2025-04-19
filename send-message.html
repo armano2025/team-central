@@ -8,9 +8,10 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       direction: rtl;
-      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
       padding: 20px;
       color: #333;
+      margin: 0;
     }
 
     h1 {
@@ -19,34 +20,39 @@
       margin-bottom: 30px;
     }
 
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
     .filter-group {
-      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
     }
 
     label {
       font-weight: bold;
-      display: block;
       margin-bottom: 8px;
       color: #004d40;
     }
 
     select, textarea, input[type="password"] {
-      width: 100%;
       padding: 12px;
       border-radius: 12px;
       border: 1px solid #ccc;
       font-size: 1em;
-      margin-bottom: 10px;
-      box-sizing: border-box;
       background-color: #f9f9f9;
+      resize: vertical;
     }
 
     select[multiple] {
-      height: 120px;
+      height: 100px;
     }
 
     button {
-      width: 100%;
       padding: 14px;
       font-size: 16px;
       border: none;
@@ -54,12 +60,17 @@
       background-color: #00796b;
       color: white;
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       transition: background-color 0.3s;
     }
 
     button:hover {
       background-color: #004d40;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
     }
   </style>
 </head>
@@ -67,74 +78,76 @@
 
   <h1>מערכת דיוור חכמה</h1>
 
-  <div class="filter-group">
-    <label>יום</label>
-    <select multiple id="day">
-      <option>ראשון</option>
-      <option>שני</option>
-      <option>שלישי</option>
-      <option>רביעי</option>
-      <option>חמישי</option>
-    </select>
-  </div>
+  <div class="container">
+    <div class="filter-group">
+      <label>יום</label>
+      <select multiple id="day">
+        <option>ראשון</option>
+        <option>שני</option>
+        <option>שלישי</option>
+        <option>רביעי</option>
+        <option>חמישי</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>מקצוע</label>
-    <select multiple id="subject">
-      <option>מתמטיקה</option>
-      <option>אנגלית</option>
-      <option>פיסיקה</option>
-      <option>דקדוק</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>מקצוע</label>
+      <select multiple id="subject">
+        <option>מתמטיקה</option>
+        <option>אנגלית</option>
+        <option>פיסיקה</option>
+        <option>דקדוק</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>כיתה</label>
-    <select multiple id="grade">
-      <option>א</option><option>ב</option><option>ג</option><option>ד</option>
-      <option>ה</option><option>ו</option><option>ז</option><option>ח</option>
-      <option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
-      <option>חינוך ביתי</option><option>סטודנט</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>כיתה</label>
+      <select multiple id="grade">
+        <option>א</option><option>ב</option><option>ג</option><option>ד</option>
+        <option>ה</option><option>ו</option><option>ז</option><option>ח</option>
+        <option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
+        <option>חינוך ביתי</option><option>סטודנט</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>מורה</label>
-    <select multiple id="teacher">
-      <option>שי שמחוני</option>
-      <option>חן בראונשטיין</option>
-      <option>רפאל</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>מורה</label>
+      <select multiple id="teacher">
+        <option>שי שמחוני</option>
+        <option>חן בראונשטיין</option>
+        <option>רפאל</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>סטטוס</label>
-    <select multiple id="status">
-      <option>מנוי פעיל</option>
-      <option>מנוי לא פעיל</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>סטטוס</label>
+      <select multiple id="status">
+        <option>מנוי פעיל</option>
+        <option>מנוי לא פעיל</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>סוג מנוי</label>
-    <select multiple id="subtype">
-      <option>על בסיס מקום פנוי</option>
-      <option>ביומן הקבוע</option>
-      <option>תלמיד שורש</option>
-    </select>
-  </div>
+    <div class="filter-group">
+      <label>סוג מנוי</label>
+      <select multiple id="subtype">
+        <option>על בסיס מקום פנוי</option>
+        <option>ביומן הקבוע</option>
+        <option>תלמיד שורש</option>
+      </select>
+    </div>
 
-  <div class="filter-group">
-    <label>הודעה לשליחה</label>
-    <textarea id="message" rows="5" placeholder="כתוב כאן את ההודעה..."></textarea>
-  </div>
+    <div class="filter-group">
+      <label>הודעה לשליחה</label>
+      <textarea id="message" rows="5" placeholder="כתוב כאן את ההודעה..."></textarea>
+    </div>
 
-  <div class="filter-group">
-    <label>סיסמה</label>
-    <input type="password" id="password" placeholder="הקלד את הסיסמה לשליחה" />
-  </div>
+    <div class="filter-group">
+      <label>סיסמה</label>
+      <input type="password" id="password" placeholder="הקלד את הסיסמה לשליחה" />
+    </div>
 
-  <button onclick="sendData()">שלח הודעה</button>
+    <button onclick="sendData()">שלח הודעה</button>
+  </div>
 
   <script>
     const WEBHOOK_URL = "https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho";
@@ -154,12 +167,12 @@
       }
 
       const filters = {
-        "Day": getSelectedValues("day"),
-        "Subject": getSelectedValues("subject"),
-        "Grade": getSelectedValues("grade"),
-        "Teacher": getSelectedValues("teacher"),
-        "Status": getSelectedValues("status"),
-        "Subscription Type": getSelectedValues("subtype")
+        Day: getSelectedValues("day"),
+        Subject: getSelectedValues("subject"),
+        Grade: getSelectedValues("grade"),
+        Teacher: getSelectedValues("teacher"),
+        Status: getSelectedValues("status"),
+        "Subscription Type": getSelectedValues("subtype"),
       };
 
       const payload = {
@@ -174,11 +187,15 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("ההודעה נשלחת...");
+      })
+      .catch((err) => {
+        alert("שגיאה בשליחה: " + err);
       });
-
-      alert("ההודעה נשלחת...");
     }
   </script>
 
 </body>
-</html>
+</html 

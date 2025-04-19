@@ -12,11 +12,11 @@
       background-color: #f4f4f4;
     }
 
-    h1 {
+    h1, h2 {
       text-align: center;
     }
 
-    .filter-group {
+    .filter-group, .message-group {
       margin-bottom: 20px;
     }
 
@@ -29,14 +29,14 @@
     select, textarea, input[type="password"] {
       width: 100%;
       padding: 10px;
+      font-size: 1em;
       border-radius: 8px;
       border: 1px solid #ccc;
-      margin-top: 4px;
+      margin-top: 5px;
     }
 
     button {
       width: 100%;
-      margin-top: 20px;
       padding: 14px;
       background-color: #2ecc71;
       color: white;
@@ -44,10 +44,35 @@
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     button:hover {
       background-color: #27ae60;
+    }
+
+    #previewSection {
+      display: none;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 10px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    ul li {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    ul li:last-child {
+      border-bottom: none;
     }
   </style>
 </head>
@@ -58,21 +83,16 @@
   <div class="filter-group">
     <label>יום</label>
     <select multiple id="day">
-      <option>ראשון</option>
-      <option>שני</option>
-      <option>שלישי</option>
-      <option>רביעי</option>
-      <option>חמישי</option>
+      <option>ראשון</option><option>שני</option><option>שלישי</option>
+      <option>רביעי</option><option>חמישי</option>
     </select>
   </div>
 
   <div class="filter-group">
     <label>מקצוע</label>
     <select multiple id="subject">
-      <option>מתמטיקה</option>
-      <option>אנגלית</option>
-      <option>פיסיקה</option>
-      <option>דקדוק</option>
+      <option>מתמטיקה</option><option>אנגלית</option>
+      <option>פיסיקה</option><option>דקדוק</option>
     </select>
   </div>
 
@@ -89,17 +109,14 @@
   <div class="filter-group">
     <label>מורה</label>
     <select multiple id="teacher">
-      <option>שי שמחוני</option>
-      <option>חן בראונשטיין</option>
-      <option>רפאל</option>
+      <option>שי שמחוני</option><option>חן בראונשטיין</option><option>רפאל</option>
     </select>
   </div>
 
   <div class="filter-group">
     <label>סטטוס</label>
     <select multiple id="status">
-      <option>מנוי פעיל</option>
-      <option>מנוי לא פעיל</option>
+      <option>מנוי פעיל</option><option>מנוי לא פעיל</option>
     </select>
   </div>
 
@@ -112,47 +129,91 @@
     </select>
   </div>
 
-  <div class="filter-group">
-    <label>הודעה לשליחה</label>
-    <textarea id="message" rows="4"></textarea>
-  </div>
+  <button onclick="previewList()">תצוגה מקדימה</button>
 
-  <div class="filter-group">
-    <label>סיסמה</label>
-    <input type="password" id="password" />
-  </div>
+  <div id="previewSection">
+    <h2>תצוגה מקדימה של נמענים</h2>
+    <ul id="previewList"></ul>
 
-  <button onclick="sendData()">שלח הודעה</button>
+    <div class="message-group">
+      <label>הודעה לשליחה</label>
+      <textarea id="message" rows="4"></textarea>
+
+      <label>סיסמה</label>
+      <input type="password" id="password" />
+    </div>
+
+    <button onclick="sendData()">שלח הודעה</button>
+  </div>
 
   <script>
-    const WEBHOOK_URL = "https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec";
     const PASSWORD = "Admin1948";
 
     function getSelectedValues(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(opt => opt.value).join(",");
+      return Array.from(document.getElementById(id).selectedOptions).map(option => option.value);
+    }
+
+    function previewList() {
+      const filters = {
+        "Day": getSelectedValues("day"),
+        "Subject": getSelectedValues("subject"),
+        "Grade": getSelectedValues("grade"),
+        "Teacher": getSelectedValues("teacher"),
+        "Status": getSelectedValues("status"),
+        "Subscription Type": getSelectedValues("subtype")
+      };
+
+      fetch(WEBHOOK_URL + "?preview=yes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(filters)
+      })
+      .then(response => response.json())
+      .then(data => {
+        const list = document.getElementById("previewList");
+        list.innerHTML = '';
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item.name + " - " + item.phone;
+          list.appendChild(li);
+        });
+        document.getElementById("previewSection").style.display = "block";
+      })
+      .catch(() => alert("שגיאה בקבלת תצוגה מקדימה."));
     }
 
     function sendData() {
-      const password = document.getElementById("password").value.trim();
-      const message = document.getElementById("message").value.trim();
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message").value;
 
       if (password !== PASSWORD) {
         alert("סיסמה שגויה");
         return;
       }
 
-      const params = new URLSearchParams({
-        day: getSelectedValues("day"),
-        subject: getSelectedValues("subject"),
-        grade: getSelectedValues("grade"),
-        teacher: getSelectedValues("teacher"),
-        status: getSelectedValues("status"),
-        subtype: getSelectedValues("subtype"),
+      const filters = {
+        "Day": getSelectedValues("day"),
+        "Subject": getSelectedValues("subject"),
+        "Grade": getSelectedValues("grade"),
+        "Teacher": getSelectedValues("teacher"),
+        "Status": getSelectedValues("status"),
+        "Subscription Type": getSelectedValues("subtype")
+      };
+
+      const payload = {
+        filters: filters,
         message: message,
         password: password
-      });
+      };
 
-      fetch(WEBHOOK_URL + "?" + params.toString());
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
 
       alert("ההודעה נשלחת...");
     }

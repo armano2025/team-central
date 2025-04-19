@@ -6,18 +6,15 @@
   <title>מערכת דיוור חכמה</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #e0f7fa, #e0f2f1);
-      color: #333;
+      font-family: Arial, sans-serif;
       direction: rtl;
       padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      background-color: #eef4f8;
     }
 
     h1 {
       text-align: center;
-      color: #00695c;
+      color: #2c3e50;
     }
 
     .filter-group {
@@ -28,44 +25,31 @@
       font-weight: bold;
       display: block;
       margin-bottom: 6px;
-      color: #004d40;
     }
 
     select, textarea, input[type="password"] {
       width: 100%;
       padding: 10px;
-      border: 1px solid #bbb;
-      border-radius: 10px;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-
-    select {
-      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      margin-top: 5px;
     }
 
     button {
       width: 100%;
-      padding: 14px;
       margin-top: 20px;
-      background-color: #26a69a;
+      padding: 14px;
+      background-color: #3498db;
       color: white;
-      font-size: 16px;
       border: none;
-      border-radius: 10px;
+      font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #00796b;
-    }
-
-    .form-section {
-      background: #ffffffcc;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #2980b9;
     }
   </style>
 </head>
@@ -73,114 +57,102 @@
 
   <h1>מערכת דיוור חכמה</h1>
 
-  <div class="form-section">
-
-    <div class="filter-group">
-      <label>יום</label>
-      <select multiple id="day">
-        <option>ראשון</option>
-        <option>שני</option>
-        <option>שלישי</option>
-        <option>רביעי</option>
-        <option>חמישי</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>מקצוע</label>
-      <select multiple id="subject">
-        <option>מתמטיקה</option>
-        <option>אנגלית</option>
-        <option>פיסיקה</option>
-        <option>דקדוק</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>כיתה</label>
-      <select multiple id="grade">
-        <option>א</option><option>ב</option><option>ג</option><option>ד</option>
-        <option>ה</option><option>ו</option><option>ז</option><option>ח</option>
-        <option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
-        <option>חינוך ביתי</option><option>סטודנט</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>מורה</label>
-      <select multiple id="teacher">
-        <option>שי שמחוני</option>
-        <option>חן בראונשטיין</option>
-        <option>רפאל</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>סטטוס</label>
-      <select multiple id="status">
-        <option>מנוי פעיל</option>
-        <option>מנוי לא פעיל</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>סוג מנוי</label>
-      <select multiple id="subtype">
-        <option>על בסיס מקום פנוי</option>
-        <option>ביומן הקבוע</option>
-        <option>תלמיד שורש</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label>הודעה לשליחה</label>
-      <textarea id="message" rows="4" placeholder="הקלד את ההודעה כאן..."></textarea>
-    </div>
-
-    <div class="filter-group">
-      <label>סיסמה</label>
-      <input type="password" id="password" placeholder="הקלד סיסמה" />
-    </div>
-
-    <button onclick="sendData()">שלח הודעה</button>
-
+  <div class="filter-group">
+    <label>יום</label>
+    <select multiple id="day">
+      <option>ראשון</option><option>שני</option><option>שלישי</option>
+      <option>רביעי</option><option>חמישי</option>
+    </select>
   </div>
 
+  <div class="filter-group">
+    <label>מקצוע</label>
+    <select multiple id="subject">
+      <option>מתמטיקה</option><option>אנגלית</option>
+      <option>פיסיקה</option><option>דקדוק</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label>כיתה</label>
+    <select multiple id="grade">
+      <option>א</option><option>ב</option><option>ג</option><option>ד</option>
+      <option>ה</option><option>ו</option><option>ז</option><option>ח</option>
+      <option>ט</option><option>י</option><option>י״א</option><option>י״ב</option>
+      <option>חינוך ביתי</option><option>סטודנט</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label>מורה</label>
+    <select multiple id="teacher">
+      <option>חן בראונשטיין</option><option>שי שמחוני</option><option>רפאל</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label>סטטוס</label>
+    <select multiple id="status">
+      <option>מנוי פעיל</option><option>מנוי לא פעיל</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label>סוג מנוי</label>
+    <select multiple id="subtype">
+      <option>על בסיס מקום פנוי</option>
+      <option>ביומן הקבוע</option>
+      <option>תלמיד שורש</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label>הודעה לשליחה</label>
+    <textarea id="message" rows="5"></textarea>
+  </div>
+
+  <div class="filter-group">
+    <label>סיסמה</label>
+    <input type="password" id="password" />
+  </div>
+
+  <button onclick="sendData()">שלח הודעה</button>
+
   <script>
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec";
+    const WEBHOOK_URL = "https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho";
     const PASSWORD = "Admin1948";
 
     function getSelectedValues(id) {
-      return Array.from(document.getElementById(id).selectedOptions).map(opt => opt.value);
+      return Array.from(document.getElementById(id).selectedOptions).map(option => option.value);
     }
 
     function sendData() {
-      const pwd = document.getElementById("password").value;
-      if (pwd !== PASSWORD) {
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("message").value;
+
+      if (password !== PASSWORD) {
         alert("סיסמה שגויה");
         return;
       }
 
       const filters = {
-        "Day": getSelectedValues("day"),
-        "Subject": getSelectedValues("subject"),
-        "Grade": getSelectedValues("grade"),
-        "Teacher": getSelectedValues("teacher"),
-        "Status": getSelectedValues("status"),
-        "Subscription Type": getSelectedValues("subtype")
+        Day: getSelectedValues("day"),
+        Subject: getSelectedValues("subject"),
+        Grade: getSelectedValues("grade"),
+        Teacher: getSelectedValues("teacher"),
+        Status: getSelectedValues("status"),
+        SubscriptionType: getSelectedValues("subtype")
       };
 
       const payload = {
         filters: filters,
-        message: document.getElementById("message").value,
-        password: pwd
+        message: message,
+        password: password
       };
 
       fetch(WEBHOOK_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 

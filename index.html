@@ -38,6 +38,7 @@
   <div class="top-buttons">
     <a href="admin.html">ADMIN</a>
     <a href="teachers.html">צוות הוראה</a>
+    <button id="dark-toggle" aria-label="Toggle dark mode">🌙</button>
   </div>
 
   <!-- כותרת ראשית -->
@@ -88,10 +89,24 @@
     </section>
   </main>
 
-  <!-- החלפת all Feather icons -->
+  <!-- Dark Mode Toggle + Feather Icons init -->
   <script>
+    // dark mode toggle
+    const toggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    toggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark-mode');
+      if (document.documentElement.classList.contains('dark-mode')) {
+        localStorage.setItem('dark-mode', '1');
+      } else {
+        localStorage.removeItem('dark-mode');
+      }
+    });
+
+    // replace feather icons
     feather.replace({ width: 48, height: 48 });
   </script>
-
 </body>
 </html>

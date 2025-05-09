@@ -2,95 +2,111 @@
 <html lang="he">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>לוגים - שליחת הודעות</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>צוות בראונשטיין</title>
+  <link rel="apple-touch-icon" href="IMG_6982.png" />
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      direction: rtl;
-      padding: 40px 20px;
-      background-color: #f4f4f4;
-    }
-    h1 {
       text-align: center;
+      direction: rtl;
+      background-color: #f4f4f4;
+      padding: 40px 20px;
+    }
+
+    .top-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .top-buttons a {
+      background-color: #555;
+      color: white;
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 1em;
+      border-radius: 6px;
+      width: 120px;
+    }
+
+    img.logo {
+      max-width: 180px;
       margin-bottom: 30px;
     }
-    table {
-      width: 100%;
-      max-width: 1000px;
-      margin: auto;
-      border-collapse: collapse;
-      background-color: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 40px;
     }
-    th, td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: right;
-    }
-    th {
+
+    a.button {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 15px;
       background-color: #3498db;
       color: white;
+      text-align: center;
+      text-decoration: none;
+      font-size: 1.2em;
+      border-radius: 25px;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
     }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    .timestamp {
-      font-size: 0.9em;
-      color: #555;
-    }
-    .status-sent {
-      color: green;
-      font-weight: bold;
-    }
-    .status-failed {
-      color: red;
-      font-weight: bold;
+
+    a.button:hover {
+      background-color: #2980b9;
     }
   </style>
 </head>
 <body>
 
-<h1>לוגים - הודעות שנשלחו</h1>
+  <div class="top-buttons">
+    <a href="admin.html">ADMIN</a>
+    <a href="teachers.html">צוות הוראה</a>
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>תאריך</th>
-      <th>פרמטרים</th>
-      <th>הודעה</th>
-      <th>סטטוס</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>2025-04-17<br><span class="timestamp">13:42</span></td>
-      <td>
-        יום: ראשון, שלישי<br>
-        מקצוע: מתמטיקה<br>
-        מורה: שי<br>
-        כיתה: ו׳<br>
-        סטטוס: מנוי פעיל<br>
-        סוג מנוי: תלמיד שורש
-      </td>
-      <td>שלום לכולם! תזכורת לשיעור היום ב-16:00.</td>
-      <td class="status-sent">נשלח</td>
-    </tr>
-    <tr>
-      <td>2025-04-17<br><span class="timestamp">10:18</span></td>
-      <td>
-        יום: שני<br>
-        מקצוע: אנגלית<br>
-        מורה: דנה<br>
-        כיתה: ד׳, ה׳<br>
-        סטטוס: מנוי לא פעיל<br>
-        סוג מנוי: ביומן הקבוע
-      </td>
-      <td>השיעור של היום נדחה למחר. תודה על ההבנה!</td>
-      <td class="status-failed">נכשל</td>
-    </tr>
-  </tbody>
-</table>
+  <img src="IMG_9789.jpeg" alt="לוגו של בראונשטיין" class="logo" />
+  <h1>צוות בראונשטיין</h1>
+
+  <a class="button" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1">
+    הפקת חשבונית
+  </a>
+  <a class="button" href="https://forms.gle/tfSaC93dagWhVKr4A">
+    דיווח שעות עבודה
+  </a>
+  <a class="button" href="https://meaningfullearning.origami.ms/-/למידה-משמעותית/שיעורים---יומן">
+    לוח זמנים יומי
+  </a>
+  <a
+    class="button"
+    href="https://docs.google.com/spreadsheets/d/1oFctctf3pqHa-Bo46SWC9kiSTW1f7_QQOKEAiYD3RJk/edit?usp=drivesdk"
+    target="_blank"
+  >
+    יומן יומי מאי 2025
+  </a>
+  <a class="button" href="ai-tools.html">
+    כלי AI
+  </a>
+  <a
+    class="button"
+    href="https://us06web.zoom.us/j/9317318197?pwd=U0tmN2YvandxUk9BUFd4REF0VzhYdz09"
+    target="_blank"
+  >
+    זימון לשיעור זום
+  </a>
 
 </body>
 </html>

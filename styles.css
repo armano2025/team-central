@@ -32,7 +32,48 @@ body {
   text-align: center;
 }
 
-/* 4. תפריט עליון */
+/* 4. Hero Section */
+.hero {
+  background: linear-gradient(
+      135deg,
+      rgba(52,152,219,0.9),
+      rgba(46,204,113,0.9)
+    ),
+    url('images/hero-bg.jpg') center/cover no-repeat;
+  padding: calc(var(--spacing) * 2) var(--spacing);
+  border-radius: var(--border-radius);
+  margin-bottom: calc(var(--spacing) * 2);
+}
+.hero-content {
+  max-width: 600px;
+  margin: 0 auto;
+  color: var(--color-surface);
+}
+.hero h2 {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing);
+}
+.hero p {
+  font-size: 1.125rem;
+  margin-bottom: calc(var(--spacing) * 1.5);
+}
+.cta-button {
+  display: inline-block;
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 2);
+  background-color: var(--color-accent);
+  color: var(--color-surface);
+  text-decoration: none;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background-color 0.3s, transform 0.2s;
+}
+.cta-button:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-2px);
+}
+
+/* 5. תפריט עליון */
 .top-buttons {
   display: flex;
   justify-content: space-between;
@@ -48,13 +89,13 @@ body {
   width: 120px;
 }
 
-/* 5. כותרת ראשית */
+/* 6. כותרת ראשית */
 h1 {
   font-size: 2rem;
   margin-bottom: calc(var(--spacing) * 1.5);
 }
 
-/* 6. Grid של קלפים */
+/* 7. Grid של קלפים */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -62,7 +103,7 @@ h1 {
   padding-top: var(--spacing);
 }
 
-/* 7. עיצוב קלף */
+/* 8. עיצוב קלף */
 .card {
   background-color: var(--color-surface);
   border-radius: var(--border-radius);
@@ -80,14 +121,14 @@ h1 {
   box-shadow: 0 4px 16px rgba(0,0,0,0.16);
 }
 
-/* 8. אייקון בתוך הקלף */
+/* 9. אייקון בתוך הקלף */
 .card img {
   width: 48px;
   height: 48px;
   margin-bottom: calc(var(--spacing) / 2);
 }
 
-/* 9. טקסט הקלף */
+/* 10. טקסט הקלף */
 .card h3 {
   font-size: 1.1rem;
   margin: 0;

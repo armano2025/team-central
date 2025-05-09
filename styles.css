@@ -38,8 +38,11 @@ body {
       135deg,
       rgba(52,152,219,0.9),
       rgba(46,204,113,0.9)
-    ),
-    url('images/hero-bg.jpg') center/cover no-repeat;
+    );
+  /* אם יש לכם תמונת רקע, ניתן לשלב:
+     background: linear-gradient(…),
+                 url('images/hero-bg.jpg') center/cover no-repeat;
+  */
   padding: calc(var(--spacing) * 2) var(--spacing);
   border-radius: var(--border-radius);
   margin-bottom: calc(var(--spacing) * 2);
@@ -122,9 +125,9 @@ h1 {
 }
 
 /* 9. אייקון בתוך הקלף */
-.card img {
-  width: 48px;
-  height: 48px;
+.card i {
+  stroke: var(--color-primary);
+  stroke-width: 2px;
   margin-bottom: calc(var(--spacing) / 2);
 }
 

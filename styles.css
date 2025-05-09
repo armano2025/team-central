@@ -13,14 +13,24 @@
   --border-radius: 12px;
 }
 
-/* 2. אפס ברירות מחדל */
+/* 2. מצב חשוך */
+html.dark-mode {
+  --color-bg: #2c3e50;
+  --color-surface: #34495e;
+  --color-text: #ecf0f1;
+  --color-primary: #1abc9c;
+  --color-secondary: #16a085;
+  --color-accent: #e67e22;
+}
+
+/* 3. אפס ברירות מחדל */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* 3. גוף הדף */
+/* 4. גוף הדף */
 body {
   font-family: var(--font-base);
   font-size: var(--font-size-base);
@@ -32,17 +42,13 @@ body {
   text-align: center;
 }
 
-/* 4. Hero Section */
+/* 5. Hero Section */
 .hero {
   background: linear-gradient(
       135deg,
       rgba(52,152,219,0.9),
       rgba(46,204,113,0.9)
     );
-  /* אם יש לכם תמונת רקע, ניתן לשלב:
-     background: linear-gradient(…),
-                 url('images/hero-bg.jpg') center/cover no-repeat;
-  */
   padding: calc(var(--spacing) * 2) var(--spacing);
   border-radius: var(--border-radius);
   margin-bottom: calc(var(--spacing) * 2);
@@ -76,29 +82,42 @@ body {
   transform: translateY(-2px);
 }
 
-/* 5. תפריט עליון */
+/* 6. תפריט עליון */
 .top-buttons {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: var(--spacing);
 }
-.top-buttons a {
+.top-buttons a,
+#dark-toggle {
   background-color: #555;
   color: #fff;
   padding: calc(var(--spacing)/2) var(--spacing);
   text-decoration: none;
   font-weight: 500;
   border-radius: var(--border-radius);
-  width: 120px;
+  cursor: pointer;
+}
+#dark-toggle {
+  background: transparent;
+  font-size: 1.25rem;
+  color: var(--color-text);
+  border: none;
+  margin-left: var(--spacing);
+  transition: color 0.3s;
+}
+#dark-toggle:hover {
+  color: var(--color-primary);
 }
 
-/* 6. כותרת ראשית */
+/* 7. כותרת ראשית */
 h1 {
   font-size: 2rem;
   margin-bottom: calc(var(--spacing) * 1.5);
 }
 
-/* 7. Grid של קלפים */
+/* 8. Grid של קלפים */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -106,7 +125,7 @@ h1 {
   padding-top: var(--spacing);
 }
 
-/* 8. עיצוב קלף */
+/* 9. עיצוב קלף */
 .card {
   background-color: var(--color-surface);
   border-radius: var(--border-radius);
@@ -124,14 +143,13 @@ h1 {
   box-shadow: 0 4px 16px rgba(0,0,0,0.16);
 }
 
-/* 9. אייקון בתוך הקלף */
+/* 10. אייקון בתוך הקלף */
 .card i {
-  stroke: var(--color-primary);
-  stroke-width: 2px;
+  color: var(--color-primary);
   margin-bottom: calc(var(--spacing) / 2);
 }
 
-/* 10. טקסט הקלף */
+/* 11. טקסט הקלף */
 .card h3 {
   font-size: 1.1rem;
   margin: 0;

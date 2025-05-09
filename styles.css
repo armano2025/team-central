@@ -1,32 +1,26 @@
 /* 1. משתני צבעים, מרווחים וגופנים */
 :root {
-  /* צבעי מותג ראשיים */
-  --color-primary: #3498db;      /* כחול עיקרי */
-  --color-secondary: #2ecc71;    /* ירוק משני */
-  --color-accent: #e67e22;       /* כתום אקצנט */
-  
-  /* צבעי רקע וטקסט */
-  --color-bg: #f4f4f4;           /* רקע כללי */
-  --color-surface: #ffffff;      /* קלפים וכפתורים */
-  --color-text: #2c3e50;         /* טקסט ראשי */
-  
-  /* טיפוגרפיה */
+  --color-primary: #3498db;
+  --color-secondary: #2ecc71;
+  --color-accent: #e67e22;
+  --color-bg: #f4f4f4;
+  --color-surface: #ffffff;
+  --color-text: #2c3e50;
   --font-base: 'Rubik', sans-serif;
-  --font-size-base: 1rem;        /* 16px */
+  --font-size-base: 1rem;
   --line-height-base: 1.6;
-  
-  /* מרווחים ועיצוב כללי */
-  --spacing: 16px;               /* מרווח סטנדרטי */
-  --border-radius: 12px;         /* פינות מעוגלות */
+  --spacing: 16px;
+  --border-radius: 12px;
 }
 
-/* 2. אפס את ברירת המחדל ויישום בסיס */
+/* 2. אפס ברירות מחדל */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* 3. גוף הדף */
 body {
   font-family: var(--font-base);
   font-size: var(--font-size-base);
@@ -34,27 +28,69 @@ body {
   color: var(--color-text);
   background-color: var(--color-bg);
   padding: var(--spacing);
-  text-align: center;
   direction: rtl;
+  text-align: center;
 }
 
-/* 3. סגנון כללי לכפתורים (עודכן לשימוש במשתנים) */
-a.button {
-  display: block;
-  width: 90%;
-  max-width: 300px;
-  margin: var(--spacing) auto;
-  padding: calc(var(--spacing) * 1.25);
-  background-color: var(--color-primary);
-  color: var(--color-surface);
+/* 4. תפריט עליון */
+.top-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing);
+}
+.top-buttons a {
+  background-color: #555;
+  color: #fff;
+  padding: calc(var(--spacing)/2) var(--spacing);
   text-decoration: none;
-  font-size: 1.1rem;
+  font-weight: 500;
   border-radius: var(--border-radius);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: background-color 0.3s, transform 0.2s;
+  width: 120px;
 }
 
-a.button:hover {
-  background-color: var(--color-secondary);
-  transform: translateY(-2px);
+/* 5. כותרת ראשית */
+h1 {
+  font-size: 2rem;
+  margin-bottom: calc(var(--spacing) * 1.5);
+}
+
+/* 6. Grid של קלפים */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing);
+  padding-top: var(--spacing);
+}
+
+/* 7. עיצוב קלף */
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: var(--spacing);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.16);
+}
+
+/* 8. אייקון בתוך הקלף */
+.card img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: calc(var(--spacing) / 2);
+}
+
+/* 9. טקסט הקלף */
+.card h3 {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+  text-align: center;
 }

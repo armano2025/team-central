@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>צוות בראונשטיין</title>
 
   <!-- Google Fonts -->
@@ -13,6 +13,9 @@
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- Feather Icons CDN -->
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
 <body>
 
@@ -44,24 +47,18 @@
   <main>
     <section class="cards-grid">
 
-      <a
-        class="card"
-        href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1"
-      >
-        <img src="icons/invoice.svg" alt="חשבונית" />
+      <a class="card" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1">
+        <i data-feather="file-text"></i>
         <h3>הפקת חשבונית</h3>
       </a>
 
       <a class="card" href="https://forms.gle/tfSaC93dagWhVKr4A">
-        <img src="icons/hours.svg" alt="דיווח שעות" />
+        <i data-feather="clock"></i>
         <h3>דיווח שעות עבודה</h3>
       </a>
 
-      <a
-        class="card"
-        href="https://meaningfullearning.origami.ms/-/למידה-משמעותית/שיעורים---יומן"
-      >
-        <img src="icons/schedule.svg" alt="לוח זמנים" />
+      <a class="card" href="https://meaningfullearning.origami.ms/-/למידה-משמעותית/שיעורים---יומן">
+        <i data-feather="calendar"></i>
         <h3>לוח זמנים יומי</h3>
       </a>
 
@@ -70,12 +67,12 @@
         href="https://docs.google.com/spreadsheets/d/1oFctctf3pqHa-Bo46SWC9kiSTW1f7_QQOKEAiYD3RJk/edit?usp=drivesdk"
         target="_blank"
       >
-        <img src="icons/journal.svg" alt="יומן יומי" />
+        <i data-feather="book-open"></i>
         <h3>יומן יומי מאי 2025</h3>
       </a>
 
       <a class="card" href="ai-tools.html">
-        <img src="icons/ai.svg" alt="כלי AI" />
+        <i data-feather="cpu"></i>
         <h3>כלי AI</h3>
       </a>
 
@@ -84,12 +81,17 @@
         href="https://us06web.zoom.us/j/9317318197?pwd=U0tmN2YvandxUk9BUFd4REF0VzhYdz09"
         target="_blank"
       >
-        <img src="icons/zoom.svg" alt="זום" />
+        <i data-feather="video"></i>
         <h3>זימון לשיעור זום</h3>
       </a>
 
     </section>
   </main>
+
+  <!-- החלפת all Feather icons -->
+  <script>
+    feather.replace({ width: 48, height: 48 });
+  </script>
 
 </body>
 </html>

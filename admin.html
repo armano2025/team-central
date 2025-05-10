@@ -4,29 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>צוות בראונשטיין – ADMIN</title>
-  <meta name="description" content="עמוד ADMIN – ניהול תשלומים, דיווח חכמה, יומן יומי ועוד." />
+  <meta name="description" content="עמוד ADMIN – ניהול כרטיס תלמיד, תשלומים ודו"חות חכמים." />
   <link rel="canonical" href="https://brawnshtein-team.web.app/admin.html" />
 
-  <!-- Open Graph -->
+  <!-- Open Graph / Twitter -->
   <meta property="og:title" content="צוות בראונשטיין – ADMIN" />
-  <meta property="og:description" content="עמוד ADMIN – ניהול תשלומים, דיווח חכמה, יומן יומי ועוד." />
+  <meta property="og:description" content="היכנסו לכרטיס תלמיד, ניהול תשלומים ודיווחים חכמים." />
   <meta property="og:image" content="icons/apple-touch-icon.png" />
   <meta property="og:url" content="https://brawnshtein-team.web.app/admin.html" />
   <meta property="og:type" content="website" />
-
-  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
 
   <!-- Main CSS -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Favicons & App Icons -->
+  <!-- Favicons & PWA -->
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png" />
   <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
@@ -36,11 +31,25 @@
   <link rel="manifest" href="icons/site.webmanifest" />
   <meta name="theme-color" content="#3498db" />
 
-  <!-- Feather Icons CDN -->
+  <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
 </head>
-
 <body>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>כרטיס תלמיד</h2>
+      <p>פתחו את כרטיס התלמיד שלכם בקליק אחד!</p>
+      <a
+        class="cta-button"
+        href="https://docs.google.com/spreadsheets/d/127H_AdcrUUhy6uRYc586z8FZSMnwt496jih9dHJ6tuM/edit?usp=drivesdk"
+        target="_blank"
+      >
+        כרטיס תלמיד
+      </a>
+    </div>
+  </header>
 
   <!-- App Header & Navigation -->
   <header class="app-header">
@@ -55,6 +64,12 @@
       <button id="dark-toggle" aria-label="Toggle dark mode">🌙</button>
     </nav>
   </header>
+
+  <!-- Navigation Arrows -->
+  <div class="nav-arrows">
+    <a href="index.html" title="דף ראשי"><i data-feather="arrow-right"></i></a>
+    <a href="teachers.html" title="צוות הוראה"><i data-feather="arrow-left"></i></a>
+  </div>
 
   <!-- Main Admin Cards -->
   <main>
@@ -90,6 +105,7 @@
 
   <!-- Scripts: Feather Icons, Dark‐mode, Share API -->
   <script>
+    // Feather icons
     feather.replace({ width: 48, height: 48 });
 
     // Dark mode toggle
@@ -98,21 +114,18 @@
       document.documentElement.classList.add('dark-mode');
     }
     darkToggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark-mode');
-      if (document.documentElement.classList.contains('dark-mode')) {
-        localStorage.setItem('dark-mode', '1');
-      } else {
-        localStorage.removeItem('dark-mode');
-      }
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
     });
 
     // Share API
-    const shareButton = document.getElementById('share-button');
-    shareButton.addEventListener('click', () => {
+    document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
           title: 'צוות בראונשטיין',
-          text: 'עקבו אחרי ניהול התשלומים וכלי הניהול שלנו!',
+          text: 'עקבו אחרי ניהול הכרטיס תלמיד וכלי הניהול שלנו!',
           url: location.href
         }).catch(console.error);
       } else {

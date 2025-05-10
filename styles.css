@@ -137,15 +137,16 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 4px 10px;               /* קומפקטי יותר */
+  font-size: 0.875rem;             /* גופן קטן יותר */
   background-color: var(--color-primary);
   color: var(--color-surface);
   text-decoration: none;
-  font-size: 0.9rem;
   border: none;
-  border-radius: var(--border-radius);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  transition: background-color 0.2s, transform 0.1s;
+  border-radius: 8px;              /* עיגול עדין יותר */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* צל עדין */
+  transition: background-color 0.2s;
+  min-width: auto;
 }
 .app-header .top-buttons a i,
 .app-header .top-buttons button i {
@@ -156,23 +157,30 @@ h1 {
 .app-header .top-buttons a:hover,
 .app-header .top-buttons button:hover {
   background-color: var(--color-secondary);
-  transform: translateY(-2px);
+  transform: none;                 /* ללא קפיצה */
 }
-/* כפתורי אייקון (dark/share) – רק אייקון ללא רקע */
-.app-header .top-buttons button#dark-toggle,
-.app-header .top-buttons button#share-button {
+
+/* כפתורי שיתוף ו-dark-mode קטנים */
+.app-header .top-buttons button#share-button,
+.app-header .top-buttons button#dark-toggle {
   background: transparent;
   box-shadow: none;
   color: var(--color-text);
-  padding: 6px;
+  padding: 4px;
+  margin: 0 2px;
 }
-.app-header .top-buttons button#dark-toggle:hover,
-.app-header .top-buttons button#share-button:hover {
+.app-header .top-buttons button#share-button i,
+.app-header .top-buttons button#dark-toggle i {
+  width: 16px;
+  height: 16px;
+}
+.app-header .top-buttons button#share-button:hover,
+.app-header .top-buttons button#dark-toggle:hover {
   background: rgba(0,0,0,0.05);
   transform: none;
 }
 
-/* 10. ניווט בין דפים (חץ ימינה וחץ שמאלה) */
+/* 10. ניווט בין דפים (חץ ימינה ושמאלה) */
 .nav-arrows {
   display: flex;
   justify-content: space-between;
@@ -182,22 +190,23 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   background-color: var(--color-surface);
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-decoration: none;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: background-color 0.2s;
+  padding: 0;
 }
 .nav-arrows a i {
   stroke: var(--color-primary);
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
 }
 .nav-arrows a:hover {
-  background-color: var(--color-secondary);
-  transform: translateY(-2px);
+  background-color: rgba(0,0,0,0.05);
+  transform: none;
 }
 
 /* 11. Button “בית” ו-“צוות הוראה” במקומות אחרים */

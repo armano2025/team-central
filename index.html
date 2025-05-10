@@ -4,18 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>צוות בראונשטיין</title>
-  <meta name="description" content="צוות בראונשטיין – ניהול לוח שיעורים יומי, דיווח שעות, הפקת חשבוניות, וכלי AI.">
-  <link rel="canonical" href="https://brawnshtein-team.web.app/index.html">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="צוות בראונשטיין" />
-  <meta property="og:description" content="בדקו את לוח השיעורים היומי והשתמשו בכלי הניהול שלנו!" />
-  <meta property="og:image" content="icons/apple-touch-icon.png" />
-  <meta property="og:url" content="https://brawnshtein-team.web.app" />
-  <meta property="og:type" content="website" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
 
   <!-- Google Fonts -->
   <link
@@ -27,88 +15,119 @@
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Favicons & App Icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png" />
-  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
-  <link rel="shortcut icon" href="icons/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/web-app-manifest-192x192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/web-app-manifest-512x512.png" />
-  <link rel="manifest" href="icons/site.webmanifest" />
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="icons/apple-touch-icon.png"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="96x96"
+    href="icons/favicon-96x96.png"
+  />
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="icons/favicon.svg"
+  />
+  <link
+    rel="shortcut icon"
+    href="icons/favicon.ico"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="icons/web-app-manifest-192x192.png"
+  />
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="512x512"
+    href="icons/web-app-manifest-512x512.png"
+  />
+  <link
+    rel="manifest"
+    href="icons/site.webmanifest"
+  />
   <meta name="theme-color" content="#3498db" />
 
   <!-- Feather Icons CDN -->
   <script src="https://unpkg.com/feather-icons"></script>
 </head>
-
 <body>
 
-  <!-- App Header & Navigation -->
-  <header class="app-header">
-    <div class="icon-wrapper">
-      <img src="icons/apple-touch-icon.png" alt="לוגו בראונשטיין" />
-    </div>
-    <h1>צוות בראונשטיין</h1>
-    <nav class="top-buttons">
-      <a href="index.html"><i data-feather="home"></i><span>בית</span></a>
-      <button id="share-button"><i data-feather="share-2"></i><span>שתף</span></button>
-      <a href="admin.html"><i data-feather="lock"></i><span>ADMIN</span></a>
-      <a href="teachers.html"><i data-feather="users"></i><span>צוות הוראה</span></a>
-      <button id="dark-toggle" aria-label="Toggle dark mode">🌙</button>
-    </nav>
-  </header>
-
   <!-- Hero Section -->
-  <section class="hero">
+  <header class="hero">
     <div class="hero-content">
       <h2>יומן השיעורים היומי</h2>
       <p>בדוק את לוח הזמנים שלך בקליק אחד!</p>
-      <a class="cta-button" href="schedule.html">
+      <a
+        class="cta-button"
+        href="https://docs.google.com/spreadsheets/d/1oFctctf3pqHa-Bo46SWC9kiSTW1f7_QQOKEAiYD3RJk/edit?usp=drivesdk"
+        target="_blank"
+      >
         פתח את היומן
       </a>
     </div>
-  </section>
+  </header>
 
-  <!-- Main Cards Navigation -->
+  <!-- ניווט עליון -->
+  <div class="top-buttons">
+    <a href="admin.html">ADMIN</a>
+    <a href="teachers.html">צוות הוראה</a>
+    <button id="dark-toggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+
+  <!-- כותרת ראשית -->
+  <h1>צוות בראונשטיין</h1>
+
+  <!-- קלפי ניווט -->
   <main>
     <section class="cards-grid">
-      <a class="card" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1" target="_blank">
+
+      <a class="card" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1">
         <i data-feather="file-text"></i>
         <h3>הפקת חשבונית</h3>
       </a>
-      <a class="card" href="https://forms.gle/tfSaC93dagWhVKr4A" target="_blank">
+
+      <a class="card" href="https://forms.gle/tfSaC93dagWhVKr4A">
         <i data-feather="clock"></i>
         <h3>דיווח שעות עבודה</h3>
       </a>
+
       <a class="card" href="schedule.html">
         <i data-feather="calendar"></i>
         <h3>לוח זמנים יומי</h3>
       </a>
+
       <a class="card" href="https://docs.google.com/spreadsheets/d/1oFctctf3pqHa-Bo46SWC9kiSTW1f7_QQOKEAiYD3RJk/edit?usp=drivesdk" target="_blank">
         <i data-feather="book-open"></i>
         <h3>יומן יומי מאי 2025</h3>
       </a>
+
       <a class="card" href="ai-tools.html">
         <i data-feather="cpu"></i>
         <h3>כלי AI</h3>
       </a>
+
       <a class="card" href="https://us06web.zoom.us/j/9317318197?pwd=U0tmN2YvandxUk9BUFd4REF0VzhYdz09" target="_blank">
         <i data-feather="video"></i>
         <h3>זימון לשיעור זום</h3>
       </a>
+
     </section>
   </main>
 
-  <!-- Scripts: Dark Mode, Share & Feather Icons -->
+  <!-- Dark Mode Toggle + Feather Icons init -->
   <script>
-    // replace Feather icons
-    feather.replace({ width: 48, height: 48 });
-
-    // Dark mode toggle
-    const darkToggle = document.getElementById('dark-toggle');
+    // dark mode toggle
+    const toggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
-    darkToggle.addEventListener('click', () => {
+    toggle.addEventListener('click', () => {
       document.documentElement.classList.toggle('dark-mode');
       if (document.documentElement.classList.contains('dark-mode')) {
         localStorage.setItem('dark-mode', '1');
@@ -117,20 +136,8 @@
       }
     });
 
-    // Share API
-    const shareButton = document.getElementById('share-button');
-    shareButton.addEventListener('click', () => {
-      if (navigator.share) {
-        navigator.share({
-          title: 'צוות בראונשטיין',
-          text: 'בדקו את לוח השיעורים היומי וכלי הניהול שלנו!',
-          url: location.href
-        }).catch(console.error);
-      } else {
-        alert('שיתוף אינו נתמך בדפדפן זה. נא העתיקו את הכתובת.');
-      }
-    });
+    // replace feather icons
+    feather.replace({ width: 48, height: 48 });
   </script>
-
 </body>
 </html>

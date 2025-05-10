@@ -1,1 +1,138 @@
-5d4a1a215d5c61d3d5e6c48f9927879db3a3b6b2
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>צוות בראונשטיין – ADMIN</title>
+  <meta name="description" content="עמוד ADMIN – ניהול כרטיס תלמיד, תשלומים ודו"חות חכמים." />
+  <link rel="canonical" href="https://brawnshtein-team.web.app/admin.html" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="צוות בראונשטיין – ADMIN" />
+  <meta property="og:description" content="היכנסו לכרטיס תלמיד, ניהול תשלומים ודיווחים חכמים." />
+  <meta property="og:image" content="icons/apple-touch-icon.png" />
+  <meta property="og:url" content="https://brawnshtein-team.web.app/admin.html" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Favicons & PWA -->
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png" />
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+  <link rel="shortcut icon" href="icons/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/web-app-manifest-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/web-app-manifest-512x512.png" />
+  <link rel="manifest" href="icons/site.webmanifest" />
+  <meta name="theme-color" content="#3498db" />
+
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>כרטיס תלמיד</h2>
+      <p>פתחו את כרטיס התלמיד שלכם בקליק אחד!</p>
+      <a
+        class="cta-button"
+        href="https://docs.google.com/spreadsheets/d/127H_AdcrUUhy6uRYc586z8FZSMnwt496jih9dHJ6tuM/edit?usp=drivesdk"
+        target="_blank"
+      >
+        כרטיס תלמיד
+      </a>
+    </div>
+  </header>
+
+  <!-- App Header & Navigation -->
+  <header class="app-header">
+    <div class="icon-wrapper">
+      <img src="icons/apple-touch-icon.png" alt="לוגו בראונשטיין" />
+    </div>
+    <h1>ADMIN</h1>
+    <nav class="top-buttons">
+      <a href="index.html"><i data-feather="home"></i><span>בית</span></a>
+      <button id="share-button"><i data-feather="share-2"></i><span>שתף</span></button>
+      <a href="teachers.html"><i data-feather="users"></i><span>צוות הוראה</span></a>
+      <button id="dark-toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <!-- Navigation Arrows -->
+  <div class="nav-arrows">
+    <a href="index.html" title="דף ראשי"><i data-feather="arrow-right"></i></a>
+    <a href="teachers.html" title="צוות הוראה"><i data-feather="arrow-left"></i></a>
+  </div>
+
+  <!-- Main Admin Cards -->
+  <main>
+    <section class="cards-grid">
+
+      <a class="card" href="payment-links.html">
+        <i data-feather="credit-card"></i>
+        <h3>לינקים לתשלומים</h3>
+      </a>
+
+      <a class="card" href="registration-topup.html">
+        <i data-feather="edit"></i>
+        <h3>טופס רישום</h3>
+      </a>
+
+      <a class="card" href="journal-april-2025.html">
+        <i data-feather="calendar"></i>
+        <h3>יומן יומי אפריל 2025</h3>
+      </a>
+
+      <a class="card" href="smart-report.html">
+        <i data-feather="bar-chart-2"></i>
+        <h3>מערכת דיווח חכמה</h3>
+      </a>
+
+      <a class="card" href="logout.html">
+        <i data-feather="log-out"></i>
+        <h3>התנתקות</h3>
+      </a>
+
+    </section>
+  </main>
+
+  <!-- Scripts: Feather Icons, Dark‐mode, Share API -->
+  <script>
+    // Feather icons
+    feather.replace({ width: 48, height: 48 });
+
+    // Dark mode toggle
+    const darkToggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    darkToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
+    });
+
+    // Share API
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'צוות בראונשטיין',
+          text: 'עקבו אחרי ניהול הכרטיס תלמיד וכלי הניהול שלנו!',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה. נא העתיקו את הכתובת.');
+      }
+    });
+  </script>
+
+</body>
+</html>

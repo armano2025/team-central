@@ -234,3 +234,83 @@ h1 {
   height: auto;
   display: block;
 }
+
+/* ——————————————————————————————————————————————
+   Header Actions: Home / Hamburger / Dark-Mode
+   —————————————————————————————————————————————— */
+.header-actions {
+  position: absolute;
+  top: var(--spacing);
+  right: var(--spacing);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+}
+
+/* Home קטנטן */
+.home-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-text);
+}
+.home-icon i {
+  stroke: var(--color-text);
+  width: 20px;
+  height: 20px;
+}
+
+/* המבורגר לתפריט */
+.menu-toggle {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 20px;
+  height: 16px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.menu-toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-text);
+}
+
+/* תפריט נפתח */
+.dropdown-menu {
+  position: absolute;
+  top: calc(var(--spacing) + 24px);
+  right: var(--spacing);
+  background-color: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: var(--border-radius);
+  display: none;
+  flex-direction: column;
+  padding: var(--spacing) 0;
+}
+.dropdown-menu.open {
+  display: flex;
+}
+
+/* פריטי התפריט */
+.dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px var(--spacing);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+.dropdown-menu button:hover {
+  background-color: var(--color-bg);
+}

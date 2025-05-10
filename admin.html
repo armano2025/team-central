@@ -17,6 +17,7 @@
   <link rel="manifest" href="icons/site.webmanifest" />
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
+
   <style>
     .menu-toggle {
       background: none;
@@ -106,14 +107,14 @@
         <h3>יומן יומי אפריל 2025</h3>
       </a>
 
-      <a class="card" href="smart-report.html">
-        <i data-feather="bar-chart-2"></i>
-        <h3>מערכת דיווח חכמה</h3>
+      <a class="card" href="https://docs.google.com/forms/d/e/1FAIpQLSdc_sc-6SS94v5G2BfybRu0e2JZEN8ZqHfN00KVFl9mg2IO_g/viewform" target="_blank">
+        <i data-feather="file-text"></i>
+        <h3>תקנון בראונשטיין</h3>
       </a>
 
-      <a class="card" href="logout.html">
-        <i data-feather="log-out"></i>
-        <h3>התנתקות</h3>
+      <a class="card" href="https://docs.google.com/spreadsheets/d/1qZ_WObPt32JhTtk-1kOOthpl1tMXY8V0dAdjhYHQKVI/edit?gid=1316826418" target="_blank">
+        <i data-feather="calendar"></i>
+        <h3>יומנים קבועים</h3>
       </a>
 
     </section>
@@ -128,7 +129,6 @@
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
-    // מצב כהה
     const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
@@ -140,7 +140,6 @@
         : localStorage.removeItem('dark-mode');
     });
 
-    // כפתור שיתוף
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({

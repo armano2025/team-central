@@ -18,41 +18,72 @@
   <!-- Main CSS -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Favicons & App Icons -->
-  <link
-    rel="apple-touch-icon"
-    sizes="180x180"
-    href="icons/apple-touch-icon.png"
-  />
-  <link
-    rel="icon"
-    type="image/png"
-    sizes="96x96"
-    href="icons/favicon-96x96.png"
-  />
-  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
-  <link rel="shortcut icon" href="icons/favicon.ico" />
-  <link
-    rel="icon"
-    type="image/png"
-    sizes="192x192"
-    href="icons/web-app-manifest-192x192.png"
-  />
-  <link
-    rel="icon"
-    type="image/png"
-    sizes="512x512"
-    href="icons/web-app-manifest-512x512.png"
-  />
+  <!-- Favicons -->
   <link rel="manifest" href="icons/site.webmanifest" />
   <meta name="theme-color" content="#3498db" />
-
-  <!-- Feather Icons CDN -->
   <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    .menu-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      width: 160px;
+    }
+
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: right;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .top-right-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Hero Section -->
+  <!-- תפריט עליון -->
+  <div class="top-right-controls">
+    <div class="top-buttons">
+      <a href="admin.html">ADMIN</a>
+      <a href="teachers.html">צוות הוראה</a>
+    </div>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+    </div>
+  </div>
+
+  <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
       <h2>יומן השיעורים היומי</h2>
@@ -67,21 +98,10 @@
     </div>
   </header>
 
-  <!-- Top Navigation -->
-  <header class="app-header">
-    <div class="top-buttons">
-      <a href="admin.html">ADMIN</a>
-      <a href="teachers.html">צוות הוראה</a>
-      <button id="dark-toggle" aria-label="Toggle dark mode">
-        <i data-feather="moon"></i>
-      </button>
-    </div>
-  </header>
-
-  <!-- Main Title -->
+  <!-- כותרת ראשית -->
   <h1>צוות בראונשטיין</h1>
 
-  <!-- Cards Grid -->
+  <!-- כפתורים -->
   <main>
     <section class="cards-grid">
       <a class="card" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1">
@@ -92,9 +112,9 @@
         <i data-feather="clock"></i>
         <h3>דיווח שעות עבודה</h3>
       </a>
-      <a class="card" href="schedule.html">
+      <a class="card" href="https://meaningfullearning.origami.ms/-/למידה-משמעותית/שיעורים---יומן" target="_blank">
         <i data-feather="calendar"></i>
-        <h3>לוח זמנים יומי</h3>
+        <h3>לוח זמנים – אוריגמי</h3>
       </a>
       <a class="card" href="https://docs.google.com/spreadsheets/d/1oFctctf3pqHa-Bo46SWC9kiSTW1f7_QQOKEAiYD3RJk/edit?usp=drivesdk" target="_blank">
         <i data-feather="book-open"></i>
@@ -104,30 +124,47 @@
         <i data-feather="cpu"></i>
         <h3>כלי AI</h3>
       </a>
-      <a class="card" href="https://us06web.zoom.us/j/9317318197?pwd=U0tmN2YvandxUk9BUFd4REF0VzhYdz09" target="_blank">
+      <a class="card" href="zoom-invite.html">
         <i data-feather="video"></i>
         <h3>זימון לשיעור זום</h3>
       </a>
     </section>
   </main>
 
-  <!-- Dark Mode Toggle & Feather Icons Init -->
+  <!-- Scripts -->
   <script>
-    // dark mode persistence
-    const toggle = document.getElementById('dark-toggle');
+    feather.replace();
+
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // מצב כהה
+    const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
-    toggle.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark-mode');
-      localStorage.setItem(
-        'dark-mode',
-        document.documentElement.classList.contains('dark-mode') ? '1' : '0'
-      );
+    darkToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
     });
 
-    // replace feather icons at 24×24
-    feather.replace({ width: 24, height: 24 });
+    // שתף
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'צוות בראונשטיין',
+          text: 'בדוק את לוח השיעורים וכלים נוספים!',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה. נא העתק את הקישור ידנית.');
+      }
+    });
   </script>
+
 </body>
 </html>

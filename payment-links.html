@@ -1,48 +1,143 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>לינקים לתשלומים</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      direction: rtl;
-      background-color: #f9f9f9;
-      padding: 40px 20px;
-      text-align: center;
+    .menu-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
     }
-    h1 {
-      font-size: 2em;
-      margin-bottom: 30px;
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      width: 160px;
     }
-    a.button {
-      display: block;
-      width: 90%;
-      max-width: 350px;
-      margin: 10px auto;
-      padding: 15px;
-      background-color: #27ae60;
-      color: white;
-      text-align: center;
-      text-decoration: none;
-      font-size: 1.1em;
-      border-radius: 12px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: right;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
     }
-    a.button:hover {
-      background-color: #219150;
+
+    .top-right-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .top-right-controls .menu-toggle {
+      margin-left: 10px;
+    }
+
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
     }
   </style>
 </head>
 <body>
 
-  <h1>לינקים לתשלומים</h1>
+  <!-- תפריט עליון -->
+  <div class="top-right-controls">
+    <a href="index.html" title="בית"><i data-feather="home" class="icon-small"></i></a>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+    </div>
+  </div>
 
-  <a class="button" href="https://secure.cardcom.solutions/EA/EA5/6baHiNC7UmeNSp0HslbQQ/PaymentSP" target="_blank">1. שיעור חד פעמי</a>
-  <a class="button" href="https://secure.cardcom.solutions/EA/EA5/WKn2SoS3rEaX0bx9MOPoQA/PaymentSP" target="_blank">2. שיעור תגבור</a>
-  <a class="button" href="https://secure.cardcom.solutions/EA/EA5/uL4b5SXHEWgS04XwpNZtg/PaymentSP" target="_blank">3. הקמת מנוי (אמצע חודש)</a>
-  <a class="button" href="https://secure.cardcom.solutions/EA/EA5/SiXbQNgF9kGVjhCssDTFgg/PaymentSP" target="_blank">4. הקמת מנוי (תחילת חודש)</a>
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>לינקים לתשלומים</h2>
+      <p>בחרו את סוג השיעור לביצוע תשלום מהיר ומאובטח</p>
+    </div>
+  </header>
+
+  <!-- תשלומים -->
+  <main>
+    <section class="cards-grid">
+
+      <a class="card" href="https://secure.cardcom.solutions/EA/EA5/6baHiNC7UmeNSp0HslbQQ/PaymentSP" target="_blank">
+        <i data-feather="dollar-sign"></i>
+        <h3>1. שיעור חד פעמי</h3>
+      </a>
+
+      <a class="card" href="https://secure.cardcom.solutions/EA/EA5/WKn2SoS3rEaX0bx9MOPoQA/PaymentSP" target="_blank">
+        <i data-feather="trending-up"></i>
+        <h3>2. שיעור תגבור</h3>
+      </a>
+
+      <a class="card" href="https://secure.cardcom.solutions/EA/EA5/uL4b5SXHEWgS04XwpNZtg/PaymentSP" target="_blank">
+        <i data-feather="calendar"></i>
+        <h3>3. הקמת מנוי (אמצע חודש)</h3>
+      </a>
+
+      <a class="card" href="https://secure.cardcom.solutions/EA/EA5/SiXbQNgF9kGVjhCssDTFgg/PaymentSP" target="_blank">
+        <i data-feather="calendar"></i>
+        <h3>4. הקמת מנוי (תחילת חודש)</h3>
+      </a>
+
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    feather.replace();
+
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // מצב כהה
+    const darkToggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    darkToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
+    });
+
+    // שיתוף
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'צוות בראונשטיין',
+          text: 'ביצוע תשלום לשיעור או מנוי במרכז הלמידה',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה. נא העתיקו את הכתובת.');
+      }
+    });
+  </script>
 
 </body>
 </html>

@@ -39,3 +39,87 @@
   <!-- Feather Icons CDN -->
   <script src="https://unpkg.com/feather-icons"></script>
 </head>
+
+<body>
+
+  <!-- App Header & Navigation -->
+  <header class="app-header">
+    <div class="icon-wrapper">
+      <img src="icons/apple-touch-icon.png" alt="לוגו בראונשטיין" />
+    </div>
+    <h1>ADMIN</h1>
+    <nav class="top-buttons">
+      <a href="index.html"><i data-feather="home"></i><span>בית</span></a>
+      <button id="share-button"><i data-feather="share-2"></i><span>שתף</span></button>
+      <a href="teachers.html"><i data-feather="users"></i><span>צוות הוראה</span></a>
+      <button id="dark-toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <!-- Main Admin Cards -->
+  <main>
+    <section class="cards-grid">
+
+      <a class="card" href="payment-links.html">
+        <i data-feather="credit-card"></i>
+        <h3>לינקים לתשלומים</h3>
+      </a>
+
+      <a class="card" href="registration-topup.html">
+        <i data-feather="edit"></i>
+        <h3>טופס רישום</h3>
+      </a>
+
+      <a class="card" href="journal-april-2025.html">
+        <i data-feather="calendar"></i>
+        <h3>יומן יומי אפריל 2025</h3>
+      </a>
+
+      <a class="card" href="smart-report.html">
+        <i data-feather="bar-chart-2"></i>
+        <h3>מערכת דיווח חכמה</h3>
+      </a>
+
+      <a class="card" href="logout.html">
+        <i data-feather="log-out"></i>
+        <h3>התנתקות</h3>
+      </a>
+
+    </section>
+  </main>
+
+  <!-- Scripts: Feather Icons, Dark‐mode, Share API -->
+  <script>
+    feather.replace({ width: 48, height: 48 });
+
+    // Dark mode toggle
+    const darkToggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    darkToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark-mode');
+      if (document.documentElement.classList.contains('dark-mode')) {
+        localStorage.setItem('dark-mode', '1');
+      } else {
+        localStorage.removeItem('dark-mode');
+      }
+    });
+
+    // Share API
+    const shareButton = document.getElementById('share-button');
+    shareButton.addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'צוות בראונשטיין',
+          text: 'עקבו אחרי ניהול התשלומים וכלי הניהול שלנו!',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה. נא העתיקו את הכתובת.');
+      }
+    });
+  </script>
+
+</body>
+</html>

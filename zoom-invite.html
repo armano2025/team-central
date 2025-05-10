@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>זימון לשיעור זום</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    .menu-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      width: 160px;
+    }
+
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: right;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .top-right-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+    }
+
+    .hero + .hero {
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- תפריט עליון -->
+  <div class="top-right-controls">
+    <a href="index.html" title="דף הבית"><i data-feather="home" class="icon-small"></i></a>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+    </div>
+  </div>
+
+  <!-- Hero 1: זום חן -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>שיעור זום – חן</h2>
+      <p>לכניסה ישירה לשיעור הזום של חן לחצו על הכפתור</p>
+      <a class="cta-button" href="https://us06web.zoom.us/j/9317318197?pwd=U0tmN2YvandxUk9BUFd4REF0VzhYdz09" target="_blank">
+        כניסה לזום של חן
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero 2: זום צוות -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>שיעור זום – צוות הוראה</h2>
+      <p>לכניסה לזום הכללי של הצוות</p>
+      <a class="cta-button" href="https://us06web.zoom.us/j/3225815720?pwd=WlIyT01XNy8rWWcvdFo5Z3pUcnl3Zz09" target="_blank">
+        כניסה לזום של הצוות
+      </a>
+    </div>
+  </header>
+
+  <!-- Scripts -->
+  <script>
+    feather.replace();
+
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    const darkToggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    darkToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
+    });
+
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'זימון לזום',
+          text: 'שיעורי זום לצוות בראונשטיין',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף לא נתמך בדפדפן זה');
+      }
+    });
+  </script>
+
+</body>
+</html>

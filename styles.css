@@ -124,58 +124,58 @@ h1 {
   text-align: center;
 }
 
-/* 9. ניווט עליון ב־app-header */
-.app-header .top-buttons {
+/* 9. ניווט עליון משותף (דף ראשי + Admin) */
+.top-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: var(--spacing);
   margin-top: var(--spacing);
 }
-.app-header .top-buttons a,
-.app-header .top-buttons button {
+.top-buttons a,
+.top-buttons button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;               /* קומפקטי יותר */
+  padding: 4px 10px;               /* קומפקטי כמו בדף הראשי */
   font-size: 0.875rem;             /* גופן קטן יותר */
   background-color: var(--color-primary);
   color: var(--color-surface);
   text-decoration: none;
   border: none;
-  border-radius: 8px;              /* עיגול עדין יותר */
+  border-radius: 8px;              /* עיגול עדין */
   box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* צל עדין */
   transition: background-color 0.2s;
   min-width: auto;
 }
-.app-header .top-buttons a i,
-.app-header .top-buttons button i {
+.top-buttons a i,
+.top-buttons button i {
   stroke: var(--color-surface);
   width: 18px;
   height: 18px;
 }
-.app-header .top-buttons a:hover,
-.app-header .top-buttons button:hover {
+.top-buttons a:hover,
+.top-buttons button:hover {
   background-color: var(--color-secondary);
   transform: none;                 /* ללא קפיצה */
 }
 
-/* כפתורי שיתוף ו-dark-mode קטנים */
-.app-header .top-buttons button#share-button,
-.app-header .top-buttons button#dark-toggle {
+/* כפתורי אייקון (שתף / dark mode) קטנים יותר */
+.top-buttons button#share-button,
+.top-buttons button#dark-toggle {
   background: transparent;
   box-shadow: none;
   color: var(--color-text);
   padding: 4px;
   margin: 0 2px;
 }
-.app-header .top-buttons button#share-button i,
-.app-header .top-buttons button#dark-toggle i {
+.top-buttons button#share-button i,
+.top-buttons button#dark-toggle i {
   width: 16px;
   height: 16px;
 }
-.app-header .top-buttons button#share-button:hover,
-.app-header .top-buttons button#dark-toggle:hover {
+.top-buttons button#share-button:hover,
+.top-buttons button#dark-toggle:hover {
   background: rgba(0,0,0,0.05);
   transform: none;
 }

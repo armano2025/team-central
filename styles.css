@@ -45,10 +45,10 @@ body {
 /* 5. Hero Section */
 .hero {
   background: linear-gradient(
-      135deg,
-      rgba(52,152,219,0.9),
-      rgba(46,204,113,0.9)
-    );
+    135deg,
+    rgba(52,152,219,0.9),
+    rgba(46,204,113,0.9)
+  );
   padding: calc(var(--spacing) * 2) var(--spacing);
   border-radius: var(--border-radius);
   margin-bottom: calc(var(--spacing) * 2);
@@ -82,42 +82,13 @@ body {
   transform: translateY(-2px);
 }
 
-/* 6. תפריט עליון */
-.top-buttons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing);
-}
-.top-buttons a,
-#dark-toggle {
-  background-color: #555;
-  color: #fff;
-  padding: calc(var(--spacing)/2) var(--spacing);
-  text-decoration: none;
-  font-weight: 500;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-}
-#dark-toggle {
-  background: transparent;
-  font-size: 1.25rem;
-  color: var(--color-text);
-  border: none;
-  margin-left: var(--spacing);
-  transition: color 0.3s;
-}
-#dark-toggle:hover {
-  color: var(--color-primary);
-}
-
-/* 7. כותרת ראשית */
+/* 6. כותרת ראשית */
 h1 {
   font-size: 2rem;
   margin-bottom: calc(var(--spacing) * 1.5);
 }
 
-/* 8. Grid של קלפים */
+/* 7. Grid של קלפים */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -125,7 +96,7 @@ h1 {
   padding-top: var(--spacing);
 }
 
-/* 9. עיצוב קלף */
+/* 8. עיצוב קלף */
 .card {
   background-color: var(--color-surface);
   border-radius: var(--border-radius);
@@ -142,14 +113,10 @@ h1 {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.16);
 }
-
-/* 10. אייקון בתוך הקלף */
 .card i {
   color: var(--color-primary);
   margin-bottom: calc(var(--spacing) / 2);
 }
-
-/* 11. טקסט הקלף */
 .card h3 {
   font-size: 1.1rem;
   margin: 0;
@@ -157,56 +124,104 @@ h1 {
   text-align: center;
 }
 
-/* חיתוך ניווט עליון ל־app-header */
+/* 9. ניווט עליון ב־app-header */
 .app-header .top-buttons {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: var(--spacing);
   margin-top: var(--spacing);
 }
-
-/* סגנון לכפתורי הניווט */
 .app-header .top-buttons a,
 .app-header .top-buttons button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 6px 12px;
   background-color: var(--color-primary);
   color: var(--color-surface);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   border: none;
   border-radius: var(--border-radius);
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   transition: background-color 0.2s, transform 0.1s;
 }
-
-/* אייקון + טקסט סביב */
 .app-header .top-buttons a i,
 .app-header .top-buttons button i {
   stroke: var(--color-surface);
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
-
-/* מצב hover */
 .app-header .top-buttons a:hover,
 .app-header .top-buttons button:hover {
   background-color: var(--color-secondary);
   transform: translateY(-2px);
 }
-
-/* כפתור ה-dark-mode ושיתוף – רק אייקון, ללא רקע */
+/* כפתורי אייקון (dark/share) – רק אייקון ללא רקע */
 .app-header .top-buttons button#dark-toggle,
 .app-header .top-buttons button#share-button {
   background: transparent;
   box-shadow: none;
   color: var(--color-text);
-  padding: 8px;
+  padding: 6px;
 }
 .app-header .top-buttons button#dark-toggle:hover,
 .app-header .top-buttons button#share-button:hover {
   background: rgba(0,0,0,0.05);
   transform: none;
+}
+
+/* 10. ניווט בין דפים (חץ ימינה וחץ שמאלה) */
+.nav-arrows {
+  display: flex;
+  justify-content: space-between;
+  margin: var(--spacing) 0;
+}
+.nav-arrows a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-surface);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-decoration: none;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.nav-arrows a i {
+  stroke: var(--color-primary);
+  width: 20px;
+  height: 20px;
+}
+.nav-arrows a:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-2px);
+}
+
+/* 11. Button “בית” ו-“צוות הוראה” במקומות אחרים */
+.top-buttons a:first-child,
+.top-buttons a:nth-child(2) {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+/* 12. עיצוב לוגו באתר הראשי */
+.icon-wrapper {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto var(--spacing) auto;
+  border-radius: var(--border-radius);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.icon-wrapper img {
+  width: 80px;
+  height: auto;
+  display: block;
 }

@@ -54,7 +54,7 @@
     let recipients = [];
 
     async function loadRecipients() {
-      const res = await fetch("https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec");
+      const res = await fetch("https://script.google.com/a/macros/brawnshtein.co.il/s/AKfycbx6UzjWdWXBNVLBWA3-osdnrwoabE9hr3aMFMgmZjv81ECB3fHOTNyHPzvylGAYVQjOUw/exec");
       recipients = await res.json();
 
       const recipientsDiv = document.getElementById("recipients");

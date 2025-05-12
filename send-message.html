@@ -2,55 +2,175 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>שליחת הודעה חכמה</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>בראונשטיין – שליחת הודעה</title>
+  <meta name="description" content="שליחת הודעות חכמות לתלמידים מסוננים." />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="icons/site.webmanifest" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-      background-color: #f9f9f9;
+    /* Inline support for the top-right controls */
+    .menu-toggle { background: none; border: none; cursor: pointer; }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      width: 160px;
     }
-    textarea {
-      width: 100%;
-      height: 100px;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-    button {
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
       padding: 10px;
-      font-size: 16px;
-      background-color: #2ecc71;
-      color: white;
+      width: 100%;
+      background: none;
       border: none;
+      text-align: right;
+      font-family: inherit;
+      font-size: 14px;
       cursor: pointer;
     }
-    #recipients {
-      margin-bottom: 20px;
-      max-height: 250px;
-      overflow-y: auto;
-      background: #fff;
+    .top-right-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
       padding: 10px;
+    }
+    .top-right-controls .menu-toggle { margin-left: 10px; }
+    .icon-small { width: 20px; height: 20px; margin-left: 8px; }
+
+    /* Container for the form */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--color-surface);
+      padding: var(--spacing);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .container h2 {
+      font-size: 1.5rem;
+      margin-bottom: var(--spacing);
+      color: var(--color-primary);
+    }
+    .container label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .container textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 1rem;
+      margin-bottom: var(--spacing);
+      padding: 8px;
       border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      resize: vertical;
+      font-family: var(--font-base);
+    }
+    .container button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      background-color: var(--color-secondary);
+      color: var(--color-surface);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-family: var(--font-base);
+    }
+    .container button:hover {
+      background-color: var(--color-accent);
+    }
+    #recipients {
+      margin-bottom: var(--spacing);
+      max-height: 200px;
+      overflow-y: auto;
+      background: var(--color-bg);
+      padding: var(--spacing);
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--color-text);
     }
     #status {
+      margin-top: var(--spacing);
       font-weight: bold;
-      margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h2>שליחת הודעה לכל המסוננים</h2>
 
-  <div id="recipients">טוען נמענים...</div>
+  <!-- Top Menu -->
+  <div class="top-right-controls">
+    <a href="index.html" title="בית"><i data-feather="home" class="icon-small"></i></a>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+    </div>
+  </div>
 
-  <label>הקלד/י את ההודעה:</label>
-  <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>שליחת הודעה חכמה</h2>
+      <p>לחץ/י למטה כדי לשלוח הודעה לכל המסוננים</p>
+    </div>
+  </header>
 
-  <button onclick="sendMessage()">שלח הודעה</button>
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <div id="recipients">טוען נמענים...</div>
 
-  <div id="status"></div>
+      <label for="message">תוכן ההודעה:</label>
+      <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
 
+      <button onclick="sendMessage()">שלח הודעה</button>
+
+      <div id="status"></div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
   <script>
+    feather.replace();
+
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'בראונשטיין – שליחת הודעות',
+          text: 'בדוק את מערכת ההודעות החכמה שלנו',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה. נא העתיקו את הכתובת.');
+      }
+    });
+
+    document.getElementById('dark-toggle').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      if (isDark) localStorage.setItem('dark-mode', '1');
+      else localStorage.removeItem('dark-mode');
+    });
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+
     let recipients = [];
 
     async function loadRecipients() {
@@ -64,7 +184,9 @@
       }
 
       recipientsDiv.innerHTML = `<strong>${recipients.length} נמענים מוכנים לשליחה:</strong><br>` +
-        recipients.map(r => `${r.firstName} ${r.lastName} – ${r.phone}`).join("<br>");
+        recipients
+          .map(r => `${r.firstName} ${r.lastName} – ${r.phone}`)
+          .join("<br>");
     }
 
     async function sendMessage() {
@@ -73,13 +195,13 @@
 
       if (!message) {
         status.textContent = "נא להקליד הודעה לפני השליחה.";
-        status.style.color = "red";
+        status.style.color = "var(--color-accent)";
         return;
       }
 
       if (recipients.length === 0) {
         status.textContent = "אין נמענים לשליחה.";
-        status.style.color = "red";
+        status.style.color = "var(--color-accent)";
         return;
       }
 
@@ -88,6 +210,7 @@
       }
 
       status.textContent = "שולח הודעות...";
+      status.style.color = "var(--color-text)";
 
       try {
         const res = await fetch("https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho", {
@@ -98,14 +221,14 @@
 
         if (res.ok) {
           status.textContent = "ההודעות נשלחו בהצלחה!";
-          status.style.color = "green";
+          status.style.color = "var(--color-secondary)";
         } else {
           status.textContent = "שגיאה בשליחה.";
-          status.style.color = "red";
+          status.style.color = "var(--color-accent)";
         }
       } catch (err) {
-        status.textContent = "שגיאת רשת. בדוק את החיבור.";
-        status.style.color = "red";
+        status.textContent = "שגיאת רשת. בדוק/י את החיבור.";
+        status.style.color = "var(--color-accent)";
       }
     }
 

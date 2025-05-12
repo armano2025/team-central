@@ -63,7 +63,7 @@
         return;
       }
 
-      recipientsDiv.innerHTML = "<strong>נמענים:</strong><br>" +
+      recipientsDiv.innerHTML = `<strong>${recipients.length} נמענים מוכנים לשליחה:</strong><br>` +
         recipients.map(r => `${r.firstName} ${r.lastName} – ${r.phone}`).join("<br>");
     }
 
@@ -83,7 +83,6 @@
         return;
       }
 
-      // תיבת אישור
       if (!confirm("האם אתה בטוח שברצונך לשלוח את ההודעה לכל המסוננים?")) {
         return;
       }

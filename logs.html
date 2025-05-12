@@ -1,112 +1,143 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>צוות בראונשטיין</title>
-  <link rel="apple-touch-icon" href="IMG_6982.png" />
-
-  <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap"
-    rel="stylesheet"
-  />
-
-  <!-- Main CSS -->
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>בראונשטיין – לוג שליחות</title>
+  <meta name="description" content="צפייה ביומן השליחות של מערכת ההודעות." />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-
+  <link rel="manifest" href="icons/site.webmanifest" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      direction: rtl;
-      background-color: #f4f4f4;
-      padding: 40px 20px;
+    .menu-toggle { background: none; border: none; cursor: pointer; }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px; right: 10px;
+      background: #fff; border: 1px solid #ccc; z-index: 1000; width: 160px;
     }
+    .dropdown-menu button {
+      display: flex; align-items: center; padding: 10px; width: 100%;
+      background: none; border: none; text-align: right; font-family: inherit; font-size: 14px; cursor: pointer;
+    }
+    .top-right-controls {
+      display: flex; justify-content: flex-end; align-items: center; padding: 10px;
+    }
+    .icon-small { width: 20px; height: 20px; margin-left: 8px; }
 
-    .top-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
+    .container {
+      max-width: 800px; margin: 2rem auto; background: var(--color-surface);
+      padding: var(--spacing); border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
-    .top-buttons a {
-      background-color: #555;
-      color: white;
-      padding: 10px 15px;
-      text-decoration: none;
-      font-size: 1em;
-      border-radius: 6px;
-      width: 120px;
+    table {
+      width: 100%; border-collapse: collapse; margin-top: var(--spacing);
+      font-family: var(--font-base); font-size: 0.9rem;
     }
-
-    img.logo {
-      max-width: 180px;
-      margin-bottom: 30px;
+    th, td {
+      padding: 8px; border: 1px solid #ddd; text-align: right;
     }
-
-    h1 {
-      font-size: 2em;
-      margin-bottom: 40px;
+    th {
+      background: var(--color-bg); color: var(--color-text); font-weight: 500;
     }
-
-    a.button {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 10px auto;
-      padding: 15px;
-      background-color: #3498db;
-      color: white;
-      text-align: center;
-      text-decoration: none;
-      font-size: 1.2em;
-      border-radius: 25px;
-      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-      transition: background-color 0.3s;
-    }
-
-    a.button:hover {
-      background-color: #2980b9;
-    }
+    tr:nth-child(even) { background: #f9f9f9; }
+    #status { margin-top: var(--spacing); font-weight: bold; text-align: center; }
   </style>
 </head>
 <body>
 
-  <div class="top-buttons">
-    <a href="admin.html">ADMIN</a>
-    <a href="teachers.html">צוות הוראה</a>
+  <!-- Top Menu -->
+  <div class="top-right-controls">
+    <a href="index.html" title="בית"><i data-feather="home" class="icon-small"></i></a>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+    </div>
   </div>
 
-  <img src="IMG_9789.jpeg" alt="לוגו של בראונשטיין" class="logo" />
-  <h1>צוות בראונשטיין</h1>
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>לוג השליחות</h2>
+      <p>כאן מוצגים כל פרטי השליחות שנרשמו בגיליון ה-Log</p>
+    </div>
+  </header>
 
-  <a class="button" href="https://secure.cardcom.solutions/Accounts/Documents/Document.aspx?doctypeid=1">
-    הפקת חשבונית
-  </a>
-  <a class="button" href="https://forms.gle/tfSaC93dagWhVKr4A">
-    דיווח שעות עבודה
-  </a>
-  <a class="button" href="https://meaningfullearning.origami.ms/-/למידה-משמעותית/שיעורים---יומן">
-    לוח זמנים יומי
-  </a>
-  <a
-    class="button"
-    href="https://docs.google.com/spreadsheets/d/1oFctctf3pqHa-Bo46SWC9kiSTW1f7_QQOKEAiYD3RJk/edit?usp=drivesdk"
-    target="_blank"
-  >
-    יומן יומי מאי 2025
-  </a>
-  <a class="button" href="ai-tools.html">
-    כלי AI
-  </a>
-  <a
-    class="button"
-    href="https://us06web.zoom.us/j/9317318197?pwd=U0tmN2YvandxUk9BUFd4REF0VzhYdz09"
-    target="_blank"
-  >
-    זימון לשיעור זום
-  </a>
+  <!-- Main -->
+  <main>
+    <div class="container">
+      <div id="status">טוען נתונים...</div>
+      <table id="logTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>שם פרטי</th>
+            <th>שם משפחה</th>
+            <th>טלפון</th>
+            <th>הודעה</th>
+            <th>זמן</th>
+            <th>סטטוס</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
 
+  <script>
+    feather.replace();
+
+    function toggleMenu() {
+      const m = document.getElementById('dropdownMenu');
+      m.style.display = m.style.display==='block'?'none':'block';
+    }
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) navigator.share({
+        title: 'בראונשטיין – לוג שליחות',
+        text: 'צפייה בלוג השליחות של מערכת ההודעות.',
+        url: location.href
+      }).catch(console.error);
+      else alert('שיתוף אינו נתמך בדפדפן זה.');
+    });
+    const darkToggle = document.getElementById('dark-toggle');
+    darkToggle.addEventListener('click', () => {
+      const d = document.documentElement.classList.toggle('dark-mode');
+      if(d) localStorage.setItem('dark-mode','1'); else localStorage.removeItem('dark-mode');
+    });
+    if(localStorage.getItem('dark-mode')==='1') document.documentElement.classList.add('dark-mode');
+
+    async function loadLog() {
+      const status = document.getElementById('status');
+      try {
+        const res = await fetch("https://script.google.com/a/macros/brawnshtein.co.il/s/AKfycbx6UzjWdWXBNVLBWA3-osdnrwoabE9hr3aMFMgmZjv81ECB3fHOTNyHPzvylGAYVQjOUw/exec?log=1");
+        const data = await res.json();
+        if (!data.length) {
+          status.textContent = 'אין נתונים להצגה.';
+          return;
+        }
+        const tbody = document.querySelector('#logTable tbody');
+        data.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.firstName}</td>
+            <td>${r.lastName}</td>
+            <td>${r.phone}</td>
+            <td>${r.message}</td>
+            <td>${r.time}</td>
+            <td>${r.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        status.style.display = 'none';
+        document.getElementById('logTable').style.display = '';
+      } catch (e) {
+        status.textContent = 'שגיאה בטעינת הלוג.';
+      }
+    }
+
+    window.onload = loadLog;
+  </script>
 </body>
 </html>

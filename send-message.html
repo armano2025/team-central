@@ -11,99 +11,68 @@
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    /* Inline support for the top-right controls */
+    /* Top menu controls */
     .menu-toggle { background: none; border: none; cursor: pointer; }
     .dropdown-menu {
       display: none;
       position: absolute;
-      top: 60px;
-      right: 10px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      z-index: 1000;
-      width: 160px;
+      top: 60px; right: 10px;
+      background: #fff; border: 1px solid #ccc; z-index: 1000; width: 160px;
     }
     .dropdown-menu button {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      width: 100%;
-      background: none;
-      border: none;
-      text-align: right;
-      font-family: inherit;
-      font-size: 14px;
-      cursor: pointer;
+      display: flex; align-items: center; padding: 10px; width: 100%;
+      background: none; border: none; text-align: right; font-family: inherit; font-size: 14px; cursor: pointer;
     }
     .top-right-controls {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 10px;
+      display: flex; justify-content: flex-end; align-items: center; padding: 10px;
     }
-    .top-right-controls .menu-toggle { margin-left: 10px; }
     .icon-small { width: 20px; height: 20px; margin-left: 8px; }
 
-    /* Container for the form */
+    /* Container */
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: var(--color-surface);
-      padding: var(--spacing);
+      max-width: 600px; margin: 2rem auto;
+      background: var(--color-surface); padding: var(--spacing);
       border-radius: var(--border-radius);
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .container h2 {
-      font-size: 1.5rem;
-      margin-bottom: var(--spacing);
+      font-size: 1.5rem; margin-bottom: var(--spacing);
       color: var(--color-primary);
     }
     .container label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
+      display: block; margin-bottom: 8px; font-weight: 500;
     }
     .container textarea {
-      width: 100%;
-      height: 100px;
-      font-size: 1rem;
-      margin-bottom: var(--spacing);
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: var(--border-radius);
-      resize: vertical;
-      font-family: var(--font-base);
+      width: 100%; height: 100px; font-size: 1rem;
+      margin-bottom: var(--spacing); padding: 8px;
+      border: 1px solid #ccc; border-radius: var(--border-radius);
+      resize: vertical; font-family: var(--font-base);
     }
     .container button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
+      width: 100%; padding: 12px; font-size: 1rem;
+      border: none; border-radius: var(--border-radius);
+      cursor: pointer; font-family: var(--font-base);
+    }
+    .container button.send {
       background-color: var(--color-secondary);
       color: var(--color-surface);
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-family: var(--font-base);
     }
-    .container button:hover {
+    .container button.send:hover {
       background-color: var(--color-accent);
     }
+    .container button.logs {
+      margin-top: var(--spacing);
+      background-color: var(--color-primary);
+      color: var(--color-surface);
+    }
     #recipients {
-      margin-bottom: var(--spacing);
-      max-height: 200px;
-      overflow-y: auto;
-      background: var(--color-bg);
-      padding: var(--spacing);
-      border: 1px solid #ccc;
-      border-radius: var(--border-radius);
-      text-align: right;
-      font-size: 0.9rem;
-      color: var(--color-text);
+      margin-bottom: var(--spacing); max-height: 200px; overflow-y: auto;
+      background: var(--color-bg); padding: var(--spacing);
+      border: 1px solid #ccc; border-radius: var(--border-radius);
+      text-align: right; font-size: 0.9rem; color: var(--color-text);
     }
     #status {
-      margin-top: var(--spacing);
-      font-weight: bold;
-      text-align: center;
+      margin-top: var(--spacing); font-weight: bold; text-align: center;
     }
   </style>
 </head>
@@ -123,7 +92,7 @@
   <header class="hero">
     <div class="hero-content">
       <h2>שליחת הודעה חכמה</h2>
-      <p>לחץ/י למטה כדי לשלוח הודעה לכל המסוננים</p>
+      <p>הודעה לכל המסוננים מתוך הרשימה שלך</p>
     </div>
   </header>
 
@@ -135,7 +104,11 @@
       <label for="message">תוכן ההודעה:</label>
       <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
 
-      <button onclick="sendMessage()">שלח הודעה</button>
+      <button class="send" onclick="sendMessage()">שלח הודעה</button>
+      <button class="logs" onclick="window.location.href='logs.html'">
+        <i data-feather="file-text" class="icon-small"></i>
+        צפה בלוג השליחות
+      </button>
 
       <div id="status"></div>
     </div>
@@ -154,17 +127,17 @@
       if (navigator.share) {
         navigator.share({
           title: 'בראונשטיין – שליחת הודעות',
-          text: 'בדוק את מערכת ההודעות החכמה שלנו',
+          text: 'בדקו את מערכת ההודעות החכמה שלנו',
           url: location.href
         }).catch(console.error);
       } else {
-        alert('שיתוף אינו נתמך בדפדפן זה. נא העתיקו את הכתובת.');
+        alert('שיתוף אינו נתמך בדפדפן זה.');
       }
     });
 
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      if (isDark) localStorage.setItem('dark-mode', '1');
+      if (isDark) localStorage.setItem('dark-mode','1');
       else localStorage.removeItem('dark-mode');
     });
     if (localStorage.getItem('dark-mode') === '1') {
@@ -184,9 +157,7 @@
       }
 
       recipientsDiv.innerHTML = `<strong>${recipients.length} נמענים מוכנים לשליחה:</strong><br>` +
-        recipients
-          .map(r => `${r.firstName} ${r.lastName} – ${r.phone}`)
-          .join("<br>");
+        recipients.map(r => `${r.firstName} ${r.lastName} – ${r.phone}`).join("<br>");
     }
 
     async function sendMessage() {

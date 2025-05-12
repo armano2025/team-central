@@ -2,55 +2,152 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>שליחת הודעה חכמה</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>שליחת הודעה</title>
+  <meta name="description" content="שליחת הודעות חכמות לתלמידים מסוננים." />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
       padding: 2rem;
-      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-top: 80px;
     }
+
     textarea {
       width: 100%;
       height: 100px;
       font-size: 16px;
       margin-bottom: 20px;
-    }
-    button {
       padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
       font-size: 16px;
       background-color: #2ecc71;
       color: white;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
     }
+
     #recipients {
       margin-bottom: 20px;
       max-height: 250px;
       overflow-y: auto;
-      background: #fff;
+      background: #f9f9f9;
       padding: 10px;
       border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
     }
+
     #status {
       font-weight: bold;
       margin-top: 10px;
+      text-align: center;
+    }
+
+    .top-right-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      width: 160px;
+    }
+
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      width: 100%;
+      background: none;
+      border: none;
+      text-align: right;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
     }
   </style>
 </head>
 <body>
-  <h2>שליחת הודעה לכל המסוננים</h2>
 
-  <div id="recipients">טוען נמענים...</div>
+  <!-- Top Menu -->
+  <div class="top-right-controls">
+    <a href="index.html" title="בית"><i data-feather="home" class="icon-small"></i></a>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+    </div>
+  </div>
 
-  <label>הקלד/י את ההודעה:</label>
-  <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
+  <!-- Main Content -->
+  <div class="container">
+    <h2>שליחת הודעה חכמה</h2>
 
-  <button onclick="sendMessage()">שלח הודעה</button>
+    <div id="recipients">טוען נמענים...</div>
 
-  <div id="status"></div>
+    <label for="message">הקלד/י את ההודעה:</label>
+    <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
 
+    <button onclick="sendMessage()">שלח הודעה</button>
+
+    <div id="status"></div>
+  </div>
+
+  <!-- Scripts -->
   <script>
+    feather.replace();
+
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'שליחת הודעות בראונשטיין',
+          text: 'בדוק את מערכת ההודעות שלנו!',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה. נא העתק/י את הקישור.');
+      }
+    });
+
     let recipients = [];
 
     async function loadRecipients() {

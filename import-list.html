@@ -4,14 +4,149 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>יבוא רשימה – בראונשטיין</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="דף יבוא רשימות לתלמידים, הורים ומספרי טלפון" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* Global */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Rubik', sans-serif;
+      background: #f5f5f5;
+      direction: rtl;
+      text-align: center;
+    }
+    header {
+      background: #3498db;
+      color: #fff;
+      padding: 2rem 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header h2 {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    /* Main container */
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Table layout */
+    .import-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .import-table th,
+    .import-table td {
+      border: 1px solid #ddd;
+      padding: 12px 8px;
+    }
+    .import-table th {
+      background: #2980b9;
+      color: #fff;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+    .import-table td {
+      background: #fafafa;
+    }
+
+    /* Buttons */
+    .import-button {
+      display: inline-block;
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background: #2ecc71;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .import-button:hover {
+      background: #27ae60;
+    }
+  </style>
 </head>
 <body>
+
   <header>
     <h2>יבוא רשימה</h2>
+    <p>בחר/י איזו רשימה לייבא ל-Google Sheets</p>
   </header>
+
   <main>
-    <!-- כאן יופיעו כפתורי הייבוא -->
+    <div class="container">
+      <table class="import-table">
+        <thead>
+          <tr>
+            <th>תלמידים</th>
+            <th>הורים</th>
+            <th>מספר לשליחה</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <button class="import-button" onclick="importList('students','lesson')">
+                שיעור פר תלמיד
+              </button>
+            </td>
+            <td>
+              <button class="import-button" onclick="importList('parents','lesson')">
+                שיעור פר תלמיד
+              </button>
+            </td>
+            <td>
+              <button class="import-button" onclick="importList('phones','lesson')">
+                שיעור פר תלמיד
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <button class="import-button" onclick="importList('students','customers')">
+                רשימת לקוחות
+              </button>
+            </td>
+            <td>
+              <button class="import-button" onclick="importList('parents','customers')">
+                רשימת לקוחות
+              </button>
+            </td>
+            <td>
+              <button class="import-button" onclick="importList('phones','customers')">
+                רשימת לקוחות
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </main>
+
+  <script>
+    /**
+     * מפעיל את Webhook של Make עם הפרמטרים המתאימים
+     * @param {string} fieldType - 'students' | 'parents' | 'phones'
+     * @param {string} listType  - 'lesson' | 'customers'
+     */
+    function importList(fieldType, listType) {
+      const MAKE_WEBHOOK_URL = 'https://hook.eu2.make.com/PUT_YOUR_WEBHOOK_ID_HERE';
+      const url = new URL(MAKE_WEBHOOK_URL);
+      url.searchParams.set('field', fieldType);
+      url.searchParams.set('list', listType);
+      window.open(url.toString(), '_blank');
+    }
+  </script>
+
 </body>
 </html>

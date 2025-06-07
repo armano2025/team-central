@@ -4,85 +4,115 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>יבוא רשימה – בראונשטיין</title>
-  <meta name="description" content="דף יבוא רשימות לתלמידים, הורים ומספרי טלפון" />
+  <meta name="description" content="יבוא רשימות תלמידים, הורים ומספרי טלפון אל Google Sheets" />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="icons/site.webmanifest" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    /* Global */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Rubik', sans-serif;
-      background: #f5f5f5;
-      direction: rtl;
+    /* Top menu controls */
+    .menu-toggle { background: none; border: none; cursor: pointer; }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px; right: 10px;
+      background: #fff; border: 1px solid #ccc; z-index: 1000; width: 160px;
+      border-radius: 4px;
+    }
+    .dropdown-menu button {
+      display: flex; align-items: center; padding: 10px; width: 100%;
+      background: none; border: none; text-align: right;
+      font-family: inherit; font-size: 14px; cursor: pointer;
+    }
+    .dropdown-menu button:hover {
+      background: #f0f0f0;
+    }
+    .top-right-controls {
+      display: flex; justify-content: flex-end; align-items: center;
+      padding: 10px; background: var(--color-surface); box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .icon-small { width: 20px; height: 20px; margin-left: 8px; }
+
+    /* Hero Section */
+    header.hero {
+      background: linear-gradient(135deg,#3498db,#2ecc71);
+      color: white;
+      padding: 2rem 1rem;
       text-align: center;
     }
-    header {
-      background: #3498db;
-      color: #fff;
-      padding: 2rem 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    header.hero h2 {
+      margin: 0; font-size: 2rem;
     }
-    header h2 {
-      margin: 0;
-      font-size: 1.75rem;
+    header.hero p {
+      margin: 0.5rem 0 0; font-size: 1rem;
     }
 
     /* Main container */
     .container {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
+      max-width: 800px; margin: 2rem auto;
+      background: var(--color-surface);
+      padding: 2rem; border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
     }
 
     /* Table layout */
     .import-table {
-      width: 100%;
-      border-collapse: collapse;
+      width: 100%; border-collapse: collapse;
       margin-top: 1rem;
     }
     .import-table th,
     .import-table td {
-      border: 1px solid #ddd;
-      padding: 12px 8px;
+      border: 1px solid #ddd; padding: 12px 8px;
     }
     .import-table th {
-      background: #2980b9;
-      color: #fff;
-      font-weight: 500;
-      font-size: 1rem;
+      background: var(--color-primary); color: var(--color-surface);
+      font-weight: 500; font-size: 1rem;
     }
     .import-table td {
-      background: #fafafa;
+      background: var(--color-bg);
     }
 
-    /* Buttons */
+    /* Import buttons */
     .import-button {
-      display: inline-block;
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 4px;
-      background: #2ecc71;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.2s;
+      width: 100%; padding: 0.75rem; font-size: 1rem;
+      border: none; border-radius: 4px;
+      background: var(--color-secondary); color: var(--color-surface);
+      cursor: pointer; transition: background 0.2s;
     }
     .import-button:hover {
-      background: #27ae60;
+      background: var(--color-accent);
     }
   </style>
 </head>
 <body>
 
-  <header>
+  <!-- Top Menu -->
+  <div class="top-right-controls">
+    <a href="send-message.html" title="בית">
+      <i data-feather="home" class="icon-small"></i>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <i data-feather="menu"></i>
+    </button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button">
+        <i data-feather="share-2" class="icon-small"></i> שתף
+      </button>
+      <button id="dark-toggle">
+        <i data-feather="moon" class="icon-small"></i> מצב כהה
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <header class="hero">
     <h2>יבוא רשימה</h2>
     <p>בחר/י איזו רשימה לייבא ל-Google Sheets</p>
   </header>
 
+  <!-- Main Content -->
   <main>
     <div class="container">
       <table class="import-table">
@@ -134,6 +164,34 @@
   </main>
 
   <script>
+    feather.replace();
+
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'בראונשטיין – ייבוא רשימות',
+          text: 'ייבא רשימת תלמידים, הורים ומספרים ישירות ל-Google Sheets',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף אינו נתמך בדפדפן זה.');
+      }
+    });
+
+    document.getElementById('dark-toggle').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      if (isDark) localStorage.setItem('dark-mode','1');
+      else localStorage.removeItem('dark-mode');
+    });
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+
     /**
      * מפעיל את Webhook של Make עם הפרמטרים המתאימים
      * @param {string} fieldType - 'students' | 'parents' | 'phones'
@@ -147,6 +205,5 @@
       window.open(url.toString(), '_blank');
     }
   </script>
-
 </body>
 </html>

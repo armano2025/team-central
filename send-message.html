@@ -52,6 +52,7 @@
       width: 100%; padding: 12px; font-size: 1rem;
       border: none; border-radius: var(--border-radius);
       cursor: pointer; font-family: var(--font-base);
+      margin-top: var(--spacing);
     }
     .container button.send {
       background-color: var(--color-secondary);
@@ -61,12 +62,10 @@
       background-color: var(--color-accent);
     }
     .container button.logs {
-      margin-top: var(--spacing);
       background-color: var(--color-primary);
       color: var(--color-surface);
     }
     .container button.import {
-      margin-top: var(--spacing);
       background-color: var(--color-secondary);
       color: var(--color-surface);
     }
@@ -119,9 +118,9 @@
       </button>
 
       <!-- כפתור ייבוא רשימה -->
-      <button class="import" onclick="window.location.href='import-list.html'">
-        ייבא רשימה
-      </button>
+      <a href="import-list.html">
+        <button class="import">ייבא רשימה</button>
+      </a>
 
       <div id="status"></div>
     </div>

@@ -65,12 +65,27 @@
       background-color: var(--color-primary);
       color: var(--color-surface);
     }
+    /* כפתור טבלת שמות */
+    .container button.table-names {
+      background-color: var(--color-secondary);
+      color: var(--color-surface);
+    }
+    .container button.table-names:hover {
+      background-color: var(--color-accent);
+    }
 
+    /* Recipients panel: עד 70% מגובה החלון, גלילה אם צריך */
     #recipients {
-      margin-bottom: var(--spacing); max-height: 200px; overflow-y: auto;
-      background: var(--color-bg); padding: var(--spacing);
-      border: 1px solid #ccc; border-radius: var(--border-radius);
-      text-align: right; font-size: 0.9rem; color: var(--color-text);
+      margin-bottom: var(--spacing);
+      max-height: 70vh;
+      overflow-y: auto;
+      background: var(--color-bg);
+      padding: var(--spacing);
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--color-text);
     }
     #status {
       margin-top: var(--spacing); font-weight: bold; text-align: center;
@@ -109,6 +124,10 @@
       <button class="logs" onclick="window.location.href='logs.html'">
         <i data-feather="file-text" class="icon-small"></i>
         צפה בלוג השליחות
+      </button>
+      <button class="table-names"
+              onclick="window.open('https://docs.google.com/spreadsheets/d/11_Vq5eYiadlpa-9TJ5EVpv38SjHIrlnraAFNKgZ5OwM/edit?usp=drivesdk','_blank')">
+        טבלת שמות
       </button>
 
       <div id="status"></div>

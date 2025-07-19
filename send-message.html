@@ -10,254 +10,114 @@
   <link rel="manifest" href="icons/site.webmanifest" />
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
-  <style>
-    .menu-toggle { background: none; border: none; cursor: pointer; }
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 60px; right: 10px;
-      background: #fff; border: 1px solid #ccc; z-index: 1000; width: 160px;
-    }
-    .dropdown-menu button {
-      display: flex; align-items: center; padding: 10px; width: 100%;
-      background: none; border: none; text-align: right; font-family: inherit; font-size: 14px; cursor: pointer;
-    }
-    .top-right-controls {
-      display: flex; justify-content: flex-end; align-items: center; padding: 10px;
-    }
-    .icon-small { width: 20px; height: 20px; margin-left: 8px; }
-
-    .container {
-      max-width: 600px; margin: 2rem auto;
-      background: var(--color-surface); padding: var(--spacing);
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .container h2 {
-      font-size: 1.5rem; margin-bottom: var(--spacing);
-      color: var(--color-primary);
-    }
-    .container label {
-      display: block; margin-bottom: 8px; font-weight: 500;
-    }
-    .container textarea {
-      width: 100%; height: 100px; font-size: 1rem;
-      margin-bottom: var(--spacing); padding: 8px;
-      border: 1px solid #ccc; border-radius: var(--border-radius);
-      resize: vertical; font-family: var(--font-base);
-    }
-    .container button {
-      width: 100%; padding: 12px; font-size: 1rem;
-      border: none; border-radius: var(--border-radius);
-      cursor: pointer; font-family: var(--font-base);
-      margin-top: var(--spacing);
-    }
-    .container button.send {
-      background-color: var(--color-secondary);
-      color: var(--color-surface);
-    }
-    .container button.send:hover {
-      background-color: var(--color-accent);
-    }
-    .container button.logs {
-      background-color: var(--color-primary);
-      color: var(--color-surface);
-    }
-    .container button.table-names {
-      background-color: var(--color-secondary);
-      color: var(--color-surface);
-    }
-    .container button.table-names:hover {
-      background-color: var(--color-accent);
-    }
-
-    #recipients {
-      margin-bottom: var(--spacing);
-      max-height: 70vh;
-      overflow-y: auto;
-      background: var(--color-bg);
-      padding: var(--spacing);
-      border: 1px solid #ccc;
-      border-radius: var(--border-radius);
-      text-align: right;
-      font-size: 0.9rem;
-      color: var(--color-text);
-    }
-    #status {
-      margin-top: var(--spacing); font-weight: bold; text-align: center;
-    }
-  </style>
 </head>
 <body>
-
-  <!-- Top Menu -->
-  <div class="top-right-controls">
-    <a href="index.html" title="בית"><i data-feather="home" class="icon-small"></i></a>
+  <!-- כפתורי ניווט עליונים -->
+  <div class="top-buttons">
+    <a href="index.html"><i data-feather="home"></i> בית</a>
     <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
     <div id="dropdownMenu" class="dropdown-menu">
-      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
-      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+      <button id="share-button"><i data-feather="share-2"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon"></i> מצב כהה</button>
     </div>
   </div>
 
-  <!-- Hero Section -->
   <header class="hero">
     <div class="hero-content">
       <h2>שליחת הודעה חכמה</h2>
-      <p>הודעה לכל המסוננים מתוך הרשימה שלך</p>
+      <p>הודעה לכל התלמידים המסוננים</p>
     </div>
   </header>
 
-  <!-- Main Content -->
   <main>
     <div class="container">
       <div id="recipients">טוען נמענים...</div>
 
       <label for="message">תוכן ההודעה:</label>
-      <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
+      <textarea id="message" placeholder="כתוב כאן את ההודעה שברצונך לשלוח..."></textarea>
 
-      <button class="send" onclick="sendMessage()">שלח הודעה</button>
-
-      <button class="logs" onclick="window.location.href='logs.html'">
-        <i data-feather="file-text" class="icon-small"></i>
-        צפה בלוג השליחות
-      </button>
-
-      <button class="table-names"
-              onclick="window.open('https://docs.google.com/spreadsheets/d/11_Vq5eYiadlpa-9TJ5EVpv38SjHIrlnraAFNKgZ5OwM/edit?usp=drivesdk','_blank')">
-        טבלת שמות
-      </button>
-
-      <button class="table-names"
-              onclick="window.open('https://meaningfullearning.origami.ms/-/%D7%9C%D7%9E%D7%99%D7%93%D7%94-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA%D7%99%D7%AA/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%A4%D7%A8-%D7%AA%D7%9C%D7%9E%D7%99%D7%93','_blank')">
-        משוך רשימת שמות
-      </button>
-
-      <button class="table-names" style="background-color: #e67e22;" onclick="resetList()">
-        איפוס רשימה
-      </button>
+      <div class="top-buttons" style="justify-content: center; flex-wrap: wrap;">
+        <button onclick="sendMessage()" class="send"><i data-feather="send"></i> שלח הודעה</button>
+        <button onclick="resetList()" class="table-names"><i data-feather="trash-2"></i> איפוס רשימה</button>
+        <button onclick="window.open('https://docs.google.com/spreadsheets/d/11_Vq5eYiadlpa-9TJ5EVpv38SjHIrlnraAFNKgZ5OwM/edit?usp=drivesdk','_blank')" class="table-names">
+          <i data-feather="database"></i> טבלת שמות
+        </button>
+        <button onclick="window.open('https://meaningfullearning.origami.ms/-/%D7%9C%D7%9E%D7%99%D7%93%D7%94-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA%D7%99%D7%AA/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%A4%D7%A8-%D7%AA%D7%9C%D7%9E%D7%99%D7%93','_blank')" class="table-names">
+          <i data-feather="download-cloud"></i> משוך רשימת שמות
+        </button>
+        <button onclick="window.location.href='logs.html'" class="logs">
+          <i data-feather="file-text"></i> לוג שליחות
+        </button>
+      </div>
 
       <div id="status"></div>
     </div>
   </main>
 
-  <!-- Scripts -->
   <script>
+    // טען את Feather Icons
     feather.replace();
 
-    function toggleMenu() {
-      const menu = document.getElementById('dropdownMenu');
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    }
-
-    document.getElementById('share-button').addEventListener('click', () => {
-      if (navigator.share) {
-        navigator.share({
-          title: 'בראונשטיין – שליחת הודעות',
-          text: 'בדקו את מערכת ההודעות החכמה שלנו',
-          url: location.href
-        }).catch(console.error);
-      } else {
-        alert('שיתוף אינו נתמך בדפדפן זה.');
-      }
-    });
-
-    document.getElementById('dark-toggle').addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark-mode');
-      if (isDark) localStorage.setItem('dark-mode','1');
-      else localStorage.removeItem('dark-mode');
-    });
-    if (localStorage.getItem('dark-mode') === '1') {
-      document.documentElement.classList.add('dark-mode');
-    }
-
-    let recipients = [];
-
+    // טעינת נמענים
     async function loadRecipients() {
-      const res = await fetch("https://script.google.com/a/macros/brawnshtein.co.il/s/AKfycbx6UzjWdWXBNVLBWA3-osdnrwoabE9hr3aMFMgmZjv81ECB3fHOTNyHPzvylGAYVQjOUw/exec");
-      recipients = await res.json();
-
-      const recipientsDiv = document.getElementById("recipients");
-      if (recipients.length === 0) {
-        recipientsDiv.innerHTML = "לא נמצאו נמענים.";
+      const res = await fetch("https://script.google.com/macros/s/AKfycbzKPI4Igbd2B4OppKAstXJm-TMtxirh8qAjhSm3loQ-b1SV-oicGrBTsueCUV7jYhZ9/exec?action=getRecipients");
+      const data = await res.json();
+      const list = data.recipients;
+      if (list.length === 0) {
+        document.getElementById("recipients").innerHTML = "לא נמצאו נמענים.";
         return;
       }
-
-      recipientsDiv.innerHTML = `<strong>${recipients.length} נמענים מוכנים לשליחה:</strong><br>` +
-        recipients.map(r => `${r.firstName} ${r.lastName} – ${r.phone}`).join("<br>");
+      document.getElementById("recipients").innerHTML =
+        "<strong>נמענים:</strong><br>" +
+        list.map(r => `${r.firstName} ${r.lastName} (${r.phone})`).join("<br>");
     }
 
+    // שליחת הודעה
     async function sendMessage() {
-      const message = document.getElementById("message").value.trim();
-      const status = document.getElementById("status");
-
-      if (!message) {
-        status.textContent = "נא להקליד הודעה לפני השליחה.";
-        status.style.color = "var(--color-accent)";
+      const msg = document.getElementById("message").value.trim();
+      if (!msg) {
+        alert("אנא כתוב תוכן הודעה לפני השליחה.");
         return;
       }
+      const confirmSend = confirm("האם אתה בטוח שברצונך לשלוח את ההודעה לכל הנמענים?");
+      if (!confirmSend) return;
 
-      if (recipients.length === 0) {
-        status.textContent = "אין נמענים לשליחה.";
-        status.style.color = "var(--color-accent)";
-        return;
-      }
+      document.getElementById("status").innerHTML = "שולח הודעות...";
 
-      if (!confirm("האם אתה בטוח שברצונך לשלוח את ההודעה לכל המסוננים?")) {
-        return;
-      }
+      const res = await fetch("https://hook.eu2.make.com/sztfzmeero425mfxirbvjsrw8yfohrke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      });
 
-      status.textContent = "שולח הודעות...";
-      status.style.color = "var(--color-text)";
-
-      try {
-        const res = await fetch("https://hook.eu2.make.com/2b96fig78b9txx26dlj5a0rhlrj2pvho", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
-        });
-
-        if (res.ok) {
-          status.textContent = "ההודעות נשלחו בהצלחה!";
-          status.style.color = "var(--color-secondary)";
-        } else {
-          status.textContent = "שגיאה בשליחה.";
-          status.style.color = "var(--color-accent)";
-        }
-      } catch (err) {
-        status.textContent = "שגיאת רשת. בדוק/י את החיבור.";
-        status.style.color = "var(--color-accent)";
+      if (res.ok) {
+        document.getElementById("status").innerHTML = "✔️ ההודעות נשלחו בהצלחה.";
+      } else {
+        document.getElementById("status").innerHTML = "❌ שגיאה בשליחה.";
       }
     }
 
+    // איפוס רשימה
     async function resetList() {
-      if (!confirm("האם אתה בטוח שברצונך למחוק את כל השורות מהרשימה?")) return;
+      const confirmReset = confirm("האם אתה בטוח שברצונך למחוק את כל השורות בטבלת השמות?");
+      if (!confirmReset) return;
 
-      const status = document.getElementById("status");
-      status.textContent = "מאפס את הרשימה...";
-      status.style.color = "var(--color-text)";
-
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "reset" })
-        });
-
-        if (res.ok) {
-          status.textContent = "הרשימה אופסה בהצלחה.";
-          status.style.color = "green";
-          loadRecipients();
-        } else {
-          status.textContent = "אירעה שגיאה באיפוס הרשימה.";
-          status.style.color = "red";
-        }
-      } catch (err) {
-        status.textContent = "שגיאת רשת באיפוס הרשימה.";
-        status.style.color = "red";
+      const res = await fetch("https://script.google.com/macros/s/AKfycbzKPI4Igbd2B4OppKAstXJm-TMtxirh8qAjhSm3loQ-b1SV-oicGrBTsueCUV7jYhZ9/exec?action=reset");
+      if (res.ok) {
+        document.getElementById("status").innerHTML = "✔️ הרשימה אופסה בהצלחה.";
+        document.getElementById("recipients").innerHTML = "אין נמענים להצגה.";
+      } else {
+        document.getElementById("status").innerHTML = "❌ שגיאה באיפוס הרשימה.";
       }
     }
 
+    // תפריט קטן (לא חובה אם אין תפריט נפתח)
+    function toggleMenu() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+
+    // טעינה אוטומטית
     window.onload = loadRecipients;
   </script>
 </body>

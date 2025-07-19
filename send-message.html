@@ -239,9 +239,10 @@
       status.style.color = "var(--color-text)";
 
       try {
-        const res = await fetch("https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE/exec?action=reset", {
-          method: "GET"
-        });
+        const res = await fetch("https://script.google.com/macros/s/AKfycbzVn9DE9cfOpvXFKssrh8nSqORnSL1aqe2ueyzSbsMH6R7IW-hhApQvwlnryKmO3Omhyg/exec?action=reset", {
+  method: "GET"
+});
+
 
         if (res.ok) {
           status.textContent = "הרשימה אופסה בהצלחה.";

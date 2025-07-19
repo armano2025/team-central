@@ -10,6 +10,83 @@
   <link rel="manifest" href="icons/site.webmanifest" />
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .menu-toggle { background: none; border: none; cursor: pointer; }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px; right: 10px;
+      background: #fff; border: 1px solid #ccc; z-index: 1000; width: 160px;
+    }
+    .dropdown-menu button {
+      display: flex; align-items: center; padding: 10px; width: 100%;
+      background: none; border: none; text-align: right; font-family: inherit; font-size: 14px; cursor: pointer;
+    }
+    .top-right-controls {
+      display: flex; justify-content: flex-end; align-items: center; padding: 10px;
+    }
+    .icon-small { width: 20px; height: 20px; margin-left: 8px; }
+
+    .container {
+      max-width: 600px; margin: 2rem auto;
+      background: var(--color-surface); padding: var(--spacing);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .container h2 {
+      font-size: 1.5rem; margin-bottom: var(--spacing);
+      color: var(--color-primary);
+    }
+    .container label {
+      display: block; margin-bottom: 8px; font-weight: 500;
+    }
+    .container textarea {
+      width: 100%; height: 100px; font-size: 1rem;
+      margin-bottom: var(--spacing); padding: 8px;
+      border: 1px solid #ccc; border-radius: var(--border-radius);
+      resize: vertical; font-family: var(--font-base);
+    }
+    .container button {
+      width: 100%; padding: 12px; font-size: 1rem;
+      border: none; border-radius: var(--border-radius);
+      cursor: pointer; font-family: var(--font-base);
+      margin-top: var(--spacing);
+    }
+    .container button.send {
+      background-color: var(--color-secondary);
+      color: var(--color-surface);
+    }
+    .container button.send:hover {
+      background-color: var(--color-accent);
+    }
+    .container button.logs {
+      background-color: var(--color-primary);
+      color: var(--color-surface);
+    }
+    .container button.table-names {
+      background-color: var(--color-secondary);
+      color: var(--color-surface);
+    }
+    .container button.table-names:hover {
+      background-color: var(--color-accent);
+    }
+
+    #recipients {
+      margin-bottom: var(--spacing);
+      max-height: 70vh;
+      overflow-y: auto;
+      background: var(--color-bg);
+      padding: var(--spacing);
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--color-text);
+    }
+    #status {
+      margin-top: var(--spacing); font-weight: bold; text-align: center;
+    }
+  </style>
 </head>
 <body>
 
@@ -41,28 +118,21 @@
 
       <button class="send" onclick="sendMessage()">שלח הודעה</button>
 
-      <!-- קבוצת כפתורים נוספים -->
-      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--spacing); justify-content: center;">
-        <button class="logs" onclick="window.location.href='logs.html'">
-          <i data-feather="file-text" class="icon-small"></i>
-          צפה בלוג השליחות
-        </button>
+      <button class="logs" onclick="window.location.href='logs.html'">
+        <i data-feather="file-text" class="icon-small"></i>
+        צפה בלוג השליחות
+      </button>
 
-        <button class="table-names"
-          onclick="window.open('https://docs.google.com/spreadsheets/d/11_Vq5eYiadlpa-9TJ5EVpv38SjHIrlnraAFNKgZ5OwM/edit?usp=drivesdk','_blank')">
-          טבלת שמות
-        </button>
+      <button class="table-names"
+              onclick="window.open('https://docs.google.com/spreadsheets/d/11_Vq5eYiadlpa-9TJ5EVpv38SjHIrlnraAFNKgZ5OwM/edit?usp=drivesdk','_blank')">
+        טבלת שמות
+      </button>
 
-        <button class="table-names"
-          onclick="window.open('https://meaningfullearning.origami.ms/-/%D7%9C%D7%9E%D7%99%D7%93%D7%94-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA%D7%99%D7%AA/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%A4%D7%A8-%D7%AA%D7%9C%D7%9E%D7%99%D7%93','_blank')">
-          משוך רשימת שמות
-        </button>
-
-        <!-- 🔽 כפתור חדש: איפוס רשימה -->
-        <button class="table-names" onclick="resetList()">
-          איפוס רשימה
-        </button>
-      </div>
+      <!-- 🔽 כפתור חדש: משוך רשימת שמות -->
+      <button class="table-names"
+              onclick="window.open('https://meaningfullearning.origami.ms/-/%D7%9C%D7%9E%D7%99%D7%93%D7%94-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA%D7%99%D7%AA/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%A4%D7%A8-%D7%AA%D7%9C%D7%9E%D7%99%D7%93','_blank')">
+        משוך רשימת שמות
+      </button>
 
       <div id="status"></div>
     </div>
@@ -94,7 +164,6 @@
       if (isDark) localStorage.setItem('dark-mode','1');
       else localStorage.removeItem('dark-mode');
     });
-
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
@@ -154,35 +223,6 @@
         }
       } catch (err) {
         status.textContent = "שגיאת רשת. בדוק/י את החיבור.";
-        status.style.color = "var(--color-accent)";
-      }
-    }
-
-    async function resetList() {
-      const confirmReset = confirm("האם אתה בטוח שברצונך לאפס את הרשימה?");
-      if (!confirmReset) return;
-
-      const status = document.getElementById("status");
-      status.textContent = "מאפס את הרשימה...";
-      status.style.color = "var(--color-text)";
-
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbzpAqiP_91vDFP52UX5NpW2lbCrW1Q7dufw7UZjlEoE7RaFF7Bxz2-e2ZbqdR3Bh6kw0Q/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "resetList" })
-        });
-
-        if (res.ok) {
-          status.textContent = "הרשימה אופסה בהצלחה.";
-          status.style.color = "var(--color-secondary)";
-          document.getElementById("recipients").innerHTML = "לא נמצאו נמענים.";
-        } else {
-          status.textContent = "אירעה שגיאה באיפוס הרשימה.";
-          status.style.color = "var(--color-accent)";
-        }
-      } catch (err) {
-        status.textContent = "שגיאת רשת באיפוס הרשימה.";
         status.style.color = "var(--color-accent)";
       }
     }

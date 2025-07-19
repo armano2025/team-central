@@ -11,7 +11,6 @@
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    /* Top menu controls */
     .menu-toggle { background: none; border: none; cursor: pointer; }
     .dropdown-menu {
       display: none;
@@ -28,7 +27,6 @@
     }
     .icon-small { width: 20px; height: 20px; margin-left: 8px; }
 
-    /* Container */
     .container {
       max-width: 600px; margin: 2rem auto;
       background: var(--color-surface); padding: var(--spacing);
@@ -65,7 +63,6 @@
       background-color: var(--color-primary);
       color: var(--color-surface);
     }
-    /* כפתור טבלת שמות */
     .container button.table-names {
       background-color: var(--color-secondary);
       color: var(--color-surface);
@@ -74,7 +71,6 @@
       background-color: var(--color-accent);
     }
 
-    /* Recipients panel: עד 70% מגובה החלון, גלילה אם צריך */
     #recipients {
       margin-bottom: var(--spacing);
       max-height: 70vh;
@@ -121,13 +117,21 @@
       <textarea id="message" placeholder="הכנס/י את תוכן ההודעה כאן..."></textarea>
 
       <button class="send" onclick="sendMessage()">שלח הודעה</button>
+
       <button class="logs" onclick="window.location.href='logs.html'">
         <i data-feather="file-text" class="icon-small"></i>
         צפה בלוג השליחות
       </button>
+
       <button class="table-names"
               onclick="window.open('https://docs.google.com/spreadsheets/d/11_Vq5eYiadlpa-9TJ5EVpv38SjHIrlnraAFNKgZ5OwM/edit?usp=drivesdk','_blank')">
         טבלת שמות
+      </button>
+
+      <!-- 🔽 כפתור חדש: משוך רשימת שמות -->
+      <button class="table-names"
+              onclick="window.open('https://meaningfullearning.origami.ms/-/%D7%9C%D7%9E%D7%99%D7%93%D7%94-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA%D7%99%D7%AA/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%A4%D7%A8-%D7%AA%D7%9C%D7%9E%D7%99%D7%93','_blank')">
+        משוך רשימת שמות
       </button>
 
       <div id="status"></div>

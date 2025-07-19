@@ -128,10 +128,14 @@
         טבלת שמות
       </button>
 
-      <!-- 🔽 כפתור חדש: משוך רשימת שמות -->
       <button class="table-names"
               onclick="window.open('https://meaningfullearning.origami.ms/-/%D7%9C%D7%9E%D7%99%D7%93%D7%94-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA%D7%99%D7%AA/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%A4%D7%A8-%D7%AA%D7%9C%D7%9E%D7%99%D7%93','_blank')">
         משוך רשימת שמות
+      </button>
+
+      <!-- 🔽 כפתור חדש: איפוס רשימה -->
+      <button class="table-names" onclick="resetSheet()">
+        איפוס רשימה
       </button>
 
       <div id="status"></div>
@@ -223,6 +227,32 @@
         }
       } catch (err) {
         status.textContent = "שגיאת רשת. בדוק/י את החיבור.";
+        status.style.color = "var(--color-accent)";
+      }
+    }
+
+    async function resetSheet() {
+      if (!confirm("האם אתה בטוח שברצונך למחוק את כל הנתונים מהרשימה?")) return;
+
+      const status = document.getElementById("status");
+      status.textContent = "מאפס את הרשימה...";
+      status.style.color = "var(--color-text)";
+
+      try {
+        const res = await fetch("https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_WEBAPP_URL_HERE/exec?action=reset", {
+          method: "GET"
+        });
+
+        if (res.ok) {
+          status.textContent = "הרשימה אופסה בהצלחה.";
+          status.style.color = "var(--color-secondary)";
+          await loadRecipients();
+        } else {
+          status.textContent = "שגיאה באיפוס הרשימה.";
+          status.style.color = "var(--color-accent)";
+        }
+      } catch (err) {
+        status.textContent = "שגיאת רשת בעת איפוס.";
         status.style.color = "var(--color-accent)";
       }
     }

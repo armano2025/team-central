@@ -35,6 +35,16 @@
       padding: 12px 20px;
     }
 
+    .top-bar button {
+      background: none;
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-right: 12px;
+    }
+
     .top-bar a {
       color: white;
       text-decoration: none;
@@ -131,7 +141,10 @@
 
   <!-- סרגל עליון -->
   <div class="top-bar">
-    <a href="index.html" title="חזרה לדף הראשי">
+    <button id="refreshButton" title="רענן">
+      <i data-feather="refresh-cw"></i>
+    </button>
+    <a href="send-message.html" title="חזרה לדף הראשי">
       <i data-feather="arrow-right-circle"></i> חזור
     </a>
   </div>
@@ -161,8 +174,6 @@
   </main>
 
   <script>
-    feather.replace();
-
     async function loadLog() {
       const status = document.getElementById('status');
       const table = document.getElementById('logTable');
@@ -202,7 +213,21 @@
       }
     }
 
-    window.onload = loadLog;
+    window.onload = function() {
+      feather.replace();
+      const refreshBtn = document.getElementById('refreshButton');
+      refreshBtn.addEventListener('click', function() {
+        const statusEl = document.getElementById('status');
+        const tableEl = document.getElementById('logTable');
+        const tbodyEl = tableEl.querySelector('tbody');
+        tbodyEl.innerHTML = '';
+        statusEl.style.display = '';
+        statusEl.textContent = 'טוען נתונים...';
+        tableEl.style.display = 'none';
+        loadLog();
+      });
+      loadLog();
+    };
   </script>
 
 </body>

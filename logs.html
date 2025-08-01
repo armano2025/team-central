@@ -26,8 +26,8 @@
     <input type="text" id="searchInput" placeholder="חפש לפי שם או טלפון" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
     <select id="statusFilter" style="padding: 8px; border-radius: 8px; margin-right: 12px;">
       <option value="">הצג הכל</option>
-      <option value="הצלחה">רק הצלחות</option>
-      <option value="נכשל">רק כישלונות</option>
+      <option value="הצלחה">הצלחה</option>
+      <option value="נכשל">נכשל</option>
     </select>
     <button id="downloadCSV"><i data-feather="download"></i> הורד CSV</button>
   </div>
@@ -43,8 +43,14 @@
       const statusEl = document.getElementById("status");
       try {
         const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
-        const data = await res.json();
-        allData = data.reverse(); // הצגה לפי האחרון ראשון
+        const json = await res.json();
+
+        // בדיקה גמישה: האם המידע הוא מערך? האם יש מפתחות?
+        if (!Array.isArray(json)) throw new Error("הפורמט של המידע אינו תקין");
+
+        // הפוך את הסדר: אחרון ראשון
+        allData = json.reverse();
+
         renderCards(allData);
         statusEl.style.display = "none";
       } catch (err) {
@@ -56,7 +62,8 @@
     function renderCards(data) {
       const container = document.getElementById("cardsContainer");
       container.innerHTML = "";
-      if (data.length === 0) {
+
+      if (!data || data.length === 0) {
         container.innerHTML = "<p>לא נמצאו תוצאות תואמות.</p>";
         return;
       }
@@ -64,9 +71,10 @@
       data.forEach(row => {
         const card = document.createElement("div");
         card.className = "card";
-        if (row.status === "נכשל") {
+        if ((row.status || "").trim() === "נכשל") {
           card.style.backgroundColor = "#ffe9e9";
         }
+
         card.innerHTML = `
           <h3>${row.firstName || ''} ${row.lastName || ''}</h3>
           <p><strong>📞</strong> ${row.phone || ''}</p>
@@ -78,43 +86,56 @@
       });
     }
 
-    function filterData() {
-      const search = document.getElementById("searchInput").value.trim().toLowerCase();
-      const status = document.getElementById("statusFilter").value;
+    function filterAndRender() {
+      const searchVal = document.getElementById("searchInput").value.trim().toLowerCase();
+      const statusVal = document.getElementById("statusFilter").value;
+
       const filtered = allData.filter(row => {
-        const fullName = `${row.firstName} ${row.lastName}`.toLowerCase();
-        const phone = (row.phone || "").toLowerCase();
-        const statusMatch = status === "" || row.status === status;
-        return (fullName.includes(search) || phone.includes(search)) && statusMatch;
+        const fullName = `${row.firstName || ''} ${row.lastName || ''}`.toLowerCase();
+        const phone = (row.phone || '').toLowerCase();
+        const status = (row.status || '');
+        return (fullName.includes(searchVal) || phone.includes(searchVal)) &&
+               (statusVal === "" || status === statusVal);
       });
+
       renderCards(filtered);
     }
 
     function downloadCSV() {
-      const status = document.getElementById("statusFilter").value;
-      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+      const statusVal = document.getElementById("statusFilter").value;
+      const searchVal = document.getElementById("searchInput").value.trim().toLowerCase();
+
       const filtered = allData.filter(row => {
-        const fullName = `${row.firstName} ${row.lastName}`.toLowerCase();
-        const phone = (row.phone || "").toLowerCase();
-        const statusMatch = status === "" || row.status === status;
-        return (fullName.includes(search) || phone.includes(search)) && statusMatch;
+        const fullName = `${row.firstName || ''} ${row.lastName || ''}`.toLowerCase();
+        const phone = (row.phone || '').toLowerCase();
+        const status = (row.status || '');
+        return (fullName.includes(searchVal) || phone.includes(searchVal)) &&
+               (statusVal === "" || status === statusVal);
       });
 
-      const csvRows = [
-        ["שם פרטי", "שם משפחה", "טלפון", "הודעה", "זמן", "סטטוס"],
-        ...filtered.map(r => [r.firstName, r.lastName, r.phone, r.message, r.time, r.status])
-      ];
-      const csvContent = csvRows.map(row => row.map(field => `"${field}"`).join(",")).join("\n");
+      const csvHeader = ['שם פרטי','שם משפחה','טלפון','הודעה','זמן','סטטוס'];
+      const csvRows = filtered.map(r => [
+        r.firstName || '',
+        r.lastName || '',
+        r.phone || '',
+        r.message || '',
+        r.time || '',
+        r.status || ''
+      ]);
+      const allRows = [csvHeader, ...csvRows];
+
+      const csvContent = allRows.map(row => row.map(val => `"${val}"`).join(",")).join("\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "log.csv";
+      link.href = url;
+      link.setAttribute("download", "log.csv");
       link.click();
     }
 
-    document.getElementById("searchInput").addEventListener("input", filterData);
-    document.getElementById("statusFilter").addEventListener("change", filterData);
-    document.getElementById("refreshBtn").addEventListener("click", () => loadLog());
+    document.getElementById("searchInput").addEventListener("input", filterAndRender);
+    document.getElementById("statusFilter").addEventListener("change", filterAndRender);
+    document.getElementById("refreshBtn").addEventListener("click", loadLog);
     document.getElementById("downloadCSV").addEventListener("click", downloadCSV);
 
     window.onload = () => {

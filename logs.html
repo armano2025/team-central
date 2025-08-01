@@ -34,11 +34,14 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px 20px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .top-bar .actions {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .top-bar button, .top-bar a {
@@ -72,10 +75,15 @@
       padding: 0 1rem;
     }
 
-    #search {
-      width: 100%;
-      padding: 0.75rem 1rem;
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 1rem;
+    }
+
+    #search, #statusFilter {
+      padding: 0.6rem 1rem;
       border: 1px solid var(--color-border);
       border-radius: var(--radius);
       font-size: 1rem;
@@ -129,6 +137,21 @@
       padding: 6px 12px;
     }
 
+    .sort-button {
+      cursor: pointer;
+      background-color: var(--color-primary);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: var(--radius);
+    }
+
+    .count-label {
+      margin-bottom: 1rem;
+      font-weight: bold;
+      color: #555;
+    }
+
     @media (max-width: 600px) {
       .card-header {
         flex-direction: column;
@@ -144,6 +167,7 @@
     <div class="actions">
       <button id="refreshButton" title="רענן"><i data-feather="refresh-cw"></i> רענן</button>
       <button id="downloadBtn" title="הורד CSV" class="button-secondary"><i data-feather="download"></i> הורד CSV</button>
+      <button id="sortButton" title="סדר לפי זמן" class="button-secondary"><i data-feather="clock"></i> סדר לפי זמן</button>
     </div>
     <a href="send-message.html"><i data-feather="arrow-right-circle"></i> חזור</a>
   </div>
@@ -155,13 +179,22 @@
   </header>
 
   <main class="container">
-    <input type="text" id="search" placeholder="🔍 חפש לפי שם, טלפון או הודעה..." />
+    <div class="filters">
+      <input type="text" id="search" placeholder="🔍 חפש לפי שם, טלפון או הודעה..." />
+      <select id="statusFilter">
+        <option value="all">כל הסטטוסים</option>
+        <option value="נשלח">נשלח</option>
+        <option value="נכשל">נכשל</option>
+      </select>
+    </div>
+    <div class="count-label" id="logCount">סה"כ: 0 הודעות</div>
     <div id="status">טוען נתונים...</div>
     <div id="logCards"></div>
   </main>
 
   <script>
     let allData = [];
+    let isDescending = true;
 
     function createCard(row) {
       const statusClass = row.status === 'נשלח' ? 'success' : 'fail';
@@ -182,13 +215,33 @@
 
     function renderCards(data) {
       const container = document.getElementById('logCards');
+      const count = document.getElementById('logCount');
       container.innerHTML = data.map(createCard).join('');
+      count.textContent = `סה"כ: ${data.length} הודעות`;
+      feather.replace();
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('search').value.toLowerCase();
+      const statusVal = document.getElementById('statusFilter').value;
+      const filtered = allData.filter(row => {
+        const matchSearch = `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase().includes(search);
+        const matchStatus = statusVal === 'all' || row.status === statusVal;
+        return matchSearch && matchStatus;
+      });
+      const sorted = [...filtered].sort((a, b) => {
+        const t1 = new Date(a.time), t2 = new Date(b.time);
+        return isDescending ? t2 - t1 : t1 - t2;
+      });
+      renderCards(sorted);
     }
 
     async function loadLog() {
       const statusEl = document.getElementById('status');
       const cardsEl = document.getElementById('logCards');
       cardsEl.innerHTML = '';
+      statusEl.style.display = 'block';
+      statusEl.textContent = "טוען נתונים...";
       try {
         const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
         const data = await res.json();
@@ -196,9 +249,9 @@
           statusEl.textContent = "אין נתונים להצגה.";
           return;
         }
-        allData = data.reverse(); // הצגה מהאחרון לראשון
-        renderCards(allData);
+        allData = data;
         statusEl.style.display = 'none';
+        applyFilters();
       } catch (err) {
         statusEl.innerHTML = '<div style="background:#ffe9e9;color:#c0392b;padding:1rem;border-radius:10px;">⚠️ שגיאה בטעינת הנתונים.</div>';
       }
@@ -219,22 +272,16 @@
       document.body.removeChild(link);
     }
 
-    function setupSearch() {
-      const input = document.getElementById('search');
-      input.addEventListener('input', () => {
-        const val = input.value.toLowerCase();
-        const filtered = allData.filter(row =>
-          `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase().includes(val)
-        );
-        renderCards(filtered);
-      });
-    }
-
     window.onload = () => {
       feather.replace();
       document.getElementById('refreshButton').onclick = loadLog;
       document.getElementById('downloadBtn').onclick = downloadCSV;
-      setupSearch();
+      document.getElementById('sortButton').onclick = () => {
+        isDescending = !isDescending;
+        applyFilters();
+      };
+      document.getElementById('search').addEventListener('input', applyFilters);
+      document.getElementById('statusFilter').addEventListener('change', applyFilters);
       loadLog();
     };
   </script>

@@ -10,280 +10,160 @@
     :root {
       --font-base: 'Rubik', sans-serif;
       --color-bg: #f5f5f5;
-      --color-surface: #ffffff;
+      --color-surface: #fff;
       --color-primary: #3498db;
-      --color-text: #333;
       --color-success: #e8f8f5;
       --color-fail: #fdecea;
       --color-border: #ddd;
       --radius: 12px;
     }
-
-    body {
-      font-family: var(--font-base);
-      margin: 0;
-      padding: 0;
-      background-color: var(--color-bg);
-      color: var(--color-text);
-    }
-
+    body { font-family: var(--font-base); margin: 0; background: var(--color-bg); }
     .top-bar {
-      background-color: var(--color-primary);
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 20px;
-      flex-wrap: wrap;
-      gap: 10px;
+      background: var(--color-primary); color: #fff;
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px;
     }
-
-    .top-bar .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
     .top-bar button, .top-bar a {
-      background: none;
-      border: none;
-      color: white;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      text-decoration: none;
+      background: none; border: none; color: #fff;
+      font-weight: 500; display: flex; align-items: center;
+      text-decoration: none; cursor: pointer;
     }
-
-    .top-bar i {
-      margin-left: 6px;
+    .top-bar i { margin-left: 6px; }
+    header { text-align: center; background: #ecf0f1; padding: 1rem; }
+    .container { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 1rem; }
+    input, select {
+      padding: 0.6rem 1rem; border: 1px solid var(--color-border);
+      border-radius: var(--radius); font-size: 1rem;
     }
-
-    header {
-      text-align: center;
-      background-color: #ecf0f1;
-      padding: 1rem;
-    }
-
-    header h2 {
-      margin: 0;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 1rem;
-    }
-
-    #search, #statusFilter {
-      padding: 0.6rem 1rem;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius);
-      font-size: 1rem;
-    }
-
     .card {
-      border-radius: var(--radius);
-      background-color: var(--color-surface);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-      padding: 1rem;
-      margin-bottom: 1rem;
-      transition: all 0.3s ease;
+      background: var(--color-surface); border-radius: var(--radius);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      padding: 1rem; margin-bottom: 1rem;
     }
-
-    .card.success {
-      background-color: var(--color-success);
-    }
-
-    .card.fail {
-      background-color: var(--color-fail);
-    }
-
+    .card.success { background: var(--color-success); }
+    .card.fail { background: var(--color-fail); }
     .card-header {
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-      color: #555;
-      display: flex;
-      justify-content: space-between;
+      font-size: 0.85rem; color: #555;
+      display: flex; justify-content: space-between; margin-bottom: 0.5rem;
     }
-
-    .card-body p {
-      margin: 0.4rem 0;
-    }
-
-    .card-body .icon {
-      margin-left: 6px;
-      color: #777;
-    }
-
-    #status {
-      text-align: center;
-      margin: 2rem 0;
-      font-weight: 500;
-    }
-
+    .card-body p { margin: 0.4rem 0; }
+    .icon { margin-left: 6px; color: #777; }
+    #status { text-align: center; margin: 2rem 0; font-weight: 500; }
     .button-secondary {
-      background-color: transparent;
-      border: 1px solid white;
-      color: white;
-      border-radius: 6px;
-      padding: 6px 12px;
+      background: transparent; border: 1px solid #fff; color: #fff;
+      border-radius: 6px; padding: 6px 12px;
     }
-
-    .sort-button {
-      cursor: pointer;
-      background-color: var(--color-primary);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: var(--radius);
-    }
-
-    .count-label {
-      margin-bottom: 1rem;
-      font-weight: bold;
-      color: #555;
-    }
-
+    .count-label { margin-bottom: 1rem; font-weight: bold; color: #555; }
     @media (max-width: 600px) {
-      .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .card-header { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
 
-  <!-- סרגל עליון -->
-  <div class="top-bar">
-    <div class="actions">
-      <button id="refreshButton" title="רענן"><i data-feather="refresh-cw"></i> רענן</button>
-      <button id="downloadBtn" title="הורד CSV" class="button-secondary"><i data-feather="download"></i> הורד CSV</button>
-      <button id="sortButton" title="סדר לפי זמן" class="button-secondary"><i data-feather="clock"></i> סדר לפי זמן</button>
-    </div>
-    <a href="send-message.html"><i data-feather="arrow-right-circle"></i> חזור</a>
+<div class="top-bar">
+  <div class="actions">
+    <button id="refreshButton"><i data-feather="refresh-cw"></i> רענן</button>
+    <button id="downloadBtn" class="button-secondary"><i data-feather="download"></i> הורד CSV</button>
+    <button id="sortButton" class="button-secondary"><i data-feather="clock"></i> סדר לפי זמן</button>
   </div>
+  <a href="send-message.html"><i data-feather="arrow-right-circle"></i> חזור</a>
+</div>
 
-  <!-- כותרת -->
-  <header>
-    <h2>לוג השליחות</h2>
-    <p>כל ההודעות שנשלחו דרך המערכת</p>
-  </header>
+<header>
+  <h2>לוג השליחות</h2>
+  <p>כל ההודעות שנשלחו דרך המערכת</p>
+</header>
 
-  <main class="container">
-    <div class="filters">
-      <input type="text" id="search" placeholder="🔍 חפש לפי שם, טלפון או הודעה..." />
-      <select id="statusFilter">
-        <option value="all">כל הסטטוסים</option>
-        <option value="נשלח">נשלח</option>
-        <option value="נכשל">נכשל</option>
-      </select>
-    </div>
-    <div class="count-label" id="logCount">סה"כ: 0 הודעות</div>
-    <div id="status">טוען נתונים...</div>
-    <div id="logCards"></div>
-  </main>
+<main class="container">
+  <div class="filters">
+    <input type="text" id="search" placeholder="🔍 חפש לפי שם, טלפון או הודעה..." />
+    <select id="statusFilter">
+      <option value="all">כל הסטטוסים</option>
+      <option value="נשלח">נשלח</option>
+      <option value="נכשל">נכשל</option>
+    </select>
+  </div>
+  <div class="count-label" id="logCount">סה"כ: 0 הודעות</div>
+  <div id="status">טוען נתונים...</div>
+  <div id="logCards"></div>
+</main>
 
-  <script>
-    let allData = [];
-    let isDescending = true;
+<script>
+  let allData = [], isDescending = true;
 
-    function createCard(row) {
-      const statusClass = row.status === 'נשלח' ? 'success' : 'fail';
-      return `
-        <div class="card ${statusClass}">
-          <div class="card-header">
-            <span>${row.time || ''}</span>
-            <strong>${row.status || ''}</strong>
-          </div>
-          <div class="card-body">
-            <p><i class="icon" data-feather="user"></i>${row.firstName || ''} ${row.lastName || ''}</p>
-            <p><i class="icon" data-feather="phone"></i>${row.phone || ''}</p>
-            <p><i class="icon" data-feather="message-square"></i>${row.message || ''}</p>
-          </div>
-        </div>
-      `;
+  const createCard = row => `
+    <div class="card ${row.status === 'נשלח' ? 'success' : 'fail'}">
+      <div class="card-header">
+        <span>${row.time || ''}</span>
+        <strong>${row.status || ''}</strong>
+      </div>
+      <div class="card-body">
+        <p><i class="icon" data-feather="user"></i>${row.firstName || ''} ${row.lastName || ''}</p>
+        <p><i class="icon" data-feather="phone"></i>${row.phone || ''}</p>
+        <p><i class="icon" data-feather="message-square"></i>${row.message || ''}</p>
+      </div>
+    </div>`;
+
+  function renderCards(data) {
+    document.getElementById('logCards').innerHTML = data.map(createCard).join('');
+    document.getElementById('logCount').textContent = `סה"כ: ${data.length} הודעות`;
+    feather.replace();
+  }
+
+  function applyFilters() {
+    const search = document.getElementById('search').value.toLowerCase();
+    const statusVal = document.getElementById('statusFilter').value;
+    const filtered = allData.filter(row => {
+      const matchSearch = `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase().includes(search);
+      const matchStatus = statusVal === 'all' || row.status === statusVal;
+      return matchSearch && matchStatus;
+    }).sort((a, b) => {
+      const t1 = new Date(a.time), t2 = new Date(b.time);
+      return isDescending ? t2 - t1 : t1 - t2;
+    });
+    renderCards(filtered);
+  }
+
+  async function loadLog() {
+    const statusEl = document.getElementById('status');
+    statusEl.style.display = 'block';
+    statusEl.textContent = "טוען נתונים...";
+    try {
+      const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
+      allData = (await res.json()).reverse(); // הפוך את הסדר כבר כאן
+      statusEl.style.display = 'none';
+      applyFilters();
+    } catch (err) {
+      statusEl.innerHTML = '<div style="background:#ffe9e9;color:#c0392b;padding:1rem;border-radius:10px;">⚠️ שגיאה בטעינת הנתונים.</div>';
     }
+  }
 
-    function renderCards(data) {
-      const container = document.getElementById('logCards');
-      const count = document.getElementById('logCount');
-      container.innerHTML = data.map(createCard).join('');
-      count.textContent = `סה"כ: ${data.length} הודעות`;
-      feather.replace();
-    }
+  function downloadCSV() {
+    if (!allData.length) return;
+    const header = ['firstName','lastName','phone','message','time','status'];
+    const rows = allData.map(r => header.map(k => `"${(r[k] || '').replace(/"/g, '""')}"`).join(','));
+    const csvContent = [header.join(','), ...rows].join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url; link.download = "log.csv"; link.click();
+    URL.revokeObjectURL(url);
+  }
 
-    function applyFilters() {
-      const search = document.getElementById('search').value.toLowerCase();
-      const statusVal = document.getElementById('statusFilter').value;
-      const filtered = allData.filter(row => {
-        const matchSearch = `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase().includes(search);
-        const matchStatus = statusVal === 'all' || row.status === statusVal;
-        return matchSearch && matchStatus;
-      });
-      const sorted = [...filtered].sort((a, b) => {
-        const t1 = new Date(a.time), t2 = new Date(b.time);
-        return isDescending ? t2 - t1 : t1 - t2;
-      });
-      renderCards(sorted);
-    }
-
-    async function loadLog() {
-      const statusEl = document.getElementById('status');
-      const cardsEl = document.getElementById('logCards');
-      cardsEl.innerHTML = '';
-      statusEl.style.display = 'block';
-      statusEl.textContent = "טוען נתונים...";
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
-        const data = await res.json();
-        if (!data.length) {
-          statusEl.textContent = "אין נתונים להצגה.";
-          return;
-        }
-        allData = data;
-        statusEl.style.display = 'none';
-        applyFilters();
-      } catch (err) {
-        statusEl.innerHTML = '<div style="background:#ffe9e9;color:#c0392b;padding:1rem;border-radius:10px;">⚠️ שגיאה בטעינת הנתונים.</div>';
-      }
-    }
-
-    function downloadCSV() {
-      if (!allData.length) return;
-      const header = ['firstName','lastName','phone','message','time','status'];
-      const rows = allData.map(r => header.map(k => `"${(r[k] || '').replace(/"/g, '""')}"`).join(','));
-      const csvContent = [header.join(','), ...rows].join('\n');
-      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", "log.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    window.onload = () => {
-      feather.replace();
-      document.getElementById('refreshButton').onclick = loadLog;
-      document.getElementById('downloadBtn').onclick = downloadCSV;
-      document.getElementById('sortButton').onclick = () => {
-        isDescending = !isDescending;
-        applyFilters();
-      };
-      document.getElementById('search').addEventListener('input', applyFilters);
-      document.getElementById('statusFilter').addEventListener('change', applyFilters);
-      loadLog();
+  window.onload = () => {
+    feather.replace();
+    document.getElementById('refreshButton').onclick = loadLog;
+    document.getElementById('downloadBtn').onclick = downloadCSV;
+    document.getElementById('sortButton').onclick = () => {
+      isDescending = !isDescending;
+      applyFilters();
     };
-  </script>
+    document.getElementById('search').oninput = applyFilters;
+    document.getElementById('statusFilter').onchange = applyFilters;
+    loadLog();
+  };
+</script>
 </body>
 </html>

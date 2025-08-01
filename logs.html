@@ -2,147 +2,165 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>לוג השליחות – בראונשטיין</title>
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/feather-icons"></script>
+  <style>
+    .log-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: var(--spacing);
+    }
+    .log-controls input, .log-controls select {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border-radius: var(--border-radius);
+      border: 1px solid #ccc;
+      min-width: 200px;
+    }
+
+    .log-card {
+      background-color: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      padding: var(--spacing);
+      margin-bottom: var(--spacing);
+      text-align: right;
+    }
+
+    .log-card.success {}
+    .log-card.fail {
+      background-color: #fdecea;
+    }
+
+    .log-card p {
+      margin: 6px 0;
+      font-size: 0.9rem;
+    }
+
+    .log-card .log-header {
+      font-size: 0.85rem;
+      color: #555;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .top-buttons {
+      justify-content: space-between;
+      margin-bottom: var(--spacing);
+    }
+  </style>
 </head>
 <body>
-
   <div class="top-buttons">
-    <button id="refreshBtn"><i data-feather="refresh-cw"></i> רענן</button>
     <a href="send-message.html"><i data-feather="arrow-right-circle"></i> חזור</a>
-  </div>
-
-  <section class="hero">
-    <div class="hero-content">
-      <h2>לוג השליחות</h2>
-      <p>כאן תוכל לעקוב אחר כל ההודעות שנשלחו מהמערכת.</p>
+    <div style="display: flex; gap: 8px;">
+      <button onclick="loadLog()"><i data-feather="refresh-cw"></i> רענן</button>
+      <button onclick="downloadCSV()"><i data-feather="download"></i> הורד CSV</button>
     </div>
-  </section>
-
-  <div class="top-buttons" style="justify-content: center;">
-    <input type="text" id="searchInput" placeholder="חפש לפי שם או טלפון" style="padding: 8px; border-radius: 8px; border: 1px solid #ccc;" />
-    <select id="statusFilter" style="padding: 8px; border-radius: 8px; margin-right: 12px;">
-      <option value="">הצג הכל</option>
-      <option value="הצלחה">הצלחה</option>
-      <option value="נכשל">נכשל</option>
-    </select>
-    <button id="downloadCSV"><i data-feather="download"></i> הורד CSV</button>
   </div>
 
-  <div id="status" style="text-align:center; margin-top: 1rem;">טוען נתונים...</div>
-  <div id="cardsContainer" class="cards-grid" style="margin-top: 2rem;"></div>
+  <h1>לוג השליחות</h1>
+
+  <div class="log-controls">
+    <input type="text" id="searchInput" placeholder="חיפוש לפי שם, טלפון, הודעה..." />
+    <select id="statusFilter">
+      <option value="">הצג הכל</option>
+      <option value="נשלח">רק נשלח</option>
+      <option value="נכשל">רק נכשל</option>
+    </select>
+  </div>
+
+  <div id="logContainer">
+    <p id="status">טוען נתונים...</p>
+  </div>
 
   <script>
     let allData = [];
+    let filteredData = [];
 
     async function loadLog() {
-      const container = document.getElementById("cardsContainer");
-      const statusEl = document.getElementById("status");
+      const statusText = document.getElementById("status");
+      const container = document.getElementById("logContainer");
+      container.innerHTML = "";
       try {
         const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
-        const json = await res.json();
-
-        // בדיקה גמישה: האם המידע הוא מערך? האם יש מפתחות?
-        if (!Array.isArray(json)) throw new Error("הפורמט של המידע אינו תקין");
-
-        // הפוך את הסדר: אחרון ראשון
-        allData = json.reverse();
-
-        renderCards(allData);
-        statusEl.style.display = "none";
-      } catch (err) {
-        statusEl.innerHTML = "⚠️ שגיאה בטעינת הנתונים.";
-        console.error(err);
+        const data = await res.json();
+        if (!data || !data.length) {
+          container.innerHTML = "<p id='status'>אין נתונים להצגה.</p>";
+          return;
+        }
+        allData = data.reverse();
+        filteredData = [...allData];
+        renderLog(filteredData);
+      } catch (e) {
+        container.innerHTML = "<p id='status'>שגיאה בטעינה.</p>";
       }
     }
 
-    function renderCards(data) {
-      const container = document.getElementById("cardsContainer");
-      container.innerHTML = "";
-
-      if (!data || data.length === 0) {
-        container.innerHTML = "<p>לא נמצאו תוצאות תואמות.</p>";
+    function renderLog(data) {
+      const container = document.getElementById("logContainer");
+      if (!data.length) {
+        container.innerHTML = "<p id='status'>לא נמצאו רשומות.</p>";
         return;
       }
-
-      data.forEach(row => {
-        const card = document.createElement("div");
-        card.className = "card";
-        if ((row.status || "").trim() === "נכשל") {
-          card.style.backgroundColor = "#ffe9e9";
-        }
-
-        card.innerHTML = `
-          <h3>${row.firstName || ''} ${row.lastName || ''}</h3>
-          <p><strong>📞</strong> ${row.phone || ''}</p>
-          <p><strong>🕒</strong> ${row.time || ''}</p>
-          <p><strong>הודעה:</strong><br>${row.message || ''}</p>
-          <p><strong>סטטוס:</strong> ${row.status || ''}</p>
+      container.innerHTML = data.map(row => {
+        const statusClass = row.status === 'נשלח' ? 'success' : 'fail';
+        return `
+          <div class="log-card ${statusClass}">
+            <div class="log-header">
+              <span>${row.time || ''}</span>
+              <strong>${row.status || ''}</strong>
+            </div>
+            <p><i data-feather="user"></i> ${row.firstName || ''} ${row.lastName || ''}</p>
+            <p><i data-feather="phone"></i> ${row.phone || ''}</p>
+            <p><i data-feather="message-square"></i> ${row.message || ''}</p>
+          </div>
         `;
-        container.appendChild(card);
-      });
+      }).join("");
+      feather.replace();
     }
 
-    function filterAndRender() {
-      const searchVal = document.getElementById("searchInput").value.trim().toLowerCase();
-      const statusVal = document.getElementById("statusFilter").value;
+    function applyFilters() {
+      const searchValue = document.getElementById("searchInput").value.toLowerCase();
+      const statusValue = document.getElementById("statusFilter").value;
 
-      const filtered = allData.filter(row => {
-        const fullName = `${row.firstName || ''} ${row.lastName || ''}`.toLowerCase();
-        const phone = (row.phone || '').toLowerCase();
-        const status = (row.status || '');
-        return (fullName.includes(searchVal) || phone.includes(searchVal)) &&
-               (statusVal === "" || status === statusVal);
+      filteredData = allData.filter(row => {
+        const combined = `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase();
+        const matchesSearch = combined.includes(searchValue);
+        const matchesStatus = !statusValue || row.status === statusValue;
+        return matchesSearch && matchesStatus;
       });
 
-      renderCards(filtered);
+      renderLog(filteredData);
     }
 
     function downloadCSV() {
-      const statusVal = document.getElementById("statusFilter").value;
-      const searchVal = document.getElementById("searchInput").value.trim().toLowerCase();
-
-      const filtered = allData.filter(row => {
-        const fullName = `${row.firstName || ''} ${row.lastName || ''}`.toLowerCase();
-        const phone = (row.phone || '').toLowerCase();
-        const status = (row.status || '');
-        return (fullName.includes(searchVal) || phone.includes(searchVal)) &&
-               (statusVal === "" || status === statusVal);
-      });
-
-      const csvHeader = ['שם פרטי','שם משפחה','טלפון','הודעה','זמן','סטטוס'];
-      const csvRows = filtered.map(r => [
-        r.firstName || '',
-        r.lastName || '',
-        r.phone || '',
-        r.message || '',
-        r.time || '',
-        r.status || ''
-      ]);
-      const allRows = [csvHeader, ...csvRows];
-
-      const csvContent = allRows.map(row => row.map(val => `"${val}"`).join(",")).join("\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      if (!filteredData.length) return;
+      const header = ['firstName','lastName','phone','message','time','status'];
+      const rows = filteredData.map(r => header.map(k => `"${(r[k] || '').replace(/"/g, '""')}"`).join(','));
+      const csvContent = [header.join(','), ...rows].join('\n');
+      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = url;
+      link.setAttribute("href", url);
       link.setAttribute("download", "log.csv");
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
 
-    document.getElementById("searchInput").addEventListener("input", filterAndRender);
-    document.getElementById("statusFilter").addEventListener("change", filterAndRender);
-    document.getElementById("refreshBtn").addEventListener("click", loadLog);
-    document.getElementById("downloadCSV").addEventListener("click", downloadCSV);
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("statusFilter").addEventListener("change", applyFilters);
 
     window.onload = () => {
       feather.replace();
       loadLog();
     };
   </script>
-
 </body>
 </html>

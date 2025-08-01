@@ -1,161 +1,165 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>לוג השליחות – בראונשטיין</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css"/>
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    .log-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: var(--spacing);
-    }
-    .log-controls input, .log-controls select {
-      padding: 8px 12px;
-      font-size: 0.9rem;
-      border-radius: var(--border-radius);
-      border: 1px solid #ccc;
-      min-width: 200px;
-    }
-
-    .log-card {
-      background-color: var(--color-surface);
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      padding: var(--spacing);
-      margin-bottom: var(--spacing);
-      text-align: right;
-    }
-
-    .log-card.success {}
-    .log-card.fail {
+    /* רקע אדום קל רק לכישלון */
+    .card.fail {
       background-color: #fdecea;
     }
-
-    .log-card p {
-      margin: 6px 0;
+    /* חיתוך טקסט והצגת החלק הנוסף בהקלקה */
+    .full-message { display: none; white-space: pre-wrap; }
+    .read-more {
+      color: var(--color-accent);
+      cursor: pointer;
+      text-decoration: underline;
       font-size: 0.9rem;
+      margin-left: 4px;
     }
-
-    .log-card .log-header {
-      font-size: 0.85rem;
-      color: #555;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
-    .top-buttons {
-      justify-content: space-between;
-      margin-bottom: var(--spacing);
+    /* קומפקטי יותר לקלט וסלקט */
+    .log-controls input,
+    .log-controls select {
+      min-width: 200px;
+      padding: 8px 12px;
+      border-radius: var(--border-radius);
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
     }
   </style>
 </head>
 <body>
+
+  <!-- ניווט עליון כמו בשאר האפליקציה -->
   <div class="top-buttons">
     <a href="send-message.html"><i data-feather="arrow-right-circle"></i> חזור</a>
-    <div style="display: flex; gap: 8px;">
-      <button onclick="loadLog()"><i data-feather="refresh-cw"></i> רענן</button>
-      <button onclick="downloadCSV()"><i data-feather="download"></i> הורד CSV</button>
-    </div>
+    <button id="refreshBtn"><i data-feather="refresh-cw"></i> רענן</button>
   </div>
 
-  <h1>לוג השליחות</h1>
+  <!-- Hero כמו בשאר הדפים -->
+  <section class="hero">
+    <div class="hero-content">
+      <h2>לוג השליחות</h2>
+      <p>צפה בכל ההודעות שנשלחו דרך המערכת.</p>
+    </div>
+  </section>
 
-  <div class="log-controls">
-    <input type="text" id="searchInput" placeholder="חיפוש לפי שם, טלפון, הודעה..." />
+  <!-- Controls: חיפוש, סינון, CSV -->
+  <div class="top-buttons log-controls">
+    <input type="text" id="searchInput" placeholder="🔍 חפש לפי שם, טלפון או תוכן הודעה"/>
     <select id="statusFilter">
       <option value="">הצג הכל</option>
-      <option value="נשלח">רק נשלח</option>
-      <option value="נכשל">רק נכשל</option>
+      <option value="הצלחה">הצלחה</option>
+      <option value="נכשל">נכשל</option>
     </select>
+    <button id="downloadCSV" class="cta-button"><i data-feather="download"></i> הורד CSV</button>
   </div>
 
-  <div id="logContainer">
+  <!-- Container לכרטיסים -->
+  <div id="cardsContainer" class="cards-grid">
     <p id="status">טוען נתונים...</p>
   </div>
 
   <script>
-    let allData = [];
-    let filteredData = [];
+    let allData = [], filteredData = [];
 
     async function loadLog() {
-      const statusText = document.getElementById("status");
-      const container = document.getElementById("logContainer");
+      const statusEl = document.getElementById("status");
+      const container = document.getElementById("cardsContainer");
       container.innerHTML = "";
       try {
         const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
         const data = await res.json();
-        if (!data || !data.length) {
+        if (!Array.isArray(data) || !data.length) {
           container.innerHTML = "<p id='status'>אין נתונים להצגה.</p>";
           return;
         }
-        allData = data.reverse();
+        allData = data.reverse();      // האחרון ראשון
         filteredData = [...allData];
-        renderLog(filteredData);
-      } catch (e) {
-        container.innerHTML = "<p id='status'>שגיאה בטעינה.</p>";
+        applyFilters();
+      } catch {
+        container.innerHTML = "<p id='status'>שגיאה בטעינת הנתונים.</p>";
       }
     }
 
-    function renderLog(data) {
-      const container = document.getElementById("logContainer");
+    function renderCards(data) {
+      const container = document.getElementById("cardsContainer");
       if (!data.length) {
         container.innerHTML = "<p id='status'>לא נמצאו רשומות.</p>";
         return;
       }
       container.innerHTML = data.map(row => {
-        const statusClass = row.status === 'נשלח' ? 'success' : 'fail';
+        // חיתוך תצוגה מקדימה של 10 מילים
+        const words = (row.message || "").split(/\s+/);
+        const preview = words.slice(0,10).join(" ");
+        const needsMore = words.length > 10;
+        // סטטוס כרטיס
+        const statusClass = row.status === "נכשל" ? "fail" : "success";
         return `
-          <div class="log-card ${statusClass}">
+          <div class="card ${statusClass}">
             <div class="log-header">
-              <span>${row.time || ''}</span>
-              <strong>${row.status || ''}</strong>
+              <span>${row.time || ""}</span>
+              <strong>${row.status || ""}</strong>
             </div>
-            <p><i data-feather="user"></i> ${row.firstName || ''} ${row.lastName || ''}</p>
-            <p><i data-feather="phone"></i> ${row.phone || ''}</p>
-            <p><i data-feather="message-square"></i> ${row.message || ''}</p>
-          </div>
-        `;
+            <p><i data-feather="user"></i> ${row.firstName||""} ${row.lastName||""}</p>
+            <p><i data-feather="phone"></i> ${row.phone||""}</p>
+            <p>
+              <strong>הודעה:</strong>
+              <span class="preview">${preview}</span>
+              ${needsMore
+                ? `<span class="ellipsis">…</span><span class="full-message">${row.message}</span>
+                   <span class="read-more">הצג הכול</span>`
+                : ""
+              }
+            </p>
+          </div>`;
       }).join("");
       feather.replace();
+      // bind "read-more"
+      document.querySelectorAll(".read-more").forEach(link => {
+        link.addEventListener("click", e => {
+          const full = link.previousElementSibling;       // .full-message
+          const ell = full.previousElementSibling;        // .ellipsis
+          ell.style.display = "none";
+          full.style.display = "inline";
+          link.style.display = "none";
+        });
+      });
     }
 
     function applyFilters() {
-      const searchValue = document.getElementById("searchInput").value.toLowerCase();
-      const statusValue = document.getElementById("statusFilter").value;
-
-      filteredData = allData.filter(row => {
-        const combined = `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase();
-        const matchesSearch = combined.includes(searchValue);
-        const matchesStatus = !statusValue || row.status === statusValue;
-        return matchesSearch && matchesStatus;
+      const txt = document.getElementById("searchInput").value.trim().toLowerCase();
+      const st = document.getElementById("statusFilter").value;
+      filteredData = allData.filter(r => {
+        const combined = `${r.firstName} ${r.lastName} ${r.phone} ${r.message}`.toLowerCase();
+        const matchText = combined.includes(txt);
+        const matchStatus = !st || r.status === st;
+        return matchText && matchStatus;
       });
-
-      renderLog(filteredData);
+      renderCards(filteredData);
     }
 
     function downloadCSV() {
       if (!filteredData.length) return;
       const header = ['firstName','lastName','phone','message','time','status'];
-      const rows = filteredData.map(r => header.map(k => `"${(r[k] || '').replace(/"/g, '""')}"`).join(','));
-      const csvContent = [header.join(','), ...rows].join('\n');
-      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const rows = filteredData.map(r =>
+        header.map(k => `"${(r[k]||"").replace(/"/g,'""')}"`).join(',')
+      );
+      const csv = [header.join(','), ...rows].join('\n');
+      const blob = new Blob(["\uFEFF"+csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", "log.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const a = document.createElement("a");
+      a.href = url; a.download = "log.csv"; a.click();
+      URL.revokeObjectURL(url);
     }
 
     document.getElementById("searchInput").addEventListener("input", applyFilters);
     document.getElementById("statusFilter").addEventListener("change", applyFilters);
+    document.getElementById("refreshBtn").addEventListener("click", loadLog);
+    document.getElementById("downloadCSV").addEventListener("click", downloadCSV);
 
     window.onload = () => {
       feather.replace();

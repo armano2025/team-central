@@ -4,163 +4,231 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>לוג השליחות – בראונשטיין</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    .log-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: var(--spacing);
-    }
-    .log-controls input, .log-controls select {
-      padding: 8px 12px;
-      font-size: 0.9rem;
-      border-radius: var(--border-radius);
-      border: 1px solid #ccc;
-      min-width: 200px;
+    :root {
+      --font-base: 'Rubik', sans-serif;
+      --color-bg: #f5f5f5;
+      --color-surface: #ffffff;
+      --color-primary: #3498db;
+      --color-text: #333333;
+      --color-border: #dddddd;
+      --radius: 12px;
     }
 
-    .log-card {
+    body {
+      font-family: var(--font-base);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+    }
+
+    .top-bar {
+      background-color: var(--color-primary);
+      color: white;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 12px 20px;
+    }
+
+    .top-bar button {
+      background: none;
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-right: 12px;
+    }
+
+    .top-bar a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+
+    .top-bar i {
+      margin-left: 8px;
+    }
+
+    header {
+      background-color: #ecf0f1;
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+
+    header p {
+      margin: 0.5rem 0 0;
+      color: #666;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 2rem auto;
       background-color: var(--color-surface);
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      padding: var(--spacing);
-      margin-bottom: var(--spacing);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    #status {
+      text-align: center;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      color: #888;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      direction: rtl;
+    }
+
+    th, td {
+      border: 1px solid var(--color-border);
+      padding: 12px;
       text-align: right;
     }
 
-    .log-card.success {}
-    .log-card.fail {
-      background-color: #fdecea;
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
     }
 
-    .log-card p {
-      margin: 6px 0;
-      font-size: 0.9rem;
+    tr:nth-child(even) {
+      background-color: #fafafa;
     }
 
-    .log-card .log-header {
-      font-size: 0.85rem;
-      color: #555;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
-    .top-buttons {
-      justify-content: space-between;
-      margin-bottom: var(--spacing);
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead {
+        display: none;
+      }
+      td {
+        position: relative;
+        padding-right: 50%;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+      td::before {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #666;
+        content: attr(data-label);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="top-buttons">
-    <a href="send-message.html"><i data-feather="arrow-right-circle"></i> חזור</a>
-    <div style="display: flex; gap: 8px;">
-      <button onclick="loadLog()"><i data-feather="refresh-cw"></i> רענן</button>
-      <button onclick="downloadCSV()"><i data-feather="download"></i> הורד CSV</button>
-    </div>
+
+  <!-- סרגל עליון -->
+  <div class="top-bar">
+    <button id="refreshButton" title="רענן">
+      <i data-feather="refresh-cw"></i>
+    </button>
+    <a href="send-message.html" title="חזרה לדף הראשי">
+      <i data-feather="arrow-right-circle"></i> חזור
+    </a>
   </div>
 
-  <h1>לוג השליחות</h1>
+  <!-- כותרת -->
+  <header>
+    <h2>לוג השליחות</h2>
+    <p>כל ההודעות שנשלחו דרך המערכת</p>
+  </header>
 
-  <div class="log-controls">
-    <input type="text" id="searchInput" placeholder="חיפוש לפי שם, טלפון, הודעה..." />
-    <select id="statusFilter">
-      <option value="">הצג הכל</option>
-      <option value="נשלח">רק נשלח</option>
-      <option value="נכשל">רק נכשל</option>
-    </select>
-  </div>
-
-  <div id="logContainer">
-    <p id="status">טוען נתונים...</p>
-  </div>
+  <!-- תוכן -->
+  <main class="container">
+    <div id="status">טוען נתונים...</div>
+    <table id="logTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>שם פרטי</th>
+          <th>שם משפחה</th>
+          <th>טלפון</th>
+          <th>הודעה</th>
+          <th>זמן</th>
+          <th>סטטוס</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
 
   <script>
-    let allData = [];
-    let filteredData = [];
-
     async function loadLog() {
-      const statusText = document.getElementById("status");
-      const container = document.getElementById("logContainer");
-      container.innerHTML = "";
+      const status = document.getElementById('status');
+      const table = document.getElementById('logTable');
+      const tbody = table.querySelector('tbody');
+
       try {
         const res = await fetch("https://script.google.com/macros/s/AKfycbw9WvZCTYDjqpWQf6H_Y8Mpl2dgRxhJD5Aqm5RkA6ICbpt3Si7rgJG3A10NctHpsK0S7A/exec");
         const data = await res.json();
-        if (!data || !data.length) {
-          container.innerHTML = "<p id='status'>אין נתונים להצגה.</p>";
+
+        if (!data.length) {
+          status.textContent = "אין נתונים להצגה.";
           return;
         }
-        allData = data.reverse();
-        filteredData = [...allData];
-        renderLog(filteredData);
-      } catch (e) {
-        container.innerHTML = "<p id='status'>שגיאה בטעינה.</p>";
-      }
-    }
 
-    function renderLog(data) {
-      const container = document.getElementById("logContainer");
-      if (!data.length) {
-        container.innerHTML = "<p id='status'>לא נמצאו רשומות.</p>";
-        return;
-      }
-      container.innerHTML = data.map(row => {
-        const statusClass = row.status === 'נשלח' ? 'success' : 'fail';
-        return `
-          <div class="log-card ${statusClass}">
-            <div class="log-header">
-              <span>${row.time || ''}</span>
-              <strong>${row.status || ''}</strong>
-            </div>
-            <p><i data-feather="user"></i> ${row.firstName || ''} ${row.lastName || ''}</p>
-            <p><i data-feather="phone"></i> ${row.phone || ''}</p>
-            <p><i data-feather="message-square"></i> ${row.message || ''}</p>
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td data-label="שם פרטי">${row.firstName || ''}</td>
+            <td data-label="שם משפחה">${row.lastName || ''}</td>
+            <td data-label="טלפון">${row.phone || ''}</td>
+            <td data-label="הודעה">${row.message || ''}</td>
+            <td data-label="זמן">${row.time || ''}</td>
+            <td data-label="סטטוס">${row.status || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        status.style.display = 'none';
+        table.style.display = '';
+      } catch (err) {
+        status.innerHTML = `
+          <div style="background:#ffe9e9;color:#c0392b;padding:1rem;border-radius:10px;">
+            ⚠️ שגיאה בטעינת הנתונים. ודא שהקישור פעיל והגיליון כולל נתונים.
           </div>
         `;
-      }).join("");
-      feather.replace();
+        console.error("שגיאת לוג:", err);
+      }
     }
 
-    function applyFilters() {
-      const searchValue = document.getElementById("searchInput").value.toLowerCase();
-      const statusValue = document.getElementById("statusFilter").value;
-
-      filteredData = allData.filter(row => {
-        const combined = `${row.firstName} ${row.lastName} ${row.phone} ${row.message}`.toLowerCase();
-        const matchesSearch = combined.includes(searchValue);
-        const matchesStatus = !statusValue || row.status === statusValue;
-        return matchesSearch && matchesStatus;
+    window.onload = function() {
+      feather.replace();
+      const refreshBtn = document.getElementById('refreshButton');
+      refreshBtn.addEventListener('click', function() {
+        const statusEl = document.getElementById('status');
+        const tableEl = document.getElementById('logTable');
+        const tbodyEl = tableEl.querySelector('tbody');
+        tbodyEl.innerHTML = '';
+        statusEl.style.display = '';
+        statusEl.textContent = 'טוען נתונים...';
+        tableEl.style.display = 'none';
+        loadLog();
       });
-
-      renderLog(filteredData);
-    }
-
-    function downloadCSV() {
-      if (!filteredData.length) return;
-      const header = ['firstName','lastName','phone','message','time','status'];
-      const rows = filteredData.map(r => header.map(k => `"${(r[k] || '').replace(/"/g, '""')}"`).join(','));
-      const csvContent = [header.join(','), ...rows].join('\n');
-      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", "log.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    document.getElementById("searchInput").addEventListener("input", applyFilters);
-    document.getElementById("statusFilter").addEventListener("change", applyFilters);
-
-    window.onload = () => {
-      feather.replace();
       loadLog();
     };
   </script>
+
 </body>
 </html>

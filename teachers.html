@@ -41,7 +41,7 @@
       border:2px solid #3498db;
     }
     .subject-card i {
-      stroke:#3498db; /* צבע האייקון */
+      stroke:#3498db;
       width:40px; height:40px;
       margin-bottom:8px;
     }
@@ -69,11 +69,19 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="index.html" title="דף הבית"><i data-feather="home" class="icon-small"></i></a>
-    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
+    <a href="index.html" title="דף הבית">
+      <i data-feather="home" class="icon-small"></i>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <i data-feather="menu"></i>
+    </button>
     <div id="dropdownMenu" class="dropdown-menu">
-      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
-      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+      <button id="share-button">
+        <i data-feather="share-2" class="icon-small"></i> שתף
+      </button>
+      <button id="dark-toggle">
+        <i data-feather="moon" class="icon-small"></i> מצב כהה
+      </button>
     </div>
   </div>
 
@@ -85,22 +93,26 @@
     </div>
   </header>
 
-  <!-- בחירת מקצוע -->
+  <!-- בחירת מקצוע ותצוגה -->
   <main>
     <section class="content">
       <h2>בחר מקצוע</h2>
       <div class="subject-grid" id="subjectGrid">
-        <div class="subject-card active" data-id="1bGyDJUh-psJyOK4BGmPGZOwmcfAEMxm5">
+        <div class="subject-card active" data-id="1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f">
           <i data-feather="folder"></i>
           <span>מתמטיקה</span>
         </div>
-        <div class="subject-card" data-id="FOLDER_ID_PHYSICS">
+        <div class="subject-card" data-id="1POYrAQNrJZsY6Cu5qEtLzyguyUbKqTji">
           <i data-feather="folder"></i>
           <span>פיזיקה</span>
         </div>
-        <div class="subject-card" data-id="FOLDER_ID_ENGLISH">
+        <div class="subject-card" data-id="1Ai848p83grWJ1wRCco_wFn1f30L6PgPp">
           <i data-feather="folder"></i>
           <span>אנגלית</span>
+        </div>
+        <div class="subject-card" data-id="1LatQkAB-GEXrZyyDpkekLxEUeeiQeRGe">
+          <i data-feather="folder"></i>
+          <span>דקדוק</span>
         </div>
       </div>
 
@@ -108,7 +120,7 @@
       <iframe
         id="folderFrame"
         class="folder-iframe"
-        src="https://drive.google.com/embeddedfolderview?id=1bGyDJUh-psJyOK4BGmPGZOwmcfAEMxm5#grid"
+        src="https://drive.google.com/embeddedfolderview?id=1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f#grid"
         allowfullscreen>
       </iframe>
     </section>
@@ -119,7 +131,8 @@
     // מעבר בין מקצועות ועדכון ה-iframe
     document.querySelectorAll('.subject-card').forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelectorAll('.subject-card').forEach(c=>c.classList.remove('active'));
+        document.querySelectorAll('.subject-card')
+          .forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         const id = card.dataset.id;
         document.getElementById('folderFrame').src =
@@ -135,14 +148,23 @@
 
     // מצב כהה ושיתוף
     const darkToggle = document.getElementById('dark-toggle');
-    if (localStorage.getItem('dark-mode') === '1') document.documentElement.classList.add('dark-mode');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
     darkToggle.addEventListener('click', () => {
       const dm = document.documentElement.classList.toggle('dark-mode');
-      dm ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
+      dm
+        ? localStorage.setItem('dark-mode','1')
+        : localStorage.removeItem('dark-mode');
     });
+
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
-        navigator.share({ title:'כלי עזר לצוות הוראה', text:'בדקו משאבים לפי מקצוע', url:location.href });
+        navigator.share({
+          title: 'כלי עזר לצוות הוראה',
+          text: 'בדקו משאבים לפי מקצוע',
+          url: location.href
+        });
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }

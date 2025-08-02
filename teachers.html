@@ -12,56 +12,55 @@
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    body { font-family: 'Rubik', sans-serif; background: #fafafa; margin:0; padding:0; }
-    .icon-small { width:20px; height:20px; margin-left:8px; }
+    body { font-family: 'Rubik', sans-serif; background: #fafafa; margin: 0; padding: 0; }
+    .icon-small { width: 20px; height: 20px; margin-left: 8px; }
 
-    /* כרטיסי מקצוע */
+    .content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 16px;
+      text-align: center;
+    }
+    .content h2 {
+      margin-bottom: 16px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    /* רשת הכפתורים */
     .subject-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-      gap:16px;
-      max-width:800px;
-      margin:16px auto;
-      padding:0 16px;
+      gap: 16px;
+      margin: 0 auto 32px;
+      padding: 0 16px;
+      max-width: 800px;
     }
     .subject-card {
-      background:#fff;
-      border-radius:8px;
-      box-shadow:0 2px 4px rgba(0,0,0,0.1);
-      padding:16px;
-      text-align:center;
-      cursor:pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px 10px;
+      text-decoration: none;
       transition: transform .1s, box-shadow .1s;
     }
     .subject-card:hover {
       transform: translateY(-2px);
-      box-shadow:0 4px 8px rgba(0,0,0,0.15);
-    }
-    .subject-card.active {
-      border:2px solid #3498db;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     .subject-card i {
-      stroke:#3498db;
-      width:40px; height:40px;
-      margin-bottom:8px;
+      stroke: #3498db;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 8px;
     }
     .subject-card span {
-      display:block;
-      margin-top:4px;
-      font-size:14px;
-      color:#333;
-    }
-
-    /* iframe של התיקייה */
-    .folder-iframe {
-      width:100%;
-      height:600px;
-      border:none;
-      border-radius:8px;
-      box-shadow:0 2px 4px rgba(0,0,0,0.1);
-      max-width:1000px;
-      margin:0 auto 32px;
-      display:block;
+      font-size: 16px;
+      color: #333;
     }
   </style>
 </head>
@@ -89,72 +88,50 @@
   <header class="hero">
     <div class="hero-content" style="text-align:center; padding:16px;">
       <h2>כלי עזר לצוות הוראה</h2>
-      <p>בחר מקצוע וצפה בדפי העבודה הרלוונטיים</p>
+      <p>בחר מקצוע כדי לעבור לדף ייעודי</p>
     </div>
   </header>
 
-  <!-- בחירת מקצוע ותצוגה -->
+  <!-- תוכן הדף -->
   <main>
     <section class="content">
       <h2>בחר מקצוע</h2>
-      <div class="subject-grid" id="subjectGrid">
-        <div class="subject-card active" data-id="1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f">
-          <i data-feather="folder"></i>
+      <div class="subject-grid">
+        <a href="math.html" class="subject-card">
+          <i data-feather="book-open"></i>
           <span>מתמטיקה</span>
-        </div>
-        <div class="subject-card" data-id="1POYrAQNrJZsY6Cu5qEtLzyguyUbKqTji">
-          <i data-feather="folder"></i>
+        </a>
+        <a href="physics.html" class="subject-card">
+          <i data-feather="activity"></i>
           <span>פיזיקה</span>
-        </div>
-        <div class="subject-card" data-id="1Ai848p83grWJ1wRCco_wFn1f30L6PgPp">
-          <i data-feather="folder"></i>
+        </a>
+        <a href="english.html" class="subject-card">
+          <i data-feather="globe"></i>
           <span>אנגלית</span>
-        </div>
-        <div class="subject-card" data-id="1LatQkAB-GEXrZyyDpkekLxEUeeiQeRGe">
-          <i data-feather="folder"></i>
+        </a>
+        <a href="grammar.html" class="subject-card">
+          <i data-feather="type"></i>
           <span>דקדוק</span>
-        </div>
+        </a>
       </div>
-
-      <h2>תיקיית דפי העבודה</h2>
-      <iframe
-        id="folderFrame"
-        class="folder-iframe"
-        src="https://drive.google.com/embeddedfolderview?id=1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f#grid"
-        allowfullscreen>
-      </iframe>
     </section>
   </main>
 
-  <!-- סקריפטים -->
+  <!-- סקריפטים ל־menu, dark mode ושיתוף -->
   <script>
-    // מעבר בין מקצועות ועדכון ה-iframe
-    document.querySelectorAll('.subject-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.subject-card')
-          .forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        const id = card.dataset.id;
-        document.getElementById('folderFrame').src =
-          `https://drive.google.com/embeddedfolderview?id=${id}#grid`;
-      });
-    });
-
-    // תפריט עליון
     function toggleMenu() {
-      const m = document.getElementById('dropdownMenu');
-      m.style.display = m.style.display === 'block' ? 'none' : 'block';
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
-    // מצב כהה ושיתוף
     const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
     darkToggle.addEventListener('click', () => {
-      const dm = document.documentElement.classList.toggle('dark-mode');
-      dm
-        ? localStorage.setItem('dark-mode','1')
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
         : localStorage.removeItem('dark-mode');
     });
 
@@ -162,9 +139,9 @@
       if (navigator.share) {
         navigator.share({
           title: 'כלי עזר לצוות הוראה',
-          text: 'בדקו משאבים לפי מקצוע',
+          text: 'בחירת מקצוע בדפי עבודה',
           url: location.href
-        });
+        }).catch(console.error);
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }

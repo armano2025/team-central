@@ -5,32 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>מתמטיקה – כלי עזר לצוות הוראה</title>
 
-  <!-- CSS הראשי של האפליקציה -->
+  <!-- CSS הראשי -->
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    /* התאמות מקומיות ל־math.html */
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: #fafafa;
+      margin: 0;
+      padding: 0;
+    }
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+    }
+
+    /* --- תפריט עליון --- */
+    .top-right-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+    }
+
+    /* --- Hero Gradient --- */
+    .hero {
+      background: linear-gradient(135deg, #3b82f6, #34d399);
+      color: #fff;
+      text-align: center;
+      padding: 32px 16px;
+    }
+    .hero-content h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .hero-content p {
+      margin: 8px 0 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* --- תוכן העמוד --- */
     .content {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 16px;
+      max-width: 800px;
+      margin: 24px auto 32px;
+      padding: 0 16px;
       text-align: center;
     }
     .content h2 {
-      margin-bottom: 12px;
-      font-size: 20px;
+      font-size: 22px;
       color: #333;
+      margin-bottom: 16px;
     }
-    .folder-iframe {
+
+    /* --- כרטיס embed --- */
+    .embed-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .embed-card iframe {
       width: 100%;
       height: 600px;
       border: none;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-top: 16px;
+      display: block;
     }
   </style>
 </head>
@@ -56,25 +99,26 @@
 
   <!-- Hero -->
   <header class="hero">
-    <div class="hero-content" style="text-align:center; padding:16px;">
+    <div class="hero-content">
       <h2>מתמטיקה</h2>
       <p>דפי עבודה ומשאבים מתוך Google Drive</p>
     </div>
   </header>
 
-  <!-- תוכן עמוד המתמטיקה -->
+  <!-- תוכן עם ה-iframe עטוף בכרטיס -->
   <main>
     <div class="content">
       <h2>תיקיית דפי העבודה במתמטיקה</h2>
-      <iframe
-        class="folder-iframe"
-        src="https://drive.google.com/embeddedfolderview?id=1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f#grid"
-        allowfullscreen>
-      </iframe>
+      <div class="embed-card">
+        <iframe
+          src="https://drive.google.com/embeddedfolderview?id=1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f#grid"
+          allowfullscreen>
+        </iframe>
+      </div>
     </div>
   </main>
 
-  <!-- סקריפטים ל־menu, dark mode ושיתוף -->
+  <!-- סקריפטים ל-menu, מצב כהה ושיתוף -->
   <script>
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
@@ -96,9 +140,9 @@
       if (navigator.share) {
         navigator.share({
           title: 'מתמטיקה – כלי עזר לצוות הוראה',
-          text: 'דפי עבודה במתמטיקה',
+          text: 'בדפי עבודה במתמטיקה מתוך Drive',
           url: location.href
-        }).catch(console.error);
+        });
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }

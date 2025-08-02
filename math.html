@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה – כלי עזר לצוות הוראה</title>
+  <title>מתמטיקה – כיתות</title>
 
-  <!-- CSS הראשי -->
+  <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#3498db" />
@@ -24,7 +24,7 @@
       margin-left: 8px;
     }
 
-    /* --- תפריט עליון --- */
+    /* תפריט עליון */
     .top-right-controls {
       display: flex;
       justify-content: space-between;
@@ -32,7 +32,7 @@
       padding: 10px 16px;
     }
 
-    /* --- Hero Gradient --- */
+    /* Hero gradient */
     .hero {
       background: linear-gradient(135deg, #3b82f6, #34d399);
       color: #fff;
@@ -49,7 +49,7 @@
       opacity: 0.9;
     }
 
-    /* --- תוכן העמוד --- */
+    /* תוכן */
     .content {
       max-width: 800px;
       margin: 24px auto 32px;
@@ -62,18 +62,29 @@
       margin-bottom: 16px;
     }
 
-    /* --- כרטיס embed --- */
-    .embed-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      overflow: hidden;
+    /* רשת כיתות */
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+      gap: 16px;
+      margin-top: 16px;
     }
-    .embed-card iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      display: block;
+    .grade-card {
+      background: #3498db;
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .1s, transform .1s;
+    }
+    .grade-card:hover {
+      background: #2779bd;
+      transform: translateY(-2px);
     }
   </style>
 </head>
@@ -81,8 +92,8 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="index.html" title="חזרה לדף המקצועות">
-      <i data-feather="home" class="icon-small"></i>
+    <a href="math.html" title="חזרה למתמטיקה">
+      <i data-feather="chevron-right" class="icon-small"></i>
     </a>
     <button class="menu-toggle" onclick="toggleMenu()">
       <i data-feather="menu"></i>
@@ -101,24 +112,32 @@
   <header class="hero">
     <div class="hero-content">
       <h2>מתמטיקה</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <p>בחר כיתה כדי לגשת לדפי עבודה</p>
     </div>
   </header>
 
-  <!-- תוכן עם ה-iframe עטוף בכרטיס -->
+  <!-- רשת הכיתות -->
   <main>
     <div class="content">
-      <h2>תיקיית דפי העבודה במתמטיקה</h2>
-      <div class="embed-card">
-        <iframe
-          src="https://drive.google.com/embeddedfolderview?id=1uW0zfYc6L9TX_vErYsqfAZVF95in-B6f#grid"
-          allowfullscreen>
-        </iframe>
+      <h2>בחר כיתה</h2>
+      <div class="grade-grid">
+        <a href="math-a.html"    class="grade-card">כיתה א</a>
+        <a href="math-b.html"    class="grade-card">כיתה ב</a>
+        <a href="math-g.html"    class="grade-card">כיתה ג</a>
+        <a href="math-d.html"    class="grade-card">כיתה ד</a>
+        <a href="math-h.html"    class="grade-card">כיתה ה</a>
+        <a href="math-v.html"    class="grade-card">כיתה ו</a>
+        <a href="math-z.html"    class="grade-card">כיתה ז</a>
+        <a href="math-het.html"  class="grade-card">כיתה ח</a>
+        <a href="math-t.html"    class="grade-card">כיתה ט</a>
+        <a href="math-y.html"    class="grade-card">כיתה י</a>
+        <a href="math-ya.html"   class="grade-card">כיתה יא</a>
+        <a href="math-yb.html"   class="grade-card">כיתה יב</a>
       </div>
     </div>
   </main>
 
-  <!-- סקריפטים ל-menu, מצב כהה ושיתוף -->
+  <!-- סקריפטים ל-menu, dark mode ושיתוף -->
   <script>
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
@@ -139,8 +158,8 @@
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה – כלי עזר לצוות הוראה',
-          text: 'בדפי עבודה במתמטיקה מתוך Drive',
+          title: 'מתמטיקה – בחירת כיתה',
+          text: 'בחר כיתה כדי לגשת לדפי עבודה',
           url: location.href
         });
       } else {

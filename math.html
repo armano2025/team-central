@@ -5,211 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>מתמטיקה – כיתות</title>
 
-  <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#3498db" />
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    body {
-      font-family: 'Rubik', sans-serif;
-      background: #fafafa;
-      margin: 0;
-      padding: 0;
-    }
-    .icon-small {
-      width: 20px;
-      height: 20px;
-      margin-left: 8px;
-    }
-
-    /* תפריט עליון */
-    .top-right-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 16px;
-    }
-
-    /* Hero gradient */
-    .hero {
-      background: linear-gradient(135deg, #3b82f6, #34d399);
-      color: #fff;
-      text-align: center;
-      padding: 32px 16px;
-    }
-    .hero-content h2 {
-      margin: 0;
-      font-size: 28px;
-    }
-    .hero-content p {
-      margin: 8px 0 0;
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    /* תוכן */
-    .content {
-      max-width: 800px;
-      margin: 24px auto 32px;
-      padding: 0 16px;
-      text-align: center;
-    }
-    .content h2 {
-      font-size: 22px;
-      color: #333;
-      margin-bottom: 16px;
-    }
-
-    /* רשת כיתות */
+    body { font-family: 'Rubik', sans-serif; background: #fafafa; margin:0; padding:0; }
+    .icon-small { width:20px; height:20px; margin-left:8px; }
+    .top-right-controls { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; }
+    .hero { background: linear-gradient(135deg,#3b82f6,#34d399); color:#fff; text-align:center; padding:32px 16px; }
+    .hero-content h2 { margin:0; font-size:28px; }
+    .hero-content p { margin:8px 0 0; font-size:16px; opacity:.9; }
+    .content { max-width:800px; margin:24px auto 32px; padding:0 16px; text-align:center; }
+    .content h2 { font-size:22px; color:#333; margin-bottom:16px; }
     .grade-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
-      gap: 16px;
-      margin-top: 16px;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+      gap:16px;
     }
     .grade-card {
-      background: #3498db;
-      color: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background .1s, transform .1s;
+      background:#3498db;
+      color:#fff;
+      border-radius:8px;
+      padding:16px;
+      text-decoration:none;
+      font-size:16px;
+      font-weight:500;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:background .1s,transform .1s;
     }
     .grade-card:hover {
-      background: #2779bd;
-      transform: translateY(-2px);
-    }
-    .grade-card.active {
-      border: 2px solid #1e4e8c;
-    }
-
-    /* כרטיס embed */
-    .embed-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      overflow: hidden;
-      margin-top: 24px;
-    }
-    .embed-card iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      display: block;
+      background:#2779bd;
+      transform:translateY(-2px);
     }
   </style>
 </head>
 <body onload="feather.replace()">
 
-  <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="math.html" title="חזרה לדף המקצועות">
-      <i data-feather="chevron-right" class="icon-small"></i>
-    </a>
-    <button class="menu-toggle" onclick="toggleMenu()">
-      <i data-feather="menu"></i>
-    </button>
+    <a href="index.html" title="דף הבית"><i data-feather="home" class="icon-small"></i></a>
+    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
     <div id="dropdownMenu" class="dropdown-menu">
-      <button id="share-button">
-        <i data-feather="share-2" class="icon-small"></i> שתף
-      </button>
-      <button id="dark-toggle">
-        <i data-feather="moon" class="icon-small"></i> מצב כהה
-      </button>
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
     </div>
   </div>
 
-  <!-- כותרת ראשית -->
   <header class="hero">
     <div class="hero-content">
       <h2>מתמטיקה</h2>
-      <p>בחר כיתה וראה דפי עבודה</p>
+      <p>בחר כיתה כדי לגשת לדפי עבודה</p>
     </div>
   </header>
 
-  <!-- בחירת כיתות והצגת התיקייה -->
   <main>
     <div class="content">
       <h2>בחר כיתה</h2>
-      <div class="grade-grid" id="gradeGrid">
-        <div class="grade-card active" data-id="1KflepnsSJF0npV0kO9ByLgRg2PKnVgRW">כיתה א</div>
-        <div class="grade-card" data-id="1GnhA3eeVowPX3t1dAzqJkrLz-x14wfVZ">כיתה ב</div>
-        <div class="grade-card" data-id="1mE9U6G2DX2tZaClFerxmGSKpwZnDLIqs">כיתה ג</div>
-        <div class="grade-card" data-id="1sVxmaccOEzu4UES5-foRZRkdHShtcvy-">כיתה ד</div>
-        <div class="grade-card" data-id="1-qnKYmihQ3MMh0Tp-8ZclXWBNOAyrs-C">כיתה ה</div>
-        <div class="grade-card" data-id="1ZkL5slBj-Cd2J37NynNtqh8ZyvGumqbJ">כיתה ו</div>
-        <div class="grade-card" data-id="1JSZW9mfVAzzGsw1fUDpkMVHsIXXLgB2N">כיתה ז</div>
-        <div class="grade-card" data-id="1qmrnBPUYHSbcSM3VxiuT9Dviz6wJl-VY">כיתה ח</div>
-        <div class="grade-card" data-id="1jOcIYCmROkswVM4qddeCeSCG0Zen9vfG">כיתה ט</div>
-        <div class="grade-card" data-id="1V425QwFuUWWhuFDGHxIUlSw5Z2iaFRmD">כיתה י</div>
-        <div class="grade-card" data-id="1dKHeMDR-ZD8sxte579xXRFfkYnOZsSdE">כיתה יא</div>
-        <div class="grade-card" data-id="1XXgzp-ndSWwEJlM3OA_rYhiazFWg0PKE">כיתה יב</div>
-      </div>
-
-      <h2>תיקיית דפי העבודה</h2>
-      <div class="embed-card">
-        <iframe
-          id="folderFrame"
-          src="https://drive.google.com/embeddedfolderview?id=1KflepnsSJF0npV0kO9ByLgRg2PKnVgRW#grid"
-          allowfullscreen>
-        </iframe>
+      <div class="grade-grid">
+        <a href="math_1.html" class="grade-card">כיתה א</a>
+        <a href="math_2.html" class="grade-card">כיתה ב</a>
+        <a href="math_3.html" class="grade-card">כיתה ג</a>
+        <a href="math_4.html" class="grade-card">כיתה ד</a>
+        <a href="math_5.html" class="grade-card">כיתה ה</a>
+        <a href="math_6.html" class="grade-card">כיתה ו</a>
+        <a href="math_7.html" class="grade-card">כיתה ז</a>
+        <a href="math_8.html" class="grade-card">כיתה ח</a>
+        <a href="math_9.html" class="grade-card">כיתה ט</a>
+        <a href="math_10.html" class="grade-card">כיתה י</a>
+        <a href="math_11.html" class="grade-card">כיתה יא</a>
+        <a href="math_12.html" class="grade-card">כיתה יב</a>
       </div>
     </div>
   </main>
 
-  <!-- סקריפטים -->
   <script>
-    // שינוי iframe בהתאם לכפתור שנבחר
-    document.querySelectorAll('.grade-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.grade-card')
-          .forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        const id = card.dataset.id;
-        document.getElementById('folderFrame').src =
-          `https://drive.google.com/embeddedfolderview?id=${id}#grid`;
-      });
-    });
-
-    // תפריט עליון toggle
     function toggleMenu() {
       const m = document.getElementById('dropdownMenu');
-      m.style.display = m.style.display === 'block' ? 'none' : 'block';
+      m.style.display = m.style.display==='block'?'none':'block';
     }
-
-    // מצב כהה ושיתוף
-    const darkToggle = document.getElementById('dark-toggle');
-    if (localStorage.getItem('dark-mode') === '1') {
-      document.documentElement.classList.add('dark-mode');
-    }
-    darkToggle.addEventListener('click', () => {
-      const dm = document.documentElement.classList.toggle('dark-mode');
-      dm
-        ? localStorage.setItem('dark-mode','1')
-        : localStorage.removeItem('dark-mode');
+    const dm = document.getElementById('dark-toggle');
+    if(localStorage.getItem('dark-mode')==='1') document.documentElement.classList.add('dark-mode');
+    dm.addEventListener('click',()=>{
+      const isDark=document.documentElement.classList.toggle('dark-mode');
+      isDark?localStorage.setItem('dark-mode','1'):localStorage.removeItem('dark-mode');
     });
-
-    document.getElementById('share-button').addEventListener('click', () => {
-      if (navigator.share) {
-        navigator.share({
-          title: 'מתמטיקה – כיתות',
-          text: 'בחר כיתה לצפייה בדפי עבודה',
-          url: location.href
-        });
-      } else {
-        alert('שיתוף לא נתמך בדפדפן זה');
-      }
+    document.getElementById('share-button').addEventListener('click',()=>{
+      if(navigator.share) navigator.share({title:'מתמטיקה – כיתות',text:'בחר כיתה לצפייה בדפי עבודה',url:location.href});
+      else alert('שיתוף לא נתמך');
     });
-
-    // טענת Feather Icons
   </script>
 </body>
 </html>

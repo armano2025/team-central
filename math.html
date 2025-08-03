@@ -46,20 +46,21 @@
     .hero-content p {
       margin: 8px 0 0; font-size: 16px; opacity: 0.9;
     }
-    .curriculum-btn {
+
+    /* כפתור לתכנית הלימודים */
+    .preview-btn {
       display: inline-block;
       margin-top: 16px;
       padding: 10px 20px;
-      background: #fff;
-      color: #3498db;
+      background: #e67e22;
+      color: #fff;
       border-radius: 6px;
       text-decoration: none;
       font-weight: 500;
       transition: background .1s, color .1s;
     }
-    .curriculum-btn:hover {
-      background: #f0f0f0;
-      color: #2779bd;
+    .preview-btn:hover {
+      background: #d35400;
     }
 
     /* תוכן */
@@ -100,8 +101,12 @@
       <i data-feather="menu"></i>
     </button>
     <div id="dropdownMenu" class="dropdown-menu">
-      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
-      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
+      <button id="share-button">
+        <i data-feather="share-2" class="icon-small"></i> שתף
+      </button>
+      <button id="dark-toggle">
+        <i data-feather="moon" class="icon-small"></i> מצב כהה
+      </button>
     </div>
   </div>
 
@@ -110,9 +115,12 @@
     <div class="hero-content">
       <h2>מתמטיקה</h2>
       <p>בחר כיתה כדי לגשת לדפי עבודה</p>
-      <!-- הכפתור החדש -->
-      <a href="https://pop.education.gov.il/tchumey_daat/matmatika/" target="_blank" class="curriculum-btn">
-        לתכנית הלימודים
+      <a
+        href="https://pop.education.gov.il/tchumey_daat/matmatika/"
+        target="_blank"
+        class="preview-btn"
+      >
+        תכנית הלימודים
       </a>
     </div>
   </header>
@@ -147,9 +155,7 @@
 
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark
-        ? localStorage.setItem('dark-mode', '1')
-        : localStorage.removeItem('dark-mode');
+      isDark ? localStorage.setItem('dark-mode', '1') : localStorage.removeItem('dark-mode');
     });
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');

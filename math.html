@@ -80,11 +80,30 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       transition: background .1s, transform .1s;
     }
     .grade-card:hover {
       background: #2779bd;
       transform: translateY(-2px);
+    }
+    .grade-card.active {
+      border: 2px solid #1e4e8c;
+    }
+
+    /* כרטיס embed */
+    .embed-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+    .embed-card iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      display: block;
     }
   </style>
 </head>
@@ -92,7 +111,7 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="math.html" title="חזרה למתמטיקה">
+    <a href="math.html" title="חזרה לדף המקצועות">
       <i data-feather="chevron-right" class="icon-small"></i>
     </a>
     <button class="menu-toggle" onclick="toggleMenu()">
@@ -108,64 +127,89 @@
     </div>
   </div>
 
-  <!-- Hero -->
+  <!-- כותרת ראשית -->
   <header class="hero">
     <div class="hero-content">
       <h2>מתמטיקה</h2>
-      <p>בחר כיתה כדי לגשת לדפי עבודה</p>
+      <p>בחר כיתה וראה דפי עבודה</p>
     </div>
   </header>
 
-  <!-- רשת הכיתות -->
+  <!-- בחירת כיתות והצגת התיקייה -->
   <main>
     <div class="content">
       <h2>בחר כיתה</h2>
-      <div class="grade-grid">
-        <a href="math-a.html"    class="grade-card">כיתה א</a>
-        <a href="math-b.html"    class="grade-card">כיתה ב</a>
-        <a href="math-g.html"    class="grade-card">כיתה ג</a>
-        <a href="math-d.html"    class="grade-card">כיתה ד</a>
-        <a href="math-h.html"    class="grade-card">כיתה ה</a>
-        <a href="math-v.html"    class="grade-card">כיתה ו</a>
-        <a href="math-z.html"    class="grade-card">כיתה ז</a>
-        <a href="math-het.html"  class="grade-card">כיתה ח</a>
-        <a href="math-t.html"    class="grade-card">כיתה ט</a>
-        <a href="math-y.html"    class="grade-card">כיתה י</a>
-        <a href="math-ya.html"   class="grade-card">כיתה יא</a>
-        <a href="math-yb.html"   class="grade-card">כיתה יב</a>
+      <div class="grade-grid" id="gradeGrid">
+        <div class="grade-card active" data-id="1KflepnsSJF0npV0kO9ByLgRg2PKnVgRW">כיתה א</div>
+        <div class="grade-card" data-id="1GnhA3eeVowPX3t1dAzqJkrLz-x14wfVZ">כיתה ב</div>
+        <div class="grade-card" data-id="1mE9U6G2DX2tZaClFerxmGSKpwZnDLIqs">כיתה ג</div>
+        <div class="grade-card" data-id="1sVxmaccOEzu4UES5-foRZRkdHShtcvy-">כיתה ד</div>
+        <div class="grade-card" data-id="1-qnKYmihQ3MMh0Tp-8ZclXWBNOAyrs-C">כיתה ה</div>
+        <div class="grade-card" data-id="1ZkL5slBj-Cd2J37NynNtqh8ZyvGumqbJ">כיתה ו</div>
+        <div class="grade-card" data-id="1JSZW9mfVAzzGsw1fUDpkMVHsIXXLgB2N">כיתה ז</div>
+        <div class="grade-card" data-id="1qmrnBPUYHSbcSM3VxiuT9Dviz6wJl-VY">כיתה ח</div>
+        <div class="grade-card" data-id="1jOcIYCmROkswVM4qddeCeSCG0Zen9vfG">כיתה ט</div>
+        <div class="grade-card" data-id="1V425QwFuUWWhuFDGHxIUlSw5Z2iaFRmD">כיתה י</div>
+        <div class="grade-card" data-id="1dKHeMDR-ZD8sxte579xXRFfkYnOZsSdE">כיתה יא</div>
+        <div class="grade-card" data-id="1XXgzp-ndSWwEJlM3OA_rYhiazFWg0PKE">כיתה יב</div>
+      </div>
+
+      <h2>תיקיית דפי העבודה</h2>
+      <div class="embed-card">
+        <iframe
+          id="folderFrame"
+          src="https://drive.google.com/embeddedfolderview?id=1KflepnsSJF0npV0kO9ByLgRg2PKnVgRW#grid"
+          allowfullscreen>
+        </iframe>
       </div>
     </div>
   </main>
 
-  <!-- סקריפטים ל-menu, dark mode ושיתוף -->
+  <!-- סקריפטים -->
   <script>
+    // שינוי iframe בהתאם לכפתור שנבחר
+    document.querySelectorAll('.grade-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.grade-card')
+          .forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        const id = card.dataset.id;
+        document.getElementById('folderFrame').src =
+          `https://drive.google.com/embeddedfolderview?id=${id}#grid`;
+      });
+    });
+
+    // תפריט עליון toggle
     function toggleMenu() {
-      const menu = document.getElementById('dropdownMenu');
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      const m = document.getElementById('dropdownMenu');
+      m.style.display = m.style.display === 'block' ? 'none' : 'block';
     }
 
+    // מצב כהה ושיתוף
     const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
     darkToggle.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark
-        ? localStorage.setItem('dark-mode', '1')
+      const dm = document.documentElement.classList.toggle('dark-mode');
+      dm
+        ? localStorage.setItem('dark-mode','1')
         : localStorage.removeItem('dark-mode');
     });
 
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה – בחירת כיתה',
-          text: 'בחר כיתה כדי לגשת לדפי עבודה',
+          title: 'מתמטיקה – כיתות',
+          text: 'בחר כיתה לצפייה בדפי עבודה',
           url: location.href
         });
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }
     });
+
+    // טענת Feather Icons
   </script>
 </body>
 </html>

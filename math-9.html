@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה ט – כלי עזר לצוות הוראה</title>
+  <title>מתמטיקה כיתה ט׳ תשפ״ו – כלי עזר לצוות הוראה</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -23,6 +23,8 @@
       height: 20px;
       margin-left: 8px;
     }
+
+    /* תפריט עליון */
     .top-right-controls {
       display: flex;
       justify-content: space-between;
@@ -51,6 +53,8 @@
       font-size: 14px;
       cursor: pointer;
     }
+
+    /* Hero gradient */
     .hero {
       background: linear-gradient(135deg, #3b82f6, #34d399);
       color: #fff;
@@ -66,6 +70,25 @@
       font-size: 16px;
       opacity: 0.9;
     }
+    .preview-btn {
+      display: inline-block;
+      margin: 16px 8px 0;
+      padding: 14px 28px;
+      background: #3498db;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 500;
+      transition: background .1s, transform .1s;
+      cursor: pointer;
+    }
+    .preview-btn:hover {
+      background: #2779bd;
+      transform: translateY(-2px);
+    }
+
+    /* תוכן ראשי */
     .content {
       max-width: 800px;
       margin: 24px auto 32px;
@@ -77,6 +100,8 @@
       color: #333;
       margin-bottom: 16px;
     }
+
+    /* הכרטיס המרכזי */
     .embed-card {
       background: #fff;
       border-radius: 12px;
@@ -84,7 +109,7 @@
       padding: 32px 16px;
       margin-top: 24px;
     }
-    .preview-btn {
+    .embed-card a {
       display: inline-block;
       padding: 14px 28px;
       background: #3498db;
@@ -92,12 +117,10 @@
       border-radius: 6px;
       text-decoration: none;
       font-size: 18px;
-      transition: background .1s, transform .1s;
-      cursor: pointer;
+      transition: background .1s;
     }
-    .preview-btn:hover {
+    .embed-card a:hover {
       background: #2779bd;
-      transform: translateY(-2px);
     }
   </style>
 </head>
@@ -124,8 +147,22 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה ט</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <h2>מתמטיקה כיתה ט׳ תשפ״ו</h2>
+      <p>בחר משאב:</p>
+      <a
+        href="https://drive.google.com/file/d/1ckoLZi8HCsUn8kBst9J5q2u32oRWzvAz/view?usp=drivesdk"
+        target="_blank"
+        class="preview-btn"
+      >
+        תכנית הוראה
+      </a>
+      <a
+        href="https://drive.google.com/file/d/1KGO1_rLEvGVPYEV_KdTHuWbvaYZIsbS-/view?usp=drivesdk"
+        target="_blank"
+        class="preview-btn"
+      >
+        פריסת הוראה
+      </a>
     </div>
   </header>
 
@@ -137,7 +174,6 @@
         <a
           href="https://drive.google.com/drive/folders/1jOcIYCmROkswVM4qddeCeSCG0Zen9vfG"
           target="_blank"
-          class="preview-btn"
         >
           פתח תיקיית כיתה ט
         </a>
@@ -152,22 +188,22 @@
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
     const darkToggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
     darkToggle.addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
       isDark
         ? localStorage.setItem('dark-mode', '1')
         : localStorage.removeItem('dark-mode');
     });
-    if (localStorage.getItem('dark-mode') === '1') {
-      document.documentElement.classList.add('dark-mode');
-    }
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה ט – כלי עזר לצוות הוראה',
-          text: 'פתח את תיקיית דפי העבודה של כיתה ט ב-Drive',
+          title: 'מתמטיקה כיתה ט׳ תשפ״ו – כלי עזר לצוות הוראה',
+          text: 'בחר משאב: תכנית הוראה או פריסת הוראה',
           url: location.href
-        }).catch(console.error);
+        });
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }

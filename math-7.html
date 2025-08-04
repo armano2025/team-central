@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה ז – כלי עזר לצוות הוראה</title>
+  <title>מתמטיקה כיתה ז׳ תשפ״ו – כלי עזר לצוות הוראה</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -71,6 +71,24 @@
       opacity: 0.9;
     }
 
+    /* כפתורי Hero */
+    .preview-btn {
+      display: inline-block;
+      margin: 16px 8px 0;
+      padding: 14px 28px;
+      background: #3498db;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 500;
+      transition: background .1s, transform .1s;
+    }
+    .preview-btn:hover {
+      background: #2779bd;
+      transform: translateY(-2px);
+    }
+
     /* תוכן הראשי */
     .content {
       max-width: 800px;
@@ -92,7 +110,7 @@
       padding: 32px 16px;
       margin-top: 24px;
     }
-    .preview-btn {
+    .embed-card a {
       display: inline-block;
       padding: 14px 28px;
       background: #3498db;
@@ -100,12 +118,10 @@
       border-radius: 6px;
       text-decoration: none;
       font-size: 18px;
-      transition: background .1s, transform .1s;
-      cursor: pointer;
+      transition: background .1s;
     }
-    .preview-btn:hover {
+    .embed-card a:hover {
       background: #2779bd;
-      transform: translateY(-2px);
     }
   </style>
 </head>
@@ -132,8 +148,22 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה ז</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <h2>מתמטיקה כיתה ז׳ תשפ״ו</h2>
+      <p>בחר משאב:</p>
+      <a
+        href="https://drive.google.com/file/d/1lpqbQOjoUozI33Gy3s9ZIndp4M2goAhv/view?usp=drivesdk"
+        target="_blank"
+        class="preview-btn"
+      >
+        תכנית הוראה
+      </a>
+      <a
+        href="https://docs.google.com/document/d/1M_5zaioG-WNuzL-_pWLCgJJBv3vF_95b/edit?usp=drivesdk&ouid=111357209229205262417&rtpof=true&sd=true"
+        target="_blank"
+        class="preview-btn"
+      >
+        פריסת הוראה
+      </a>
     </div>
   </header>
 
@@ -145,7 +175,6 @@
         <a
           href="https://drive.google.com/drive/folders/1JSZW9mfVAzzGsw1fUDpkMVHsIXXLgB2N"
           target="_blank"
-          class="preview-btn"
         >
           פתח תיקיית כיתה ז
         </a>
@@ -166,17 +195,18 @@
     }
     darkToggle.addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      if (isDark) localStorage.setItem('dark-mode', '1');
-      else localStorage.removeItem('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
     });
 
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה ז – כלי עזר לצוות הוראה',
-          text: 'פתח את תיקיית דפי העבודה של כיתה ז ב-Drive',
+          title: 'מתמטיקה כיתה ז׳ תשפ״ו – כלי עזר לצוות הוראה',
+          text: 'בחר משאב: תכנית הוראה או פריסת הוראה',
           url: location.href
-        }).catch(console.error);
+        });
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }

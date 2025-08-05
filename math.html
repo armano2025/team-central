@@ -46,8 +46,6 @@
     .hero-content p {
       margin: 8px 0 0; font-size: 16px; opacity: 0.9;
     }
-
-    /* כפתורים ב־Hero */
     .preview-btn {
       display: inline-block;
       margin-top: 16px;
@@ -130,6 +128,13 @@
       >
         חוזר מפמ״ר שנה״ל תשפ״ו במתמטיקה חט״ב - חט״ע
       </a>
+      <a
+        href="https://drive.google.com/file/d/1AmdzB2AT1QMOVqhgqKGpjO9qhX6TQqmK/view?usp=drivesdk"
+        target="_blank"
+        class="preview-btn"
+      >
+        חוזר מפמ״ר מתמטיקה תשפ״ו בחינוך היסודי
+      </a>
     </div>
   </header>
 
@@ -162,9 +167,7 @@
     }
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark
-        ? localStorage.setItem('dark-mode', '1')
-        : localStorage.removeItem('dark-mode');
+      isDark ? localStorage.setItem('dark-mode', '1') : localStorage.removeItem('dark-mode');
     });
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');

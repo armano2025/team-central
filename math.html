@@ -47,10 +47,11 @@
       margin: 8px 0 0; font-size: 16px; opacity: 0.9;
     }
 
-    /* כפתור לתכנית הלימודים */
+    /* כפתורים ב־Hero */
     .preview-btn {
       display: inline-block;
       margin-top: 16px;
+      margin-left: 8px;
       padding: 10px 20px;
       background: #e67e22;
       color: #fff;
@@ -122,6 +123,13 @@
       >
         תכנית הלימודים
       </a>
+      <a
+        href="https://meyda.education.gov.il/files/Pop/0files/matmatika/Chativa-Elyona/tashpav/mafmar-tashpav.pdf"
+        target="_blank"
+        class="preview-btn"
+      >
+        חוזר מפמ״ר שנה״ל תשפ״ו במתמטיקה חט״ב - חט״ע
+      </a>
     </div>
   </header>
 
@@ -152,15 +160,15 @@
       const menu = document.getElementById('dropdownMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
-
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark ? localStorage.setItem('dark-mode', '1') : localStorage.removeItem('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode', '1')
+        : localStorage.removeItem('dark-mode');
     });
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
-
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({

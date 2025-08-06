@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>מתמטיקה – בחירת רמת הוראה</title>
+
+  <!-- CSS הראשי של האפליקציה -->
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: #fafafa;
+      margin: 0;
+      padding: 0;
+    }
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+    }
+    /* תפריט עליון */
+    .top-right-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 16px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #3b82f6, #34d399);
+      color: #fff;
+      text-align: center;
+      padding: 32px 16px;
+    }
+    .hero-content h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .hero-content p {
+      margin: 8px 0 0;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* תוכן */
+    .content {
+      max-width: 800px;
+      margin: 24px auto 32px;
+      padding: 0 16px;
+      text-align: center;
+    }
+    .content h2 {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 16px;
+    }
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+      gap: 16px;
+    }
+    .grade-card {
+      background: #3498db;
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .1s, transform .1s;
+    }
+    .grade-card:hover {
+      background: #2779bd;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body onload="feather.replace()">
+
+  <!-- תפריט עליון -->
+  <div class="top-right-controls">
+    <a href="index.html" title="דף הבית">
+      <i data-feather="home" class="icon-small"></i>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <i data-feather="menu"></i>
+    </button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button">
+        <i data-feather="share-2" class="icon-small"></i> שתף
+      </button>
+      <button id="dark-toggle">
+        <i data-feather="moon" class="icon-small"></i> מצב כהה
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>מתמטיקה</h2>
+      <p>בחר רמת הוראה</p>
+    </div>
+  </header>
+
+  <!-- בחירת רמה -->
+  <main>
+    <div class="content">
+      <h2>בחר רמת הוראה</h2>
+      <div class="grade-grid">
+        <a href="math-a.html" class="grade-card">מתמטיקה יסודי</a>
+        <a href="math-b.html" class="grade-card">מתמטיקה חטיבת ביניים</a>
+        <a href="math-c.html" class="grade-card">מתמטיקה חטיבה עליונה</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- סקריפטים ל־תפריט, מצב כהה ושיתוף -->
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+    document.getElementById('dark-toggle').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode','1')
+        : localStorage.removeItem('dark-mode');
+    });
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'מתמטיקה – בחירת רמת הוראה',
+          text: 'בחר רמת הוראה לצפייה בתכנים',
+          url: location.href
+        });
+      } else {
+        alert('שיתוף לא נתמך בדפדפן זה');
+      }
+    });
+  </script>
+</body>
+</html>

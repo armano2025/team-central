@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה י – כלי עזר לצוות הוראה</title>
+  <title>מתמטיקה חטיבה עליונה – בחירת יחידות</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -23,7 +23,6 @@
       height: 20px;
       margin-left: 8px;
     }
-
     /* תפריט עליון */
     .top-right-controls {
       display: flex;
@@ -54,7 +53,7 @@
       cursor: pointer;
     }
 
-    /* Hero gradient */
+    /* Hero */
     .hero {
       background: linear-gradient(135deg, #3b82f6, #34d399);
       color: #fff;
@@ -71,7 +70,7 @@
       opacity: 0.9;
     }
 
-    /* תוכן הראשי */
+    /* תוכן */
     .content {
       max-width: 800px;
       margin: 24px auto 32px;
@@ -83,27 +82,25 @@
       color: #333;
       margin-bottom: 16px;
     }
-
-    /* הכרטיס המרכזי */
-    .embed-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      padding: 32px 16px;
-      margin-top: 24px;
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+      gap: 16px;
     }
-    .preview-btn {
-      display: inline-block;
-      padding: 14px 28px;
+    .grade-card {
       background: #3498db;
       color: #fff;
-      border-radius: 6px;
+      border-radius: 8px;
+      padding: 16px;
       text-decoration: none;
-      font-size: 18px;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: background .1s, transform .1s;
-      cursor: pointer;
     }
-    .preview-btn:hover {
+    .grade-card:hover {
       background: #2779bd;
       transform: translateY(-2px);
     }
@@ -113,7 +110,7 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="math.html" title="חזרה לדף הכיתות">
+    <a href="math-prime.html" title="חזרה לבחירת רמה">
       <i data-feather="chevron-right" class="icon-small"></i>
     </a>
     <button class="menu-toggle" onclick="toggleMenu()">
@@ -132,51 +129,43 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה י</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <h2>מתמטיקה חטיבה עליונה</h2>
+      <p>בחר יחידה</p>
     </div>
   </header>
 
-  <!-- תוכן הדף -->
-  <main>
-    <div class="content">
-      <h2>דפי עבודה מגוגל דרייב</h2>
-      <div class="embed-card">
-        <a
-          href="https://drive.google.com/drive/folders/1V425QwFuUWWhuFDGHxIUlSw5Z2iaFRmD"
-          target="_blank"
-          class="preview-btn"
-        >
-          פתח תיקיית כיתה י
-        </a>
-      </div>
+  <!-- בחירת יחידות -->
+  <main class="content">
+    <h2>בחר יחידה</h2>
+    <div class="grade-grid">
+      <a href="math-3u.html" class="grade-card">3 יחידות</a>
+      <a href="math-4u.html" class="grade-card">4 יחידות</a>
+      <a href="math-5u.html" class="grade-card">5 יחידות</a>
     </div>
   </main>
 
-  <!-- סקריפטים ל־menu, מצב כהה ושיתוף -->
+  <!-- סקריפטים -->
   <script>
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
-
-    const darkToggle = document.getElementById('dark-toggle');
+    document.getElementById('dark-toggle').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode','1')
+        : localStorage.removeItem('dark-mode');
+    });
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
-    darkToggle.addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark-mode');
-      if (isDark) localStorage.setItem('dark-mode', '1');
-      else localStorage.removeItem('dark-mode');
-    });
-
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה י – כלי עזר לצוות הוראה',
-          text: 'פתח את תיקיית דפי העבודה של כיתה י ב-Drive',
+          title: 'מתמטיקה חטיבה עליונה – בחירת יחידה',
+          text: 'בחר יחידה לצפייה בדפי עבודה',
           url: location.href
-        }).catch(console.error);
+        });
       } else {
         alert('שיתוף לא נתמך בדפדפן זה');
       }

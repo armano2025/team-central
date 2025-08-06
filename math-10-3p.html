@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה י – 3 יחידות בגרות</title>
+  <title>מתמטיקה כיתה י – 3/4/5 יחידות תשפ״ו</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -47,10 +47,11 @@
       margin: 8px 0 0; font-size: 16px; opacity: 0.9;
     }
 
-    /* Preview button */
+    /* Preview buttons */
     .preview-btn {
       display: inline-block;
-      margin-top: 24px;
+      margin-top: 16px;
+      margin-left: 8px;
       padding: 12px 24px;
       background: #3498db;
       color: #fff;
@@ -97,8 +98,8 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה י – 3 יחידות</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <h2>מתמטיקה כיתה י תשפ״ו</h2>
+      <p>בחר יחידת בגרות</p>
     </div>
   </header>
 
@@ -111,7 +112,21 @@
         target="_blank"
         class="preview-btn"
       >
-        פתח תיקיית כיתה י – 3 יחידות
+        3 יחידות
+      </a>
+      <a
+        href="https://drive.google.com/drive/folders/1EA-aqnXNM1zEy0i-sqF8ZmOyWLxW6dfR"
+        target="_blank"
+        class="preview-btn"
+      >
+        4 יחידות
+      </a>
+      <a
+        href="https://drive.google.com/drive/folders/1-TrFXDzcqdabC0OuLESXI89AjPYLmH4p"
+        target="_blank"
+        class="preview-btn"
+      >
+        5 יחידות
       </a>
     </div>
   </main>
@@ -128,13 +143,15 @@
     }
     darkToggle.addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
+      isDark
+        ? localStorage.setItem('dark-mode','1')
+        : localStorage.removeItem('dark-mode');
     });
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה י – 3 יחידות',
-          text: 'פתח את תיקיית דפי העבודה של כיתה י – 3 יחידות',
+          title: 'מתמטיקה כיתה י תשפ״ו – יחידות בגרות',
+          text: 'בחר יחידת בגרות לצפייה בדפי עבודה',
           url: location.href
         });
       } else {

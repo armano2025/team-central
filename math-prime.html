@@ -154,9 +154,7 @@
     }
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark
-        ? localStorage.setItem('dark-mode','1')
-        : localStorage.removeItem('dark-mode');
+      isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
     });
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');

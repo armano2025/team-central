@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה י תשפ״ו – בחירת יחידות</title>
+  <title>מתמטיקה כיתה י – 3 יחידות</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -18,89 +18,59 @@
       margin: 0;
       padding: 0;
     }
+
     .icon-small {
       width: 20px;
       height: 20px;
       margin-left: 8px;
     }
-    /* תפריט עליון */
+
     .top-right-controls {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 16px;
     }
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 50px;
-      right: 16px;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-    .dropdown-menu button {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      padding: 8px 12px;
-      background: none;
-      border: none;
-      font-family: inherit;
-      font-size: 14px;
-      cursor: pointer;
-    }
 
-    /* Hero */
     .hero {
       background: linear-gradient(135deg, #3b82f6, #34d399);
       color: #fff;
       text-align: center;
       padding: 32px 16px;
     }
+
     .hero-content h2 {
       margin: 0;
       font-size: 28px;
     }
+
     .hero-content p {
       margin: 8px 0 0;
       font-size: 16px;
       opacity: 0.9;
     }
 
-    /* תוכן */
     .content {
       max-width: 800px;
-      margin: 24px auto 32px;
+      margin: 24px auto;
       padding: 0 16px;
       text-align: center;
     }
-    .content h2 {
-      font-size: 22px;
-      color: #333;
-      margin-bottom: 16px;
-    }
-    .grade-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
-      gap: 16px;
-    }
-    .grade-card {
+
+    .link-button {
       background: #3498db;
       color: #fff;
+      border: none;
       border-radius: 8px;
-      padding: 16px;
-      text-decoration: none;
+      padding: 14px 24px;
       font-size: 16px;
       font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .1s, transform .1s;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s, transform 0.2s;
     }
-    .grade-card:hover {
+
+    .link-button:hover {
       background: #2779bd;
       transform: translateY(-2px);
     }
@@ -110,13 +80,13 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="math-prime.html" title="חזרה לבחירת רמה">
+    <a href="index.html" title="חזרה לעמוד הראשי">
       <i data-feather="chevron-right" class="icon-small"></i>
     </a>
     <button class="menu-toggle" onclick="toggleMenu()">
       <i data-feather="menu"></i>
     </button>
-    <div id="dropdownMenu" class="dropdown-menu">
+    <div id="dropdownMenu" class="dropdown-menu" style="display:none;">
       <button id="share-button">
         <i data-feather="share-2" class="icon-small"></i> שתף
       </button>
@@ -126,22 +96,19 @@
     </div>
   </div>
 
-  <!-- Hero -->
+  <!-- כותרת Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה י תשפ״ו</h2>
-      <p>בחר יחידה</p>
+      <h2>מתמטיקה כיתה י – 3 יחידות</h2>
+      <p>צפה בקבצים ותרגולים</p>
     </div>
   </header>
 
-  <!-- בחירת יחידות -->
+  <!-- תוכן -->
   <main class="content">
-    <h2>בחר יחידה</h2>
-    <div class="grade-grid">
-      <a href="math-10-3p.html" class="grade-card">3 יחידות</a>
-      <a href="math-10-4p.html" class="grade-card">4 יחידות</a>
-      <a href="math-10-5p.html" class="grade-card">5 יחידות</a>
-    </div>
+    <a href="https://drive.google.com/drive/folders/INSERT_FOLDER_ID_HERE" target="_blank" class="link-button">
+      גש לתיקיית גוגל דרייב
+    </a>
   </main>
 
   <!-- סקריפטים -->
@@ -165,8 +132,8 @@
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה י תשפ״ו – בחירת יחידה',
-          text: 'בחר יחידה לצפייה בדפי עבודה',
+          title: 'מתמטיקה כיתה י – 3 יחידות',
+          text: 'גש לקבצים ותרגולים',
           url: location.href
         });
       } else {

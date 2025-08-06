@@ -138,9 +138,9 @@
   <main class="content">
     <h2>בחר יחידה</h2>
     <div class="grade-grid">
-      <a href="math-3u.html" class="grade-card">3 יחידות</a>
-      <a href="math-4u.html" class="grade-card">4 יחידות</a>
-      <a href="math-5u.html" class="grade-card">5 יחידות</a>
+      <a href="math-10-3p.html" class="grade-card">3 יחידות</a>
+      <a href="math-10-4p.html" class="grade-card">4 יחידות</a>
+      <a href="math-10-5p.html" class="grade-card">5 יחידות</a>
     </div>
   </main>
 
@@ -150,15 +150,18 @@
       const menu = document.getElementById('dropdownMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
+
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
       isDark
         ? localStorage.setItem('dark-mode','1')
         : localStorage.removeItem('dark-mode');
     });
+
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
+
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({

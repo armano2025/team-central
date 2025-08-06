@@ -15,53 +15,48 @@
     body { font-family: 'Rubik', sans-serif; background: #fafafa; margin: 0; padding: 0; }
     .icon-small { width: 20px; height: 20px; margin-left: 8px; }
 
-    .content {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 16px;
-      text-align: center;
+    .top-right-controls {
+      display: flex; justify-content: space-between; align-items: center; padding: 10px 16px;
     }
-    .content h2 {
-      margin-bottom: 16px;
-      font-size: 20px;
-      color: #333;
+    .dropdown-menu {
+      display: none; position: absolute; top: 50px; right: 16px;
+      background: #fff; border: 1px solid #ccc; border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 1000;
+    }
+    .dropdown-menu button {
+      display: flex; align-items: center; width: 100%; padding: 8px 12px;
+      background: none; border: none; font-family: inherit; font-size: 14px; cursor: pointer;
     }
 
-    /* רשת הכפתורים */
+    .hero {
+      background: linear-gradient(135deg, #3b82f6, #34d399);
+      color: #fff; text-align: center; padding: 32px 16px;
+    }
+    .hero-content h2 { margin: 0; font-size: 28px; }
+    .hero-content p { margin: 8px 0 0; font-size: 16px; opacity: 0.9; }
+
+    .content {
+      max-width: 1000px; margin: 0 auto; padding: 16px; text-align: center;
+    }
+    .content h2 { margin-bottom: 16px; font-size: 20px; color: #333; }
+
     .subject-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-      gap: 16px;
-      margin: 0 auto 32px;
-      padding: 0 16px;
-      max-width: 800px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+      gap: 16px; margin: 0 auto 32px; padding: 0 16px; max-width: 800px;
     }
     .subject-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      padding: 20px 10px;
-      text-decoration: none;
-      transition: transform .1s, box-shadow .1s;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; background: #fff; border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px 10px;
+      text-decoration: none; transition: transform .1s, box-shadow .1s;
     }
     .subject-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     .subject-card i {
-      stroke: #3498db;
-      width: 36px;
-      height: 36px;
-      margin-bottom: 8px;
+      stroke: #3498db; width: 36px; height: 36px; margin-bottom: 8px;
     }
-    .subject-card span {
-      font-size: 16px;
-      color: #333;
-    }
+    .subject-card span { font-size: 16px; color: #333; }
   </style>
 </head>
 <body onload="feather.replace()">
@@ -75,18 +70,14 @@
       <i data-feather="menu"></i>
     </button>
     <div id="dropdownMenu" class="dropdown-menu">
-      <button id="share-button">
-        <i data-feather="share-2" class="icon-small"></i> שתף
-      </button>
-      <button id="dark-toggle">
-        <i data-feather="moon" class="icon-small"></i> מצב כהה
-      </button>
+      <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
+      <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
     </div>
   </div>
 
   <!-- כותרת ראשית -->
   <header class="hero">
-    <div class="hero-content" style="text-align:center; padding:16px;">
+    <div class="hero-content">
       <h2>כלי עזר לצוות הוראה</h2>
       <p>בחר מקצוע כדי לעבור לדף ייעודי</p>
     </div>
@@ -97,7 +88,7 @@
     <section class="content">
       <h2>בחר מקצוע</h2>
       <div class="subject-grid">
-        <a href="math.html" class="subject-card">
+        <a href="math-prime.html" class="subject-card">
           <i data-feather="book-open"></i>
           <span>מתמטיקה</span>
         </a>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה יא – כלי עזר לצוות הוראה</title>
+  <title>מתמטיקה כיתה יא – בחירת יחידות</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -18,19 +18,20 @@
       margin: 0;
       padding: 0;
     }
+
     .icon-small {
       width: 20px;
       height: 20px;
       margin-left: 8px;
     }
 
-    /* תפריט עליון */
     .top-right-controls {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 16px;
     }
+
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -42,6 +43,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       z-index: 1000;
     }
+
     .dropdown-menu button {
       display: flex;
       align-items: center;
@@ -54,56 +56,59 @@
       cursor: pointer;
     }
 
-    /* Hero gradient */
     .hero {
       background: linear-gradient(135deg, #3b82f6, #34d399);
       color: #fff;
       text-align: center;
       padding: 32px 16px;
     }
+
     .hero-content h2 {
       margin: 0;
       font-size: 28px;
     }
+
     .hero-content p {
       margin: 8px 0 0;
       font-size: 16px;
       opacity: 0.9;
     }
 
-    /* תוכן הראשי */
     .content {
       max-width: 800px;
       margin: 24px auto 32px;
       padding: 0 16px;
       text-align: center;
     }
+
     .content h2 {
       font-size: 22px;
       color: #333;
       margin-bottom: 16px;
     }
 
-    /* הכרטיס המרכזי */
-    .embed-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      padding: 32px 16px;
-      margin-top: 24px;
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 16px;
+      margin-top: 32px;
     }
-    .preview-btn {
-      display: inline-block;
-      padding: 14px 28px;
+
+    .grade-card {
       background: #3498db;
       color: #fff;
-      border-radius: 6px;
+      border-radius: 8px;
+      padding: 16px;
       text-decoration: none;
-      font-size: 18px;
-      transition: background .1s, transform .1s;
-      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
     }
-    .preview-btn:hover {
+
+    .grade-card:hover {
       background: #2779bd;
       transform: translateY(-2px);
     }
@@ -129,42 +134,36 @@
     </div>
   </div>
 
-  <!-- Hero -->
+  <!-- HERO -->
   <header class="hero">
     <div class="hero-content">
       <h2>מתמטיקה כיתה יא</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <p>בחר את רמת היחידה</p>
     </div>
   </header>
 
-  <!-- תוכן הדף -->
-  <main>
-    <div class="content">
-      <h2>דפי עבודה מגוגל דרייב</h2>
-      <div class="embed-card">
-        <a
-          href="https://drive.google.com/drive/folders/1dKHeMDR-ZD8sxte579xXRFfkYnOZsSdE"
-          target="_blank"
-          class="preview-btn"
-        >
-          פתח תיקיית כיתה יא
-        </a>
-      </div>
+  <!-- תוכן -->
+  <main class="content">
+    <h2>בחירת יחידה</h2>
+    <div class="grade-grid">
+      <a href="math-11-3p.html" class="grade-card">3 יחידות</a>
+      <a href="math-11-4p.html" class="grade-card">4 יחידות</a>
+      <a href="math-11-5p.html" class="grade-card">5 יחידות</a>
     </div>
   </main>
 
-  <!-- סקריפטים ל־menu, מצב כהה ושיתוף -->
+  <!-- סקריפטים -->
   <script>
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
 
-    const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
-    darkToggle.addEventListener('click', () => {
+
+    document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
       isDark
         ? localStorage.setItem('dark-mode', '1')
@@ -174,8 +173,8 @@
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה יא – כלי עזר לצוות הוראה',
-          text: 'פתח את תיקיית דפי העבודה של כיתה יא ב-Drive',
+          title: 'מתמטיקה כיתה יא – בחירת יחידות',
+          text: 'בחר את רמת היחידה הרצויה לעבודה',
           url: location.href
         }).catch(console.error);
       } else {

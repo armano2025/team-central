@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>מתמטיקה כיתה י״ב – 5 יחידות</title>
 
+  <!-- CSS הראשי של האפליקציה -->
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#3498db" />
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: #fafafa;
+      margin: 0;
+      padding: 0;
+    }
+    .icon-small {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+    }
+
+    /* תפריט עליון */
+    .top-right-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 16px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    .dropdown-menu button {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Hero gradient */
+    .hero {
+      background: linear-gradient(135deg, #3b82f6, #34d399);
+      color: #fff;
+      text-align: center;
+      padding: 32px 16px;
+    }
+    .hero-content h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    /* תוכן הכפתורים */
+    .content {
+      max-width: 800px;
+      margin: 24px auto 32px;
+      padding: 0 16px;
+      text-align: center;
+    }
+    .embed-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 32px 16px;
+      margin-top: 24px;
+    }
+    .preview-btn {
+      display: inline-block;
+      padding: 14px 28px;
+      background: #3498db;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background .1s, transform .1s;
+      cursor: pointer;
+      margin: 8px;
+    }
+    .preview-btn:hover {
+      background: #2779bd;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body onload="feather.replace()">
+
+  <!-- תפריט עליון -->
+  <div class="top-right-controls">
+    <a href="math-12.html" title="חזרה לדף כיתה י״ב">
+      <i data-feather="chevron-right" class="icon-small"></i>
+    </a>
+    <button class="menu-toggle" onclick="toggleMenu()">
+      <i data-feather="menu"></i>
+    </button>
+    <div id="dropdownMenu" class="dropdown-menu">
+      <button id="share-button">
+        <i data-feather="share-2" class="icon-small"></i> שתף
+      </button>
+      <button id="dark-toggle">
+        <i data-feather="moon" class="icon-small"></i> מצב כהה
+      </button>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>מתמטיקה כיתה י״ב – 5 יחידות</h2>
+    </div>
+  </header>
+
+  <!-- כפתורים -->
+  <main>
+    <div class="content">
+      <div class="embed-card">
+        <a href="https://drive.google.com/drive/folders/קישור-1" target="_blank" class="preview-btn">נושא 1</a>
+        <a href="https://drive.google.com/drive/folders/קישור-2" target="_blank" class="preview-btn">נושא 2</a>
+        <a href="https://drive.google.com/drive/folders/קישור-3" target="_blank" class="preview-btn">נושא 3</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- סקריפטים -->
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('dropdownMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    const darkToggle = document.getElementById('dark-toggle');
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    darkToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      if (isDark) localStorage.setItem('dark-mode', '1');
+      else localStorage.removeItem('dark-mode');
+    });
+
+    document.getElementById('share-button').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'מתמטיקה כיתה י״ב – 5 יחידות',
+          text: 'פתח את דפי העבודה של כיתה י״ב – 5 יחידות',
+          url: location.href
+        }).catch(console.error);
+      } else {
+        alert('שיתוף לא נתמך בדפדפן זה');
+      }
+    });
+  </script>
+</body>
+</html>

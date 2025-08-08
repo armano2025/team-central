@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה יב – כלי עזר לצוות הוראה</title>
+  <title>מתמטיקה כיתה י״א – 5 יחידות</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -71,20 +71,13 @@
       opacity: 0.9;
     }
 
-    /* תוכן הראשי */
+    /* תוכן הכפתורים */
     .content {
       max-width: 800px;
       margin: 24px auto 32px;
       padding: 0 16px;
       text-align: center;
     }
-    .content h2 {
-      font-size: 22px;
-      color: #333;
-      margin-bottom: 16px;
-    }
-
-    /* הכרטיס המרכזי */
     .embed-card {
       background: #fff;
       border-radius: 12px;
@@ -102,6 +95,7 @@
       font-size: 18px;
       transition: background .1s, transform .1s;
       cursor: pointer;
+      margin: 8px;
     }
     .preview-btn:hover {
       background: #2779bd;
@@ -113,7 +107,7 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="math.html" title="חזרה לדף הכיתות">
+    <a href="math-prime.html" title="חזרה לדף הכיתות">
       <i data-feather="chevron-right" class="icon-small"></i>
     </a>
     <button class="menu-toggle" onclick="toggleMenu()">
@@ -132,28 +126,22 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה יב</h2>
-      <p>דפי עבודה ומשאבים מתוך Google Drive</p>
+      <h2>מתמטיקה כיתה י״א – 5 יחידות</h2>
     </div>
   </header>
 
-  <!-- תוכן הדף -->
+  <!-- כפתורים -->
   <main>
     <div class="content">
-      <h2>דפי עבודה מגוגל דרייב</h2>
       <div class="embed-card">
-        <a
-          href="https://drive.google.com/drive/folders/1XXgzp-ndSWwEJlM3OA_rYhiazFWg0PKE"
-          target="_blank"
-          class="preview-btn"
-        >
-          פתח תיקיית כיתה יב
-        </a>
+        <a href="https://drive.google.com/drive/folders/קישור-3-יחידות" target="_blank" class="preview-btn">3 יחידות</a>
+        <a href="https://drive.google.com/drive/folders/קישור-4-יחידות" target="_blank" class="preview-btn">4 יחידות</a>
+        <a href="https://drive.google.com/drive/folders/קישור-5-יחידות" target="_blank" class="preview-btn">5 יחידות</a>
       </div>
     </div>
   </main>
 
-  <!-- סקריפטים ל־menu, מצב כהה ושיתוף -->
+  <!-- סקריפטים -->
   <script>
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
@@ -173,8 +161,8 @@
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה יב – כלי עזר לצוות הוראה',
-          text: 'פתח את תיקיית דפי העבודה של כיתה יב ב-Drive',
+          title: 'מתמטיקה כיתה י״א – 5 יחידות',
+          text: 'פתח את דפי העבודה של כיתה י״א – 5 יחידות',
           url: location.href
         }).catch(console.error);
       } else {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>מתמטיקה כיתה י״א – 5 יחידות</title>
+  <title>מתמטיקה כיתה י״ב</title>
 
   <!-- CSS הראשי של האפליקציה -->
   <link rel="stylesheet" href="styles.css" />
@@ -65,11 +65,6 @@
       margin: 0;
       font-size: 28px;
     }
-    .hero-content p {
-      margin: 8px 0 0;
-      font-size: 16px;
-      opacity: 0.9;
-    }
 
     /* תוכן הכפתורים */
     .content {
@@ -107,7 +102,7 @@
 
   <!-- תפריט עליון -->
   <div class="top-right-controls">
-    <a href="math-prime.html" title="חזרה לדף הכיתות">
+    <a href="math-c.html" title="חזרה לדף הכיתות">
       <i data-feather="chevron-right" class="icon-small"></i>
     </a>
     <button class="menu-toggle" onclick="toggleMenu()">
@@ -126,7 +121,7 @@
   <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>מתמטיקה כיתה י״א – 5 יחידות</h2>
+      <h2>מתמטיקה כיתה י״ב</h2>
     </div>
   </header>
 
@@ -134,9 +129,9 @@
   <main>
     <div class="content">
       <div class="embed-card">
-        <a href="https://drive.google.com/drive/folders/קישור-3-יחידות" target="_blank" class="preview-btn">3 יחידות</a>
-        <a href="https://drive.google.com/drive/folders/קישור-4-יחידות" target="_blank" class="preview-btn">4 יחידות</a>
-        <a href="https://drive.google.com/drive/folders/קישור-5-יחידות" target="_blank" class="preview-btn">5 יחידות</a>
+        <a href="math-12-3p.html" class="preview-btn">י״ב – 3 יחידות</a>
+        <a href="math-12-4p.html" class="preview-btn">י״ב – 4 יחידות</a>
+        <a href="math-12-5p.html" class="preview-btn">י״ב – 5 יחידות</a>
       </div>
     </div>
   </main>
@@ -161,8 +156,8 @@
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
-          title: 'מתמטיקה כיתה י״א – 5 יחידות',
-          text: 'פתח את דפי העבודה של כיתה י״א – 5 יחידות',
+          title: 'מתמטיקה כיתה י״ב',
+          text: 'בחר את יחידת הלימוד בכיתה י״ב',
           url: location.href
         }).catch(console.error);
       } else {

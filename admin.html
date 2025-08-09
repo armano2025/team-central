@@ -24,7 +24,6 @@
       border: none;
       cursor: pointer;
     }
-
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -35,7 +34,6 @@
       z-index: 1000;
       width: 160px;
     }
-
     .dropdown-menu button {
       display: flex;
       align-items: center;
@@ -48,26 +46,41 @@
       font-size: 14px;
       cursor: pointer;
     }
-
     .top-right-controls {
       display: flex;
       justify-content: flex-end;
       align-items: center;
       padding: 10px;
     }
-
     .top-right-controls .menu-toggle {
       margin-left: 10px;
     }
-
     .icon-small {
       width: 20px;
       height: 20px;
       margin-left: 8px;
     }
+    /* חץ חזרה */
+    .back-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: #3498db;
+      font-size: 14px;
+      margin: 8px 12px;
+    }
+    .back-arrow:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
+
+  <!-- חץ חזרה ל-index.html -->
+  <a href="index.html" class="back-arrow">
+    <i data-feather="arrow-right"></i> חזרה
+  </a>
 
   <!-- Hero Section -->
   <header class="hero">
@@ -112,18 +125,22 @@
         <h3>יומנים קבועים</h3>
       </a>
 
+      <!-- כרטיס חדש לצ׳ט שאלות נפוצות -->
+      <a class="card" href="chat.html">
+        <i data-feather="message-circle"></i>
+        <h3>צ'ט שאלות נפוצות</h3>
+      </a>
+
     </section>
   </main>
 
   <!-- Scripts -->
   <script>
     feather.replace();
-
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
-
     const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
@@ -134,7 +151,6 @@
         ? localStorage.setItem('dark-mode', '1')
         : localStorage.removeItem('dark-mode');
     });
-
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({

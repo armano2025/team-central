@@ -9,202 +9,215 @@
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/feather-icons"></script>
   <style>
-    .chat-container {
-      max-width: 600px;
-      margin: 24px auto;
-      background: var(--card-bg, #fff);
-      border-radius: 16px;
-      border: 1px solid var(--border-color, #e5e7eb);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      overflow: hidden;
+    :root{
+      --radius:16px;
+      --card:#fff;
+      --border:#e5e7eb;
+      --muted:#6b7280;
+      --primary:#3498db;
+      --bg:#f7f7f9;
     }
-    .chat-header {
-      padding: 16px;
-      background: var(--primary, #3498db);
-      color: #fff;
-      font-size: 18px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .chat-body {
-      padding: 16px;
-    }
-    .chat-btn {
-      display: block;
-      width: 100%;
-      padding: 12px 14px;
-      margin: 6px 0;
-      border-radius: 12px;
-      border: 1px solid var(--border-color, #e5e7eb);
-      background: #fff;
-      cursor: pointer;
-      font-size: 16px;
-      text-align: center;
-    }
-    .chat-btn:hover {
-      background: var(--hover-bg, #f7f7f9);
-    }
-    .bubble {
-      background: var(--hover-bg, #f7f7f9);
-      border: 1px solid var(--border-color, #e5e7eb);
-      padding: 12px;
-      border-radius: 12px;
-      margin: 8px 0;
-      line-height: 1.6;
-    }
-    .link-list a {
-      display: inline-block;
-      margin: 4px 0;
-      color: var(--primary, #3498db);
-      text-decoration: none;
-      border-bottom: 1px dashed var(--primary, #3498db);
-    }
-    .chat-footer {
-      padding: 12px;
-      border-top: 1px solid var(--border-color, #e5e7eb);
-      display: flex;
-      gap: 8px;
-    }
-    .chat-footer button {
-      flex: 1;
-    }
-    .hidden { display: none; }
-    .back-arrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      color: #fff;
-      font-size: 14px;
-    }
-    .back-arrow:hover {
-      text-decoration: underline;
-    }
+    body{background:var(--bg);}
+    .wrap{max-width:720px;margin:24px auto;padding:0 12px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 20px rgba(0,0,0,.06);overflow:hidden}
+    .head{display:flex;align-items:center;justify-content:space-between;background:var(--primary);color:#fff;padding:14px 16px}
+    .head .title{font-weight:700}
+    .head .back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;font-size:14px}
+    .body{padding:16px;min-height:260px}
+    .footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px}
+    .btn{display:block;width:100%;text-align:center;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:16px;margin:8px 0}
+    .btn:hover{background:#fafafa}
+    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .bubble{background:#f1f5f9;border:1px solid var(--border);padding:12px 14px;border-radius:12px;margin:8px 0;line-height:1.6}
+    .links a{display:inline-block;margin:4px 0;color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)}
+    .bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;color:var(--muted);font-size:13px}
+    .spinner{width:18px;height:18px;border:3px solid rgba(0,0,0,.1);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    /* skeletons */
+    .skeleton{background:linear-gradient(90deg,#eee 25%,#f5f5f5 37%,#eee 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite}
+    @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+    .sk-btn{height:44px;border-radius:12px;margin:8px 0}
+    .error{background:#fff1f2;border-color:#fca5a5;color:#7f1d1d}
   </style>
 </head>
 <body>
-
-  <div class="chat-container">
-    <div class="chat-header">
-      <span>צ'ט שאלות נפוצות</span>
-      <a href="admin.html" class="back-arrow"><i data-feather="arrow-right"></i> חזרה</a>
-    </div>
-    <div id="chatArea" class="chat-body"></div>
-    <div class="chat-footer">
-      <button id="backBtn" class="chat-btn">⬅ חזרה</button>
-      <button id="homeBtn" class="chat-btn">🏠 ראשי</button>
+  <div class="wrap">
+    <div class="card">
+      <div class="head">
+        <div class="title">צ'ט שאלות נפוצות</div>
+        <a href="admin.html" class="back"><i data-feather="arrow-right"></i> חזרה</a>
+      </div>
+      <div class="body">
+        <div id="bar" class="bar" style="display:none;">
+          <div class="spinner" aria-label="טוען"></div><span id="barText">טוען…</span>
+        </div>
+        <div id="area"></div>
+      </div>
+      <div class="footer">
+        <button id="backBtn" class="btn">חזרה</button>
+        <button id="homeBtn" class="btn">לתפריט ראשי</button>
+      </div>
     </div>
   </div>
 
   <script>
     feather.replace();
-    const BASE_URL = "https://script.google.com/macros/s/AKfycbwaRmJdcTTd0S2BjOSs_OtMxuEHg1f5EV71owkAPynKSUDIYyyPCWBvmeOpkr6NdlK5/exec";
 
-    const chatArea = document.getElementById('chatArea');
+    // ===== הגדרות =====
+    const BASE_URL = "https://script.google.com/macros/s/AKfycbwaRmJdcTTd0S2BjOSs_OtMxuEHg1f5EV71owkAPynKSUDIYyyPCWBvmeOpkr6NdlK5/exec";
+    const area = document.getElementById('area');
+    const bar = document.getElementById('bar');
+    const barText = document.getElementById('barText');
     const backBtn = document.getElementById('backBtn');
     const homeBtn = document.getElementById('homeBtn');
-    let navStack = [];
 
-    backBtn.onclick = () => {
-      if (navStack.length > 1) {
-        navStack.pop();
-        render(navStack.pop());
-      }
+    // ===== ניווט =====
+    const navStack = [];
+    function pushState(state){ navStack.push(state); render(state); }
+    function goBack(){
+      if(navStack.length>1){ navStack.pop(); render(navStack[navStack.length-1], true); }
+    }
+    backBtn.onclick = goBack;
+    homeBtn.onclick = () => { navStack.length = 0; loadCategories(); };
+
+    // ===== Cache בזיכרון + sessionStorage =====
+    const cache = {
+      get(k){ try{ return JSON.parse(sessionStorage.getItem(k)); }catch{ return null; } },
+      set(k,v){ sessionStorage.setItem(k, JSON.stringify(v)); }
     };
-    homeBtn.onclick = () => loadCategories();
 
-    async function api(path) {
-      try {
-        const res = await fetch(`${BASE_URL}${path}`);
+    // ===== עזרי רינדור =====
+    function setLoading(on, text){
+      bar.style.display = on ? 'flex':'none';
+      if(text) barText.textContent = text;
+    }
+    function clearArea(){
+      // מחיקה יעילה
+      while(area.firstChild) area.removeChild(area.firstChild);
+    }
+    function add(el){ area.appendChild(el); }
+
+    // ===== API עם מינימום בקשות =====
+    async function api(path, {cacheKey, cacheForMs=120000}={}){
+      if(cacheKey){
+        const hit = cache.get(cacheKey);
+        if(hit && (Date.now() - hit.t) < cacheForMs){ return hit.v; }
+      }
+      setLoading(true, 'טוען…');
+      try{
+        const res = await fetch(`${BASE_URL}${path}`, {method:'GET', credentials:'omit', cache:'no-store'});
         const json = await res.json();
-        if (!json.ok) throw new Error(json.error || 'API error');
+        if(!json.ok) throw new Error(json.error||'שגיאת שרת');
+        if(cacheKey){ cache.set(cacheKey, {t:Date.now(), v:json.data}); }
         return json.data;
-      } catch (err) {
-        showError(err.message);
+      }catch(err){
+        showError(err.message||String(err));
+        return null;
+      }finally{
+        setLoading(false);
       }
     }
 
-    function render(state) {
-      chatArea.innerHTML = '';
-      navStack.push(state);
-
-      if (state.view === 'categories') {
-        state.items.forEach(cat => {
-          const btn = document.createElement('button');
-          btn.className = 'chat-btn';
-          btn.textContent = `${cat.category_name} (${cat.count})`;
-          btn.onclick = () => loadQuestions(cat.category_slug, cat.category_name);
-          chatArea.appendChild(btn);
+    // ===== תצוגות =====
+    function render(state, skipPush=false){
+      clearArea();
+      if(!skipPush && (navStack.length===0 || navStack[navStack.length-1]!==state)){
+        // כבר דחפנו ב-pushState בעת טעינה; כאן רק מציירים
+      }
+      // קטגוריות
+      if(state.view==='categories'){
+        state.items.forEach(cat=>{
+          const b = document.createElement('button');
+          b.className = 'btn';
+          b.textContent = `${cat.category_name} (${cat.count})`;
+          b.onclick = ()=> loadQuestions(cat.category_slug, cat.category_name);
+          add(b);
         });
       }
-
-      if (state.view === 'questions') {
-        state.items.forEach(q => {
-          const btn = document.createElement('button');
-          btn.className = 'chat-btn';
-          btn.textContent = q.question_text;
-          btn.onclick = () => loadAnswer(q.question_slug);
-          chatArea.appendChild(btn);
+      // שאלות
+      if(state.view==='questions'){
+        state.items.forEach(q=>{
+          const b = document.createElement('button');
+          b.className = 'btn';
+          b.textContent = q.question_text;
+          b.onclick = ()=> loadAnswer(q.question_slug);
+          add(b);
         });
       }
-
-      if (state.view === 'answer') {
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.innerHTML = `<strong>${state.data.question_text}</strong><br>${state.data.answer_short}`;
-        chatArea.appendChild(bubble);
+      // תשובה
+      if(state.view==='answer'){
+        const box = document.createElement('div');
+        box.className='bubble';
+        box.innerHTML = `<strong>${state.data.question_text}</strong><br>${state.data.answer_short}`;
+        add(box);
 
         const more = document.createElement('button');
-        more.className = 'chat-btn';
-        more.textContent = 'פרטים נוספים';
-        more.onclick = () => showFull(state.data);
-        chatArea.appendChild(more);
+        more.className='btn primary';
+        more.textContent='פרטים נוספים';
+        more.onclick = ()=> showFull(state.data);
+        add(more);
       }
     }
 
-    function showFull(ans) {
-      const box = document.createElement('div');
-      box.className = 'bubble';
-      box.innerHTML = `<strong>${ans.question_text}</strong><br>${ans.answer_full || ans.answer_short}`;
+    function showSkeleton(n=4){
+      clearArea();
+      for(let i=0;i<n;i++){
+        const sk = document.createElement('div');
+        sk.className='skeleton sk-btn';
+        add(sk);
+      }
+    }
 
-      if (ans.links && ans.links.length) {
+    function showFull(ans){
+      const box = document.createElement('div');
+      box.className='bubble';
+      box.innerHTML = `<strong>${ans.question_text}</strong><br>${ans.answer_full || ans.answer_short}`;
+      if(ans.links && ans.links.length){
         const list = document.createElement('div');
-        list.className = 'link-list';
-        ans.links.forEach(href => {
+        list.className='links';
+        ans.links.forEach(h=>{
           const a = document.createElement('a');
-          a.href = href;
-          a.target = '_blank';
-          a.textContent = href;
+          a.href=h; a.target='_blank'; a.rel='noopener';
+          a.textContent=h;
           list.appendChild(a);
         });
         box.appendChild(list);
       }
-      chatArea.appendChild(box);
+      add(box);
     }
 
-    function showError(msg) {
-      chatArea.innerHTML = `<div class="bubble" style="background:#ffe5e5;color:#b00000;">שגיאה: ${msg}</div>`;
+    function showError(msg){
+      clearArea();
+      const e = document.createElement('div');
+      e.className='bubble error';
+      e.innerHTML = `<strong>שגיאה</strong><br>${msg}`;
+      add(e);
     }
 
-    async function loadCategories() {
-      const data = await api("?fn=categories");
-      if (data) render({ view: 'categories', items: data });
+    // ===== זרימה =====
+    async function loadCategories(){
+      showSkeleton(5);
+      const data = await api('?fn=categories', {cacheKey:'cat'});
+      if(!data) return;
+      pushState({view:'categories', items:data});
     }
 
-    async function loadQuestions(category_slug, category_name) {
-      const data = await api(`?fn=questions&category=${encodeURIComponent(category_slug)}`);
-      if (data) render({ view: 'questions', items: data.questions, category_name });
+    async function loadQuestions(category_slug, category_name){
+      showSkeleton(5);
+      const data = await api(`?fn=questions&category=${encodeURIComponent(category_slug)}`, {cacheKey:`q:${category_slug}`});
+      if(!data) return;
+      pushState({view:'questions', items:data.questions, category_name});
     }
 
-    async function loadAnswer(question_slug) {
-      const data = await api(`?fn=answer&question=${encodeURIComponent(question_slug)}`);
-      if (data) render({ view: 'answer', data });
+    async function loadAnswer(question_slug){
+      showSkeleton(2);
+      const data = await api(`?fn=answer&question=${encodeURIComponent(question_slug)}`, {cacheKey:`a:${question_slug}`, cacheForMs:300000});
+      if(!data) return;
+      pushState({view:'answer', data});
     }
 
+    // התחלה
     loadCategories();
   </script>
-
 </body>
 </html>

@@ -125,10 +125,16 @@
         <h3>יומנים קבועים</h3>
       </a>
 
-      <!-- כרטיס חדש לצ׳ט שאלות נפוצות -->
-      <a class="card" href="chat.html">
+      <!-- צ'ט הישן (שיטס) -->
+      <a class="card" href="/chat.html">
         <i data-feather="message-circle"></i>
         <h3>צ'ט שאלות נפוצות</h3>
+      </a>
+
+      <!-- צ'ט חדש – Firestore -->
+      <a class="card" href="/chat-b.html">
+        <i data-feather="message-square"></i>
+        <h3>צ'ט משופר</h3>
       </a>
 
     </section>
@@ -137,10 +143,12 @@
   <!-- Scripts -->
   <script>
     feather.replace();
+
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     }
+
     const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
@@ -151,6 +159,7 @@
         ? localStorage.setItem('dark-mode', '1')
         : localStorage.removeItem('dark-mode');
     });
+
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({

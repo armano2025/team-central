@@ -20,12 +20,14 @@
     .btn{display:block;width:100%;text-align:center;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:16px;margin:8px 0}
     .btn:hover{background:#fafafa}
     .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .btn.linklike{background:transparent;border:none;color:var(--primary);text-decoration:underline;cursor:pointer}
     .bubble{background:#f1f5f9;border:1px solid var(--border);padding:12px 14px;border-radius:12px;margin:8px 0;line-height:1.7}
-    .links a{display:inline-block;margin:4px 0;color:var(--primary);text-decoration:none;border-bottom:1px dashed var(--primary)}
+    .muted{color:var(--muted);font-size:14px}
+    .footer{display:flex;gap:8px;border-top:1px solid var(--border);padding:12px 16px}
     .skeleton{height:44px;border-radius:12px;margin:8px 0;background:linear-gradient(90deg,#eee 25%,#f5f5f5 37%,#eee 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite}
     @keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
-    .footer{display:flex;gap:8px;border-top:1px solid var(--border);padding:12px 16px}
-    .error{background:#fff1f2;border-color:#fca5a5;color:#7f1d1d}
+    .ok{background:#ecfdf5;border-color:#a7f3d0}
+    .err{background:#fff1f2;border-color:#fca5a5}
   </style>
 </head>
 <body>
@@ -46,7 +48,7 @@
   <script type="module">
     feather.replace();
 
-    // קונפיג Firebase שלך
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDIof9bpkgL1L7mlbmj-JXQ3GHDTnTQpSM",
       authDomain: "brawnshtein-team.firebaseapp.com",
@@ -57,129 +59,262 @@
       measurementId: "G-D6TEBLLXTP"
     };
 
-    // ייבוא מודולים מה-CDN
+    // Firebase SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, query, where, orderBy, limit
+      getFirestore, collection, addDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-    // אתחול
+    // Init
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    // DOM helpers
+    // DOM
     const area    = document.getElementById('area');
     const backBtn = document.getElementById('backBtn');
     const homeBtn = document.getElementById('homeBtn');
-    const nav     = [];
     const clear   = () => area.innerHTML = '';
-    const skeleton= (n=5)=>{ clear(); for(let i=0;i<n;i++){ const d=document.createElement('div'); d.className='skeleton'; area.appendChild(d);} };
+    const skeleton= (n=3)=>{ clear(); for(let i=0;i<n;i++){ const d=document.createElement('div'); d.className='skeleton'; area.appendChild(d);} };
 
-    backBtn.onclick = ()=>{ if(nav.length>1){ nav.pop(); render(nav.at(-1)); } };
-    homeBtn.onclick = ()=>{ nav.length=0; loadCategories(); };
-
-    // שלב א: קטגוריות
-    async function loadCategories(){
-      skeleton(6);
-      const snap = await getDocs(query(collection(db,'faq'), where('active','==', true)));
-      const map = new Map();
-      snap.forEach(doc=>{
-        const d=doc.data();
-        const key = d.category_slug || d.category_name;
-        if(!key) return;
-        if(!map.has(key)) map.set(key, {category_slug:d.category_slug, category_name:d.category_name, count:0});
-        map.get(key).count++;
-      });
-      const cats = Array.from(map.values()).sort((a,b)=> a.category_name.localeCompare(b.category_name,'he'));
-      nav.push({view:'cats', items:cats});
-      render(nav.at(-1));
-    }
-
-    // שלב ב: שאלות בקטגוריה
-    async function loadQuestions(slug, name){
-      skeleton(6);
-      const q = query(collection(db,'faq'),
-        where('active','==', true),
-        where('category_slug','==', slug)
-      );
-      const snap = await getDocs(q);
-      const items = [];
-      snap.forEach(doc=>{
-        const d=doc.data();
-        items.push({slug:d.question_slug, text:d.question_text});
-      });
-      nav.push({view:'qs', items, meta:{slug, name}});
-      render(nav.at(-1));
-    }
-
-    // שלב ג: תשובה
-    async function loadAnswer(slug){
-      skeleton(2);
-      const q = query(collection(db,'faq'),
-        where('active','==', true),
-        where('question_slug','==', slug),
-        limit(1)
-      );
-      const snap = await getDocs(q);
-      if (snap.empty){
-        clear();
-        const e=document.createElement('div'); e.className='bubble error';
-        e.textContent='לא נמצאה תשובה לשאלה זו.';
-        area.appendChild(e); return;
+    // State
+    const state = {
+      history: [], // for back
+      data: { // selections
+        path: null,        // 'subscription_info' | 'on_demand' | 'have_subscription'
+        subject: null,     // English / Math / ...
+        planType: null,    // 'group' | 'triple' | 'private'
+        price: null,       // number
+        cta: null          // 'callback' | 'lesson_this_week'
       }
-      const d = snap.docs[0].data();
-      nav.push({view:'ans', data:d});
-      render(nav.at(-1));
+    };
+
+    const push = (viewFn) => {
+      state.history.push(viewFn);
+    };
+    const goBack = () => {
+      if (state.history.length > 1) {
+        state.history.pop();
+        const prev = state.history[state.history.length-1];
+        prev();
+      }
+    };
+    const goHome = () => {
+      state.history.length = 0;
+      state.data = { path:null, subject:null, planType:null, price:null, cta:null };
+      step1();
+    };
+
+    backBtn.onclick = goBack;
+    homeBtn.onclick = goHome;
+
+    // Helpers
+    function p(text) {
+      const b = document.createElement('div');
+      b.className = 'bubble';
+      b.innerHTML = text;
+      area.appendChild(b);
+      return b;
+    }
+    function btn(text, onClick, cls='btn') {
+      const b = document.createElement('button');
+      b.className = cls;
+      b.textContent = text;
+      b.onclick = onClick;
+      area.appendChild(b);
+      return b;
+    }
+    async function recordLead(payload){
+      try{
+        await addDoc(collection(db,'chat_leads'), {
+          ...payload,
+          createdAt: serverTimestamp(),
+          source: 'web-app',
+          status: 'new'
+        });
+        return true;
+      }catch(e){
+        console.error(e);
+        return false;
+      }
     }
 
-    // רינדור
-    function render(state){
+    // ---- FLOW IMPLEMENTATION (Branch 1 refined) ----
+
+    // Step 1 – Opening
+    function step1(){
       clear();
-      if(state.view==='cats'){
-        state.items.forEach(c=>{
-          const b=document.createElement('button');
-          b.className='btn';
-          b.textContent=`${c.category_name} (${c.count})`;
-          b.onclick=()=>loadQuestions(c.category_slug, c.category_name);
-          area.appendChild(b);
-        });
-      }
-      if(state.view==='qs'){
-        state.items.forEach(q=>{
-          const b=document.createElement('button');
-          b.className='btn';
-          b.textContent=q.text;
-          b.onclick=()=>loadAnswer(q.slug);
-          area.appendChild(b);
-        });
-      }
-      if(state.view==='ans'){
-        const d = state.data;
-        const head=document.createElement('div');
-        head.className='bubble';
-        head.innerHTML = `<strong>${d.question_text || ''}</strong><br>${d.answer_short || ''}`;
-        area.appendChild(head);
+      push(step1);
+      p(`<strong>היי, אני יוסטון</strong><br>אני העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.`);
+      p(`<strong>איך אוכל לעזור?</strong><br>
+         1. ברשותי מנוי חודשי קבוע.<br>
+         2. אני מעוניינת לקבל פרטים על מנוי חודשי.<br>
+         3. אני מעוניינת בשיעור על בסיס מקום פנוי.`).classList.add('muted');
 
-        const more=document.createElement('button');
-        more.className='btn primary';
-        more.textContent='פרטים נוספים';
-        more.onclick=()=>{
-          const box=document.createElement('div');
-          box.className='bubble';
-          box.innerHTML = d.answer_full || d.answer_short || '';
-          if (Array.isArray(d.links) && d.links.length){
-            const list=document.createElement('div'); list.className='links';
-            d.links.forEach(h=>{ const a=document.createElement('a'); a.href=h; a.target="_blank"; a.rel="noopener"; a.textContent=h; list.appendChild(a); });
-            box.appendChild(list);
-          }
-          area.appendChild(box);
-        };
-        area.appendChild(more);
-      }
+      btn('1. ברשותי מנוי חודשי קבוע', () => {
+        state.data.path = 'have_subscription';
+        stepHaveSubscription();
+      });
+      btn('2. פרטים על מנוי חודשי', () => {
+        state.data.path = 'subscription_info';
+        stepChooseSubject();
+      });
+      btn('3. שיעור על בסיס מקום פנוי', () => {
+        state.data.path = 'on_demand';
+        stepOnDemandChoosePlan();
+      });
     }
 
-    // התחלה
-    loadCategories();
+    // For existing subscribers (minimal stub – אפשר להרחיב)
+    function stepHaveSubscription(){
+      clear();
+      push(stepHaveSubscription);
+      p('<strong>ברוכה השבה!</strong> איך נוכל לעזור היום?');
+      btn('שינוי מועד שיעור', () => finalLead({reason:'change_schedule'}));
+      btn('בירור תשלום/חשבונית', () => finalLead({reason:'billing'}));
+      btn('שליחת הודעה למורה', () => finalLead({reason:'message_to_teacher'}));
+    }
+
+    // Step 2 – Choose subject (used by subscription_info flow)
+    function stepChooseSubject(){
+      clear();
+      push(stepChooseSubject);
+      p('<strong>באיזה מקצוע תרצי ללמוד?</strong>');
+      [
+        ['אנגלית','English'],
+        ['מתמטיקה','Math'],
+        ['פיזיקה','Physics'],
+        ['שפה','Language'],
+        ['אנגלית מדוברת','Spoken English']
+      ].forEach(([label, value])=>{
+        btn(label, () => { state.data.subject = label; stepSubscriptionOrOnDemand(); });
+      });
+      btn('חזרה', goBack);
+    }
+
+    // Step 3 – Subscription or On-demand (only for subscription_info path)
+    function stepSubscriptionOrOnDemand(){
+      clear();
+      push(stepSubscriptionOrOnDemand);
+      p('אנו עוזרים בשיעורי בית, הכנה למבחנים, השלמת פערים והתקדמות בלימודים.');
+      p('<strong>על מה תרצי לשמוע פרטים?</strong>').classList.add('muted');
+
+      btn('שיעור חד-פעמי על בסיס מקום פנוי', () => {
+        state.data.path = 'on_demand';
+        stepOnDemandChoosePlan();
+      });
+      btn('מנוי קבוע – שיעור פעם בשבוע', stepSubscriptionPlans);
+    }
+
+    // Step 4A – Subscription plans (order: group -> triple -> private)
+    function stepSubscriptionPlans(){
+      clear();
+      push(stepSubscriptionPlans);
+      p('המנוי הקבוע כולל שיעור פעם בשבוע, ביום ושעה קבועים מראש.');
+      p('<strong>בחרי מסלול</strong>').classList.add('muted');
+      btn('מסלול קבוצה – עד 5 תלמידים – 295₪', () => { state.data.planType='group'; state.data.price=295; stepCTA(); });
+      btn('מסלול טריפל – עד 3 תלמידים – 385₪', () => { state.data.planType='triple'; state.data.price=385; stepCTA(); });
+      btn('מסלול פרטי – 685₪', () => { state.data.planType='private'; state.data.price=685; stepCTA(); });
+      btn('חזרה', goBack);
+    }
+
+    // Step 4B – On-demand plans and then subject (for path=on_demand)
+    function stepOnDemandChoosePlan(){
+      clear();
+      push(stepOnDemandChoosePlan);
+      p('<strong>שיעור על בסיס מקום פנוי</strong>');
+      p('בחרי מסלול חד־פעמי:').classList.add('muted');
+      btn('קבוצה – עד 5 תלמידים – 70₪', () => { state.data.planType='group'; state.data.price=70; stepOnDemandSubject(); });
+      btn('טריפל – עד 3 תלמידים – 100₪', () => { state.data.planType='triple'; state.data.price=100; stepOnDemandSubject(); });
+      btn('פרטי – 160₪', () => { state.data.planType='private'; state.data.price=160; stepOnDemandSubject(); });
+      btn('חזרה', goBack);
+    }
+    function stepOnDemandSubject(){
+      clear();
+      push(stepOnDemandSubject);
+      p('<strong>איזה מקצוע תרצי לשיעור החד־פעמי?</strong>');
+      ['אנגלית','מתמטיקה','פיזיקה','שפה','אנגלית מדוברת'].forEach(label=>{
+        btn(label, () => { state.data.subject = label; stepOnDemandSummary(); });
+      });
+      btn('חזרה', goBack);
+    }
+    function stepOnDemandSummary(){
+      clear();
+      push(stepOnDemandSummary);
+      const {subject, planType, price} = state.data;
+      const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
+      p(`<strong>סיכום</strong><br>שיעור חד־פעמי ב${subject} במסלול ${planHeb} – ${price}₪.`);
+      btn('אשרי ושלחי למזכירות', async () => {
+        const ok = await recordLead({
+          path: 'on_demand',
+          subject,
+          planType,
+          price,
+          cta: 'lesson_this_week'
+        });
+        if(ok){
+          clear();
+          p('הבקשה נרשמה. המזכירות יצורו איתך קשר בקרוב מאוד כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
+          btn('לתפריט ראשי', goHome, 'btn primary');
+        }else{
+          p('אירעה שגיאה בשמירת הבקשה. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err');
+        }
+      }, 'btn primary');
+      btn('חזרה', goBack);
+    }
+
+    // Step 5 – CTA for subscription_info path
+    function stepCTA(){
+      clear();
+      push(stepCTA);
+      const {subject, planType, price} = state.data;
+      const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
+      p(`<strong>בחירה מצוינת</strong><br>${subject ? 'מקצוע: '+subject+'<br>' : ''}מסלול: ${planHeb} – ${price}₪ לחודש.`);
+
+      p('<strong>מה תרצי לעשות עכשיו?</strong>').classList.add('muted');
+      btn('1. שיחזרו אליי עם פרטים נוספים', async () => {
+        state.data.cta = 'callback';
+        // נרשום ל־Firestore וגם נפתח את הטופס
+        const ok = await recordLead({
+          path: 'subscription_info',
+          subject,
+          planType,
+          price,
+          cta: 'callback'
+        });
+        window.open('https://wordpress-1184560-4777160.cloudwaysapps.com/', '_blank', 'noopener');
+        clear();
+        if(ok){
+          p('נהדר. הטופס נפתח בחלון חדש. לאחר מילוי, נטע תחזור אלייך בהקדם.').classList.add('ok');
+        } else {
+          p('הטופס נפתח, אך לא הצלחנו לשמור את הבקשה למערכת. נשמח שתעדכני אותנו אם לא יצרו קשר.').classList.add('err');
+        }
+        btn('לתפריט ראשי', goHome, 'btn primary');
+      });
+
+      btn('2. אני רוצה שיעור כבר היום (או השבוע)', async () => {
+        state.data.cta = 'lesson_this_week';
+        const ok = await recordLead({
+          path: 'subscription_info',
+          subject,
+          planType,
+          price,
+          cta: 'lesson_this_week'
+        });
+        clear();
+        if(ok){
+          p('מצוין. המזכירות יצורו איתך קשר בקרוב מאוד כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
+        }else{
+          p('לא הצלחנו לשמור את הבקשה. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err');
+        }
+        btn('לתפריט ראשי', goHome, 'btn primary');
+      });
+
+      btn('3. חזרה לתפריט הראשי', goHome);
+      btn('חזרה', goBack);
+    }
+
+    // Start
+    step1();
   </script>
 </body>
 </html>

@@ -3,13 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>צ'ט יוסטון – Leads לשיטס</title>
-
+  <title>יוסטון – שיעור על בסיס מקום פנוי</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#0f172a" />
 
   <style>
-    /* ---------- Design Tokens ---------- */
     :root{
       --bg:#0b1220; --bg-grad-1:#0b1220; --bg-grad-2:#101a33;
       --glass:rgba(255,255,255,0.06); --glass-strong:rgba(255,255,255,0.12);
@@ -27,7 +25,6 @@
       }
     }
 
-    /* ---------- Base ---------- */
     html,body{height:100%}
     body{
       margin:0; font-family:'Rubik',system-ui,-apple-system,Segoe UI,Arial,Helvetica;
@@ -41,7 +38,6 @@
     }
     *{box-sizing:border-box}
 
-    /* ---------- Layout ---------- */
     .wrap{max-width:880px;margin:28px auto;padding:0 16px}
     .card{
       position:relative; border-radius:var(--radius-xl);
@@ -78,7 +74,6 @@
       background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,0));
     }
 
-    /* ---------- Components ---------- */
     .bubble{
       background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
       border:1px solid var(--border);
@@ -113,15 +108,17 @@
     }
     .btn.primary:hover{ box-shadow:0 12px 24px rgba(76,181,255,0.45) }
 
-    /* Inputs */
     .input-wrap{display:grid; gap:8px}
     .input-wrap label{font-weight:700}
     .input{
       padding:12px 14px; border-radius:12px; border:1px solid var(--border);
       background:rgba(255,255,255,0.06); color:var(--text);
     }
+    .textarea{
+      padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+      background:rgba(255,255,255,0.06); color:var(--text); min-height:88px; resize:vertical;
+    }
 
-    /* מובייל */
     @media (max-width:540px){
       .body{padding:16px}
       .footer{padding:12px 16px}
@@ -136,7 +133,7 @@
       <div class="head">
         <div class="brand">
           <div class="logo">HB</div>
-          <div class="title">צ'ט יוסטון – Leads לשיטס</div>
+          <div class="title">יוסטון – שיעור על בסיס מקום פנוי</div>
         </div>
         <div></div>
       </div>
@@ -151,8 +148,18 @@
   </div>
 
   <script>
-    /* ======== Config: Google Sheets Web App ======== */
+    /* ======== Web App URL (Apps Script) ======== */
     const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwnNKY0BeO5N2O9oWmr8ltCHr9fVdDdrXsL_3erastx4qdEqhCz1mYAhkvZETF-86CGnw/exec';
+
+    /* ======== Hebrew labels ======== */
+    const HE = {
+      path_on_demand: 'שיעור על בסיס מקום פנוי',
+      cta_on_demand: 'שיעור חד־פעמי',
+      source: 'יוסטון – אתר',
+      status_new: 'חדש',
+      plan: { group: 'קבוצה', triple: 'טריפל', private: 'פרטי' }
+    };
+    const PRICES = { group: 80, triple: 100, private: 160 }; // קבוצה=80₪
 
     /* ======== DOM ======== */
     const area    = document.getElementById('area');
@@ -163,11 +170,21 @@
     /* ======== State ======== */
     const state = {
       history: [],
-      data: { path:null, subject:null, planType:null, price:null, cta:null, fullName:null, phone:null }
+      data: {
+        path: null,         // תמיד בעברית לענף זה
+        subject: null,      // בעברית
+        planType: null,     // 'group' | 'triple' | 'private'
+        price: null,        // מספר
+        availability: null, // טקסט חופשי
+        fullName: null,
+        phone: null,
+        cta: null
+      }
     };
     const push  = (fn)=> state.history.push(fn);
     const goBack= ()=>{ if(state.history.length>1){ state.history.pop(); state.history.at(-1)(); } };
-    const goHome= ()=>{ state.history.length=0; state.data={path:null,subject:null,planType:null,price:null,cta:null,fullName:null,phone:null}; step1(); };
+    const goHome= ()=>{ state.history.length=0; state.data={ path:null,subject:null,planType:null,price:null,availability:null,fullName:null,phone:null,cta:null }; step1(); };
+
     backBtn.onclick = goBack;
     homeBtn.onclick = goHome;
 
@@ -175,12 +192,17 @@
     function p(html){ const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; area.appendChild(b); return b; }
     function btn(text, onClick, cls='btn'){ const b=document.createElement('button'); b.className=cls; b.textContent=text; b.onclick=onClick; area.appendChild(b); return b; }
 
-    // inputs
-    function inputRow(label, type='text', id){
+    function inputRow(label, type='text', id, {dir='rtl', textarea=false}={}){
       const wrap=document.createElement('div'); wrap.className='bubble input-wrap';
       const l=document.createElement('label'); l.textContent=label;
-      const i=document.createElement('input'); i.type=type; i.id=id; i.dir='ltr'; i.className='input';
-      i.autocomplete=(id==='phone'?'tel':'name');
+      let i;
+      if (textarea){
+        i=document.createElement('textarea'); i.className='textarea';
+      } else {
+        i=document.createElement('input'); i.type=type; i.className='input';
+        i.autocomplete=(id==='phone'?'tel':'name');
+      }
+      i.id=id; i.dir=dir;
       wrap.appendChild(l); wrap.appendChild(i); area.appendChild(wrap);
       return i;
     }
@@ -194,7 +216,25 @@
     };
     const validILPhone = p => /^0\d{8,9}$/.test(p||'');
 
-    /* ======== Sheets sender ======== */
+    // breadcrumb
+    function hebPlan(){ return HE.plan[state.data.planType] || ''; }
+    function pathText(){
+      const parts=[];
+      if (state.data.planType) parts.push(`מסלול: ${hebPlan()} (${state.data.price}₪)`);
+      if (state.data.subject)  parts.push(`מקצוע: ${state.data.subject}`);
+      if (state.data.availability) parts.push(`זמינות: ${state.data.availability}`);
+      if (state.data.fullName) parts.push(`שם: ${state.data.fullName}`);
+      if (state.data.phone) parts.push(`טלפון: ${state.data.phone}`);
+      return parts.join(' • ');
+    }
+    function showPath(){
+      const txt = pathText();
+      if (!txt) return;
+      const b = p(`<span class="muted">בחירה עד כה: ${txt}</span>`);
+      b.style.fontSize='14px';
+    }
+
+    /* ======== send to Sheets ======== */
     async function sendLeadToSheet(payload){
       try{
         const res = await fetch(SHEETS_WEBAPP_URL, {
@@ -210,69 +250,30 @@
       }
     }
 
-    /* ========== FLOW ========== */
+    /* ========== FLOW (ענף 1) ========== */
 
-    // STEP 1 – פתיח
+    // פתיח
     function step1(){
       clear(); push(step1);
       p('<strong>היי, אני יוסטון 👨‍🚀</strong><br>העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.');
       p('<strong>איך אוכל לעזור?</strong><br><span class="muted">בחרי אפשרות אחת מהכפתורים למטה.</span>');
-
-      btn('ברשותי מנוי חודשי קבוע', ()=>{ state.data.path='have_subscription'; stepHaveSubscription(); });
-      btn('פרטים על מנוי חודשי',     ()=>{ state.data.path='subscription_info'; stepChooseSubject(); });
-      btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path='on_demand'; stepOnDemandChoosePlan(); });
+      btn('ברשותי מנוי חודשי קבוע', ()=>{ /* ענף אחר */ alert('ענף מנויה קבועה – נתרכז כרגע בענף שיעור חד־פעמי'); });
+      btn('פרטים על מנוי חודשי',     ()=>{ /* ענף אחר */ alert('ענף מנוי – נתרכז כרגע בענף שיעור חד־פעמי'); });
+      btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path = HE.path_on_demand; stepOnDemandChoosePlan(); });
     }
 
-    // מנויה קיימת (פנייה נשמרת לשיטס)
-    function stepHaveSubscription(){
-      clear(); push(stepHaveSubscription);
-      p('<strong>ברוכה השבה</strong><br><span class="muted">בחרי מה תרצי לעשות.</span>');
-      btn('שינוי מועד שיעור',    ()=> stepCollectContact(({fullName,phone})=> finalizeLead({path:'have_subscription', reason:'change_schedule', fullName, phone})));
-      btn('בירור תשלום/חשבונית', ()=> stepCollectContact(({fullName,phone})=> finalizeLead({path:'have_subscription', reason:'billing', fullName, phone})));
-      btn('שליחת הודעה למורה',   ()=> stepCollectContact(({fullName,phone})=> finalizeLead({path:'have_subscription', reason:'message_to_teacher', fullName, phone})));
-      btn('חזרה', goBack);
-    }
-
-    // בחירת מקצוע (לענף מידע על מנוי)
-    function stepChooseSubject(){
-      clear(); push(stepChooseSubject);
-      p('<strong>באיזה מקצוע תרצי ללמוד?</strong><br><span class="muted">בחרי אפשרות אחת.</span>');
-      ['אנגלית','מתמטיקה','פיזיקה','שפה','אנגלית מדוברת'].forEach(label=>{
-        btn(label, ()=>{ state.data.subject=label; stepSubscriptionOrOnDemand(); });
-      });
-      btn('חזרה', goBack);
-    }
-
-    // לבחור: שיעור חד פעמי או מנוי
-    function stepSubscriptionOrOnDemand(){
-      clear(); push(stepSubscriptionOrOnDemand);
-      p('<strong>על מה תרצי לשמוע פרטים?</strong><br><span class="muted">שיעור חד־פעמי או מנוי קבוע.</span>');
-      btn('שיעור חד-פעמי על בסיס מקום פנוי', ()=>{ state.data.path='on_demand'; stepOnDemandChoosePlan(); });
-      btn('מנוי קבוע – שיעור פעם בשבוע',       stepSubscriptionPlans);
-      btn('חזרה', goBack);
-    }
-
-    // מסלולי מנוי
-    function stepSubscriptionPlans(){
-      clear(); push(stepSubscriptionPlans);
-      p('<strong>מסלולי מנוי</strong><br><span class="muted">בחרי את המסלול המתאים.</span>');
-      btn('מסלול קבוצה – עד 5 תלמידים – 295₪', ()=>{ state.data.planType='group';  state.data.price=295; stepCTA(); });
-      btn('מסלול טריפל – עד 3 תלמידים – 385₪', ()=>{ state.data.planType='triple'; state.data.price=385; stepCTA(); });
-      btn('מסלול פרטי – 685₪',                  ()=>{ state.data.planType='private';state.data.price=685; stepCTA(); });
-      btn('חזרה', goBack);
-    }
-
-    // שיעור חד-פעמי: בחירת מסלול
+    // בחירת מסלול חד־פעמי
     function stepOnDemandChoosePlan(){
       clear(); push(stepOnDemandChoosePlan);
       p('<strong>שיעור על בסיס מקום פנוי</strong><br><span class="muted">בחרי מסלול חד־פעמי.</span>');
-      btn('קבוצה – עד 5 תלמידים – 70₪',  ()=>{ state.data.planType='group';  state.data.price=70;  stepOnDemandSubject(); });
-      btn('טריפל – עד 3 תלמידים – 100₪', ()=>{ state.data.planType='triple'; state.data.price=100; stepOnDemandSubject(); });
-      btn('פרטי – 160₪',                   ()=>{ state.data.planType='private';state.data.price=160; stepOnDemandSubject(); });
+      btn('קבוצה – עד 5 תלמידים – 80₪',  ()=>{ state.data.planType='group';  state.data.price=PRICES.group;  stepOnDemandSubject(); });
+      btn('טריפל – עד 3 תלמידים – 100₪', ()=>{ state.data.planType='triple'; state.data.price=PRICES.triple; stepOnDemandSubject(); });
+      btn('פרטי – 160₪',                   ()=>{ state.data.planType='private';state.data.price=PRICES.private;stepOnDemandSubject(); });
       btn('חזרה', goBack);
+      showPath();
     }
 
-    // שיעור חד-פעמי: בחירת מקצוע
+    // בחירת מקצוע
     function stepOnDemandSubject(){
       clear(); push(stepOnDemandSubject);
       p('<strong>איזה מקצוע לשיעור החד־פעמי?</strong><br><span class="muted">בחרי מקצוע אחד.</span>');
@@ -280,95 +281,106 @@
         btn(l, ()=>{ state.data.subject=l; stepOnDemandSummary(); });
       });
       btn('חזרה', goBack);
+      showPath();
     }
 
-    // שיעור חד-פעמי: סיכום → פרטי קשר → שליחה לשיטס
+    // סיכום ביניים + מעבר לזמינות
     function stepOnDemandSummary(){
       clear(); push(stepOnDemandSummary);
-      const {subject, planType, price} = state.data;
-      const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
-      p('<strong>סיכום</strong><br><span class="muted">בדקי שהכול נכון ואז המשיכי להזנת פרטי קשר.</span>');
-      p(`שיעור חד־פעמי ב${subject} במסלול ${planHeb} – ${price}₪.`);
-      btn('המשך להזנת פרטי קשר', ()=> stepCollectContact(({fullName,phone})=>{
-        finalizeLead({
-          path:'on_demand',
-          subject, planType, price,
-          cta:'lesson_this_week',
-          fullName, phone
-        });
-      }), 'btn primary');
+      const planHeb = hebPlan();
+      p('<strong>סיכום</strong><br><span class="muted">בדקי שהכול נכון ואז נבקש זמינות.</span>');
+      p(`שיעור חד־פעמי ב<strong>${state.data.subject}</strong> במסלול <strong>${planHeb}</strong> – <strong>${state.data.price}₪</strong>.`);
+      btn('המשך לבחירת זמינות', stepAvailability, 'btn primary');
       btn('חזרה', goBack);
+      showPath();
     }
 
-    // איסוף שם + טלפון
-    function stepCollectContact(next){
-      clear(); push(()=>stepCollectContact(next));
-      p('<strong>פרטי קשר</strong><br><span class="muted">מלאי שם מלא ומספר טלפון לחזרה.</span>');
-      const nameInput  = inputRow('שם מלא','text','fullName');
-      const phoneInput = inputRow('טלפון לחזרה','tel','phone');
+    // שלב חדש – זמינות (ימים ושעות)
+    function stepAvailability(){
+      clear(); push(stepAvailability);
+      p('<strong>זמינות לשיעור</strong><br><span class="muted">כתבי ימים ושעות שנוח לך (למשל: “א׳–ג׳ 15:00–19:00, ו׳ בוקר”).</span>');
+      const availInput = inputRow('ימי ושעות זמינות','text','availability',{dir:'rtl', textarea:true});
+      btn('המשך לפרטי קשר', ()=>{
+        const txt = (availInput.value||'').trim();
+        if (!txt){ p('אנא כתבי זמינות (ימים ושעות).').classList.add('err'); return; }
+        state.data.availability = txt;
+        stepCollectContact();
+      }, 'btn primary');
+      btn('חזרה', goBack);
+      showPath();
+    }
 
-      btn('המשך', ()=>{
+    // פרטי קשר (RTL)
+    function stepCollectContact(){
+      clear(); push(stepCollectContact);
+      p('<strong>פרטי קשר</strong><br><span class="muted">מלאי שם מלא ומספר טלפון לחזרה.</span>');
+      const nameInput  = inputRow('שם מלא','text','fullName',{dir:'rtl'});
+      const phoneInput = inputRow('טלפון לחזרה','tel','phone',{dir:'rtl'});
+
+      btn('המשך לאישור סופי', ()=>{
         const fullName=(nameInput.value||'').trim();
-        const phone   = normalizeILPhone(phoneInput.value||'');
+        const phoneRaw = (phoneInput.value||'').trim();
+        const phone = normalizeILPhone(phoneRaw);
         if(!fullName){ p('יש להזין שם מלא.').classList.add('err'); return; }
         if(!validILPhone(phone)){ p('מספר טלפון לא תקין (למשל 0501234567).').classList.add('err'); return; }
         state.data.fullName=fullName; state.data.phone=phone;
-        next({fullName,phone});
+        stepFinalApprove();
       }, 'btn primary');
       btn('חזרה', goBack);
+      showPath();
     }
 
-    // CTA של מנוי: שיחזרו אליי / שיעור השבוע → פרטי קשר → שליחה לשיטס
-    function stepCTA(){
-      clear(); push(stepCTA);
-      const {subject, planType, price} = state.data;
-      const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
-      p('<strong>מה תרצי לעשות עכשיו?</strong><br><span class="muted">בחרי פעולה, נבקש פרטי קשר ונשלח למזכירות.</span>');
-      p(`${subject ? 'מקצוע: '+subject+' · ' : ''}מסלול: ${planHeb} · ${price}₪ לחודש`);
+    // אישור סופי
+    function stepFinalApprove(){
+      clear(); push(stepFinalApprove);
+      const planHeb = hebPlan();
+      p('<strong>נאשר שליחה למזכירות?</strong>');
+      p([
+        `מקצוע: <strong>${state.data.subject}</strong>`,
+        `מסלול: <strong>${planHeb}</strong>`,
+        `מחיר: <strong>${state.data.price}₪</strong>`,
+        `זמינות: <strong>${state.data.availability}</strong>`,
+        `שם: <strong>${state.data.fullName}</strong>`,
+        `טלפון: <strong>${state.data.phone}</strong>`
+      ].join('<br>'));
 
-      btn('שיחזרו אליי עם פרטים נוספים', ()=>{
-        stepCollectContact(({fullName,phone})=>{
-          finalizeLead({
-            path:'subscription_info',
-            subject, planType, price,
-            cta:'callback',
-            fullName, phone
-          });
-        });
-      });
-
-      btn('אני רוצה שיעור כבר היום (או השבוע)', ()=>{
-        stepCollectContact(({fullName,phone})=>{
-          finalizeLead({
-            path:'subscription_info',
-            subject, planType, price,
-            cta:'lesson_this_week',
-            fullName, phone
-          });
-        });
-      });
-
-      btn('חזרה לתפריט הראשי', goHome);
+      btn('שליחה למזכירות', finalizeLead, 'btn primary');
       btn('חזרה', goBack);
+      showPath();
     }
 
-    // כתיבה סופית לשיטס + פידבק
-    async function finalizeLead(payload){
-      const toSend = {
-        ...payload,
-        source:'web-app',
-        status:'new',
+    // שליחה לשיטס (בעברית) + פידבק
+    async function finalizeLead(){
+      // payload בעברית
+      const payload = {
+        path: HE.path_on_demand,                    // "שיעור על בסיס מקום פנוי"
+        planType: HE.plan[state.data.planType],     // "קבוצה" | "טריפל" | "פרטי"
+        price: `${state.data.price}₪`,              // "80₪" ...
+        subject: state.data.subject,                // עברית
+        availability: state.data.availability,      // ייכנס ל-raw בעמודה JSON
+        fullName: state.data.fullName,              // RTL בתצוגה, ערך רגיל ב-JSON
+        phone: state.data.phone,
+        cta: HE.cta_on_demand,                      // "שיעור חד־פעמי"
+        source: HE.source,                          // "יוסטון – אתר"
+        status: HE.status_new,                      // "חדש"
         createdAt: new Date().toISOString()
       };
-      const okGS = await sendLeadToSheet(toSend);
 
       clear();
+      const sending = p('שולח בקשה...'); sending.classList.add('bubble');
+
+      const okGS = await sendLeadToSheet(payload);
+      clear();
+
       if(okGS){
-        p('הבקשה נרשמה והתווספה לגיליון. המזכירות יצורו איתך קשר בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
+        p('הבקשה נרשמה והועברה למזכירות 🛰️ נחזור אלייך בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
+        btn('לתפריט ראשי', goHome, 'btn primary');
+        btn('פתח/י את הגיליון', ()=> window.open('https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit#gid=0','_blank','noopener'));
       }else{
-        p('לא הצלחנו לשמור את הבקשה לגיליון. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err');
+        p('לא הצלחנו לשמור את הבקשה לגיליון. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050‑9570866.').classList.add('err');
+        btn('נסי שוב', stepFinalApprove, 'btn');
+        btn('לתפריט ראשי', goHome, 'btn primary');
       }
-      btn('לתפריט ראשי', goHome, 'btn primary');
     }
 
     // Start

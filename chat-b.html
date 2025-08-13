@@ -176,6 +176,7 @@
         planType: null,     // 'group' | 'triple' | 'private'
         price: null,        // מספר
         availability: null, // טקסט חופשי
+        message: null,      // מלל חופשי מהלקוח
         fullName: null,
         phone: null,
         cta: null
@@ -183,7 +184,7 @@
     };
     const push  = (fn)=> state.history.push(fn);
     const goBack= ()=>{ if(state.history.length>1){ state.history.pop(); state.history.at(-1)(); } };
-    const goHome= ()=>{ state.history.length=0; state.data={ path:null,subject:null,planType:null,price:null,availability:null,fullName:null,phone:null,cta:null }; step1(); };
+    const goHome= ()=>{ state.history.length=0; state.data={ path:null,subject:null,planType:null,price:null,availability:null,message:null,fullName:null,phone:null,cta:null }; step1(); };
 
     backBtn.onclick = goBack;
     homeBtn.onclick = goHome;
@@ -192,7 +193,7 @@
     function p(html){ const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; area.appendChild(b); return b; }
     function btn(text, onClick, cls='btn'){ const b=document.createElement('button'); b.className=cls; b.textContent=text; b.onclick=onClick; area.appendChild(b); return b; }
 
-    function inputRow(label, type='text', id, {dir='rtl', textarea=false}={}){
+    function inputRow(label, type='text', id, {dir='rtl', textarea=false, placeholder=''}={}){
       const wrap=document.createElement('div'); wrap.className='bubble input-wrap';
       const l=document.createElement('label'); l.textContent=label;
       let i;
@@ -202,7 +203,7 @@
         i=document.createElement('input'); i.type=type; i.className='input';
         i.autocomplete=(id==='phone'?'tel':'name');
       }
-      i.id=id; i.dir=dir;
+      i.id=id; i.dir=dir; if(placeholder) i.placeholder=placeholder;
       wrap.appendChild(l); wrap.appendChild(i); area.appendChild(wrap);
       return i;
     }
@@ -223,8 +224,9 @@
       if (state.data.planType) parts.push(`מסלול: ${hebPlan()} (${state.data.price}₪)`);
       if (state.data.subject)  parts.push(`מקצוע: ${state.data.subject}`);
       if (state.data.availability) parts.push(`זמינות: ${state.data.availability}`);
+      if (state.data.message)  parts.push(`הודעה: ${state.data.message.slice(0,24)}${state.data.message.length>24?'…':''}`);
       if (state.data.fullName) parts.push(`שם: ${state.data.fullName}`);
-      if (state.data.phone) parts.push(`טלפון: ${state.data.phone}`);
+      if (state.data.phone)    parts.push(`טלפון: ${state.data.phone}`);
       return parts.join(' • ');
     }
     function showPath(){
@@ -257,8 +259,8 @@
       clear(); push(step1);
       p('<strong>היי, אני יוסטון 👨‍🚀</strong><br>העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.');
       p('<strong>איך אוכל לעזור?</strong><br><span class="muted">בחרי אפשרות אחת מהכפתורים למטה.</span>');
-      btn('ברשותי מנוי חודשי קבוע', ()=>{ /* ענף אחר */ alert('ענף מנויה קבועה – נתרכז כרגע בענף שיעור חד־פעמי'); });
-      btn('פרטים על מנוי חודשי',     ()=>{ /* ענף אחר */ alert('ענף מנוי – נתרכז כרגע בענף שיעור חד־פעמי'); });
+      btn('ברשותי מנוי חודשי קבוע', ()=>{ /* ענף אחר */ alert('ענף מנויה קבועה – מתמקדים כעת בשיעור חד־פעמי'); });
+      btn('פרטים על מנוי חודשי',     ()=>{ /* ענף אחר */ alert('ענף מנוי – מתמקדים כעת בשיעור חד־פעמי'); });
       btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path = HE.path_on_demand; stepOnDemandChoosePlan(); });
     }
 
@@ -295,15 +297,29 @@
       showPath();
     }
 
-    // שלב חדש – זמינות (ימים ושעות)
+    // זמינות (ימים ושעות)
     function stepAvailability(){
       clear(); push(stepAvailability);
       p('<strong>זמינות לשיעור</strong><br><span class="muted">כתבי ימים ושעות שנוח לך (למשל: “א׳–ג׳ 15:00–19:00, ו׳ בוקר”).</span>');
-      const availInput = inputRow('ימי ושעות זמינות','text','availability',{dir:'rtl', textarea:true});
-      btn('המשך לפרטי קשר', ()=>{
+      const availInput = inputRow('ימי ושעות זמינות','text','availability',{dir:'rtl', textarea:true, placeholder:'לדוגמה: א׳–ג׳ 15:00–19:00; ו׳ בוקר'});
+      btn('המשך למסר חופשי', ()=>{
         const txt = (availInput.value||'').trim();
         if (!txt){ p('אנא כתבי זמינות (ימים ושעות).').classList.add('err'); return; }
         state.data.availability = txt;
+        stepFreeMessage();
+      }, 'btn primary');
+      btn('חזרה', goBack);
+      showPath();
+    }
+
+    // מלל חופשי (חדש – לפני פרטי קשר)
+    function stepFreeMessage(){
+      clear(); push(stepFreeMessage);
+      p('<strong>יש לך מסר או בקשה?</strong><br><span class="muted">ספרי לנו כל דבר שיעזור לנו לשבץ אותך נכון (אופציונלי).</span>');
+      const msgInput = inputRow('הודעה חופשית (לא חובה)','text','message',{dir:'rtl', textarea:true, placeholder:'למשל: העדפה למורה מסוים/ת, רמת חומר, הערות מיוחדות'});
+      btn('המשך לפרטי קשר', ()=>{
+        const msg = (msgInput.value||'').trim();
+        state.data.message = msg || ''; // אופציונלי
         stepCollectContact();
       }, 'btn primary');
       btn('חזרה', goBack);
@@ -314,8 +330,8 @@
     function stepCollectContact(){
       clear(); push(stepCollectContact);
       p('<strong>פרטי קשר</strong><br><span class="muted">מלאי שם מלא ומספר טלפון לחזרה.</span>');
-      const nameInput  = inputRow('שם מלא','text','fullName',{dir:'rtl'});
-      const phoneInput = inputRow('טלפון לחזרה','tel','phone',{dir:'rtl'});
+      const nameInput  = inputRow('שם מלא','text','fullName',{dir:'rtl', placeholder:'לדוגמה: דנה לוי'});
+      const phoneInput = inputRow('טלפון לחזרה','tel','phone',{dir:'rtl', placeholder:'לדוגמה: 0501234567'});
 
       btn('המשך לאישור סופי', ()=>{
         const fullName=(nameInput.value||'').trim();
@@ -340,9 +356,10 @@
         `מסלול: <strong>${planHeb}</strong>`,
         `מחיר: <strong>${state.data.price}₪</strong>`,
         `זמינות: <strong>${state.data.availability}</strong>`,
+        state.data.message ? `הודעה: <strong>${state.data.message}</strong>` : '',
         `שם: <strong>${state.data.fullName}</strong>`,
         `טלפון: <strong>${state.data.phone}</strong>`
-      ].join('<br>'));
+      ].filter(Boolean).join('<br>'));
 
       btn('שליחה למזכירות', finalizeLead, 'btn primary');
       btn('חזרה', goBack);
@@ -351,15 +368,15 @@
 
     // שליחה לשיטס (בעברית) + פידבק
     async function finalizeLead(){
-      // payload בעברית
       const payload = {
         path: HE.path_on_demand,                    // "שיעור על בסיס מקום פנוי"
         planType: HE.plan[state.data.planType],     // "קבוצה" | "טריפל" | "פרטי"
         price: `${state.data.price}₪`,              // "80₪" ...
         subject: state.data.subject,                // עברית
-        availability: state.data.availability,      // ייכנס ל-raw בעמודה JSON
-        fullName: state.data.fullName,              // RTL בתצוגה, ערך רגיל ב-JSON
-        phone: state.data.phone,
+        availability: state.data.availability,      // טקסט חופשי
+        message: state.data.message || '',          // טקסט חופשי (אופציונלי)
+        fullName: state.data.fullName,              // RTL בתצוגה
+        phone: state.data.phone,                    // בפועל נשלח כמספר ישראלי
         cta: HE.cta_on_demand,                      // "שיעור חד־פעמי"
         source: HE.source,                          // "יוסטון – אתר"
         status: HE.status_new,                      // "חדש"

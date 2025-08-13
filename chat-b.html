@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>צ'ט משופר – Firestore</title>
+  <title>צ'ט יוסטון – Leads לשיטס</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#0f172a" />
@@ -15,10 +15,8 @@
       --glass:rgba(255,255,255,0.06); --glass-strong:rgba(255,255,255,0.12);
       --border:rgba(255,255,255,0.16); --text:#e5edf8; --muted:#9fb1c8;
       --primary:#4cb5ff; --primary-800:#1c78b2; --success:#10b981; --danger:#ef4444;
-      --radius-xl:22px; --radius-lg:16px; --radius-md:12px;
-      --shadow-xl:0 20px 60px rgba(0,0,0,.35);
-      --shadow-md:0 10px 30px rgba(0,0,0,.25);
-      --blur:14px; --speed:.22s;
+      --radius-xl:22px; --shadow-xl:0 20px 60px rgba(0,0,0,.35);
+      --shadow-md:0 10px 30px rgba(0,0,0,.25); --blur:14px; --speed:.22s;
     }
     @media (prefers-color-scheme: light){
       :root{
@@ -66,14 +64,6 @@
       box-shadow:inset 0 0 10px rgba(255,255,255,.25), 0 10px 24px rgba(76,181,255,.35);
     }
     .title{font-weight:700;font-size:18px}
-    .head a{
-      text-decoration:none;display:inline-flex;gap:8px;align-items:center;
-      padding:10px 12px;border-radius:10px;border:1px solid var(--border);
-      background:var(--glass-strong);
-      transition:transform var(--speed), background var(--speed), border-color var(--speed);
-      color:inherit;
-    }
-    .head a:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.35) }
 
     .body{
       padding:22px; min-height:360px; display:grid; align-items:start;
@@ -100,7 +90,6 @@
     .ok{background:linear-gradient(180deg, rgba(16,185,129,.18), rgba(16,185,129,.10)); border-color:rgba(16,185,129,.45)}
     .err{background:linear-gradient(180deg, rgba(239,68,68,.20), rgba(239,68,68,.10)); border-color:rgba(239,68,68,.45)}
 
-    /* ---- Buttons: מודגש, “לחיץ”, בולט מהכרטיס ---- */
     .btn{
       width:100%; text-align:center; padding:13px 14px;
       border-radius:14px; border:1px solid var(--border);
@@ -117,7 +106,6 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
     .btn:active{ transform: translateY(0) }
-
     .btn.primary{
       background:linear-gradient(145deg, var(--primary), var(--primary-800));
       color:#fff; border-color:transparent;
@@ -125,10 +113,13 @@
     }
     .btn.primary:hover{ box-shadow:0 12px 24px rgba(76,181,255,0.45) }
 
-    /* נגישות */
-    :focus{outline:none}
-    .btn:focus-visible, a:focus-visible{ box-shadow:0 0 0 3px rgba(76,181,255,.55) }
-    @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
+    /* Inputs */
+    .input-wrap{display:grid; gap:8px}
+    .input-wrap label{font-weight:700}
+    .input{
+      padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+      background:rgba(255,255,255,0.06); color:var(--text);
+    }
 
     /* מובייל */
     @media (max-width:540px){
@@ -145,14 +136,9 @@
       <div class="head">
         <div class="brand">
           <div class="logo">HB</div>
-          <div class="title">צ'ט משופר (Firestore)</div>
+          <div class="title">צ'ט יוסטון – Leads לשיטס</div>
         </div>
-        <a href="admin.html" aria-label="חזרה ל־Admin">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          חזרה ל־Admin
-        </a>
+        <div></div>
       </div>
 
       <div class="body"><div id="area"></div></div>
@@ -164,60 +150,72 @@
     </div>
   </div>
 
-  <script type="module">
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDIof9bpkgL1L7mlbmj-JXQ3GHDTnTQpSM",
-      authDomain: "brawnshtein-team.firebaseapp.com",
-      projectId: "brawnshtein-team",
-      storageBucket: "brawnshtein-team.firebasestorage.app",
-      messagingSenderId: "44992266530",
-      appId: "1:44992266530:web:d27bd36cba15c464cb257b",
-      measurementId: "G-D6TEBLLXTP"
-    };
+  <script>
+    /* ======== Config: Google Sheets Web App ======== */
+    const SHEETS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwnNKY0BeO5N2O9oWmr8ltCHr9fVdDdrXsL_3erastx4qdEqhCz1mYAhkvZETF-86CGnw/exec';
 
-    // Firebase SDK
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-    // Init
-    const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-
-    // DOM
+    /* ======== DOM ======== */
     const area    = document.getElementById('area');
     const backBtn = document.getElementById('backBtn');
     const homeBtn = document.getElementById('homeBtn');
     const clear   = () => area.innerHTML = '';
 
-    // State
+    /* ======== State ======== */
     const state = {
       history: [],
-      data: { path:null, subject:null, planType:null, price:null, cta:null }
+      data: { path:null, subject:null, planType:null, price:null, cta:null, fullName:null, phone:null }
     };
     const push  = (fn)=> state.history.push(fn);
     const goBack= ()=>{ if(state.history.length>1){ state.history.pop(); state.history.at(-1)(); } };
-    const goHome= ()=>{ state.history.length=0; state.data={path:null,subject:null,planType:null,price:null,cta:null}; step1(); };
-
+    const goHome= ()=>{ state.history.length=0; state.data={path:null,subject:null,planType:null,price:null,cta:null,fullName:null,phone:null}; step1(); };
     backBtn.onclick = goBack;
     homeBtn.onclick = goHome;
 
-    // UI helpers
+    /* ======== UI helpers ======== */
     function p(html){ const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; area.appendChild(b); return b; }
     function btn(text, onClick, cls='btn'){ const b=document.createElement('button'); b.className=cls; b.textContent=text; b.onclick=onClick; area.appendChild(b); return b; }
-    async function recordLead(payload){
-      try{
-        await addDoc(collection(db,'chat_leads'), { ...payload, createdAt: serverTimestamp(), source:'web-app', status:'new' });
-        return true;
-      }catch(e){ console.error(e); return false; }
+
+    // inputs
+    function inputRow(label, type='text', id){
+      const wrap=document.createElement('div'); wrap.className='bubble input-wrap';
+      const l=document.createElement('label'); l.textContent=label;
+      const i=document.createElement('input'); i.type=type; i.id=id; i.dir='ltr'; i.className='input';
+      i.autocomplete=(id==='phone'?'tel':'name');
+      wrap.appendChild(l); wrap.appendChild(i); area.appendChild(wrap);
+      return i;
     }
 
-    /* ================= FLOW ================= */
+    // phone helpers (IL)
+    const normalizeILPhone = raw => {
+      let p=(raw||'').toString().trim().replace(/[^\d+]/g,'');
+      if(p.startsWith('+972')) p='0'+p.slice(4);
+      if(p.startsWith('972'))  p='0'+p.slice(3);
+      return p;
+    };
+    const validILPhone = p => /^0\d{8,9}$/.test(p||'');
 
-    // STEP 1 – Opening (שאלה + הנחיה, ללא כפילות אפשרויות)
+    /* ======== Sheets sender ======== */
+    async function sendLeadToSheet(payload){
+      try{
+        const res = await fetch(SHEETS_WEBAPP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' }, // מפחית Preflight
+          body: JSON.stringify(payload)
+        });
+        const j = await res.json().catch(()=>({ok:false}));
+        return j.ok === true || res.ok;
+      }catch(e){
+        console.error('Sheets webapp error', e);
+        return false;
+      }
+    }
+
+    /* ========== FLOW ========== */
+
+    // STEP 1 – פתיח
     function step1(){
       clear(); push(step1);
-      p('<strong>היי, אני יוסטון</strong><br>אני העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.');
+      p('<strong>היי, אני יוסטון 👨‍🚀</strong><br>העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.');
       p('<strong>איך אוכל לעזור?</strong><br><span class="muted">בחרי אפשרות אחת מהכפתורים למטה.</span>');
 
       btn('ברשותי מנוי חודשי קבוע', ()=>{ state.data.path='have_subscription'; stepHaveSubscription(); });
@@ -225,16 +223,17 @@
       btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path='on_demand'; stepOnDemandChoosePlan(); });
     }
 
-    // EXISTING SUBSCRIBER
+    // מנויה קיימת (פנייה נשמרת לשיטס)
     function stepHaveSubscription(){
       clear(); push(stepHaveSubscription);
       p('<strong>ברוכה השבה</strong><br><span class="muted">בחרי מה תרצי לעשות.</span>');
-      btn('שינוי מועד שיעור',    ()=> finalLead({reason:'change_schedule'}));
-      btn('בירור תשלום/חשבונית', ()=> finalLead({reason:'billing'}));
-      btn('שליחת הודעה למורה',   ()=> finalLead({reason:'message_to_teacher'}));
+      btn('שינוי מועד שיעור',    ()=> stepCollectContact(({fullName,phone})=> finalizeLead({path:'have_subscription', reason:'change_schedule', fullName, phone})));
+      btn('בירור תשלום/חשבונית', ()=> stepCollectContact(({fullName,phone})=> finalizeLead({path:'have_subscription', reason:'billing', fullName, phone})));
+      btn('שליחת הודעה למורה',   ()=> stepCollectContact(({fullName,phone})=> finalizeLead({path:'have_subscription', reason:'message_to_teacher', fullName, phone})));
+      btn('חזרה', goBack);
     }
 
-    // SUBJECT (for subscription_info path)
+    // בחירת מקצוע (לענף מידע על מנוי)
     function stepChooseSubject(){
       clear(); push(stepChooseSubject);
       p('<strong>באיזה מקצוע תרצי ללמוד?</strong><br><span class="muted">בחרי אפשרות אחת.</span>');
@@ -244,7 +243,7 @@
       btn('חזרה', goBack);
     }
 
-    // SUBSCRIPTION or ON-DEMAND (question + hint only)
+    // לבחור: שיעור חד פעמי או מנוי
     function stepSubscriptionOrOnDemand(){
       clear(); push(stepSubscriptionOrOnDemand);
       p('<strong>על מה תרצי לשמוע פרטים?</strong><br><span class="muted">שיעור חד־פעמי או מנוי קבוע.</span>');
@@ -253,7 +252,7 @@
       btn('חזרה', goBack);
     }
 
-    // SUBSCRIPTION PLANS (group → triple → private)
+    // מסלולי מנוי
     function stepSubscriptionPlans(){
       clear(); push(stepSubscriptionPlans);
       p('<strong>מסלולי מנוי</strong><br><span class="muted">בחרי את המסלול המתאים.</span>');
@@ -263,7 +262,7 @@
       btn('חזרה', goBack);
     }
 
-    // ON-DEMAND: choose plan → choose subject → summary
+    // שיעור חד-פעמי: בחירת מסלול
     function stepOnDemandChoosePlan(){
       clear(); push(stepOnDemandChoosePlan);
       p('<strong>שיעור על בסיס מקום פנוי</strong><br><span class="muted">בחרי מסלול חד־פעמי.</span>');
@@ -273,6 +272,7 @@
       btn('חזרה', goBack);
     }
 
+    // שיעור חד-פעמי: בחירת מקצוע
     function stepOnDemandSubject(){
       clear(); push(stepOnDemandSubject);
       p('<strong>איזה מקצוע לשיעור החד־פעמי?</strong><br><span class="muted">בחרי מקצוע אחד.</span>');
@@ -282,56 +282,92 @@
       btn('חזרה', goBack);
     }
 
+    // שיעור חד-פעמי: סיכום → פרטי קשר → שליחה לשיטס
     function stepOnDemandSummary(){
       clear(); push(stepOnDemandSummary);
       const {subject, planType, price} = state.data;
       const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
-      p(`<strong>סיכום</strong><br><span class="muted">בדקי שהכול נכון ואז אשרי.</span>`);
+      p('<strong>סיכום</strong><br><span class="muted">בדקי שהכול נכון ואז המשיכי להזנת פרטי קשר.</span>');
       p(`שיעור חד־פעמי ב${subject} במסלול ${planHeb} – ${price}₪.`);
-      btn('אשרי ושלחי למזכירות', async ()=>{
-        const ok = await recordLead({ path:'on_demand', subject, planType, price, cta:'lesson_this_week' });
-        clear();
-        if(ok){ p('הבקשה נרשמה. המזכירות יצורו איתך קשר בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok'); }
-        else  { p('אירעה שגיאה בשמירת הבקשה. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err'); }
-        btn('לתפריט ראשי', goHome, 'btn primary');
+      btn('המשך להזנת פרטי קשר', ()=> stepCollectContact(({fullName,phone})=>{
+        finalizeLead({
+          path:'on_demand',
+          subject, planType, price,
+          cta:'lesson_this_week',
+          fullName, phone
+        });
+      }), 'btn primary');
+      btn('חזרה', goBack);
+    }
+
+    // איסוף שם + טלפון
+    function stepCollectContact(next){
+      clear(); push(()=>stepCollectContact(next));
+      p('<strong>פרטי קשר</strong><br><span class="muted">מלאי שם מלא ומספר טלפון לחזרה.</span>');
+      const nameInput  = inputRow('שם מלא','text','fullName');
+      const phoneInput = inputRow('טלפון לחזרה','tel','phone');
+
+      btn('המשך', ()=>{
+        const fullName=(nameInput.value||'').trim();
+        const phone   = normalizeILPhone(phoneInput.value||'');
+        if(!fullName){ p('יש להזין שם מלא.').classList.add('err'); return; }
+        if(!validILPhone(phone)){ p('מספר טלפון לא תקין (למשל 0501234567).').classList.add('err'); return; }
+        state.data.fullName=fullName; state.data.phone=phone;
+        next({fullName,phone});
       }, 'btn primary');
       btn('חזרה', goBack);
     }
 
-    // CTA for subscription flow
+    // CTA של מנוי: שיחזרו אליי / שיעור השבוע → פרטי קשר → שליחה לשיטס
     function stepCTA(){
       clear(); push(stepCTA);
       const {subject, planType, price} = state.data;
       const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
-      p('<strong>מה תרצי לעשות עכשיו?</strong><br><span class="muted">בחרי פעולה.</span>');
+      p('<strong>מה תרצי לעשות עכשיו?</strong><br><span class="muted">בחרי פעולה, נבקש פרטי קשר ונשלח למזכירות.</span>');
       p(`${subject ? 'מקצוע: '+subject+' · ' : ''}מסלול: ${planHeb} · ${price}₪ לחודש`);
 
-      btn('שיחזרו אליי עם פרטים נוספים', async ()=>{
-        const ok = await recordLead({ path:'subscription_info', subject, planType, price, cta:'callback' });
-        window.open('https://wordpress-1184560-4777160.cloudwaysapps.com/', '_blank', 'noopener');
-        clear();
-        if(ok){ p('הטופס נפתח. לאחר מילוי, נטע תחזור אלייך בהקדם.').classList.add('ok'); }
-        else  { p('הטופס נפתח, אך לא הצלחנו לשמור את הבקשה. אם לא יצרו קשר — כתבי לנו.').classList.add('err'); }
-        btn('לתפריט ראשי', goHome, 'btn primary');
+      btn('שיחזרו אליי עם פרטים נוספים', ()=>{
+        stepCollectContact(({fullName,phone})=>{
+          finalizeLead({
+            path:'subscription_info',
+            subject, planType, price,
+            cta:'callback',
+            fullName, phone
+          });
+        });
       });
 
-      btn('אני רוצה שיעור כבר היום (או השבוע)', async ()=>{
-        const ok = await recordLead({ path:'subscription_info', subject, planType, price, cta:'lesson_this_week' });
-        clear();
-        if(ok){ p('מצוין. המזכירות יצורו איתך קשר בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok'); }
-        else  { p('לא הצלחנו לשמור את הבקשה. נסי שוב או פני בוואטסאפ 050-9570866.').classList.add('err'); }
-        btn('לתפריט ראשי', goHome, 'btn primary');
+      btn('אני רוצה שיעור כבר היום (או השבוע)', ()=>{
+        stepCollectContact(({fullName,phone})=>{
+          finalizeLead({
+            path:'subscription_info',
+            subject, planType, price,
+            cta:'lesson_this_week',
+            fullName, phone
+          });
+        });
       });
 
       btn('חזרה לתפריט הראשי', goHome);
       btn('חזרה', goBack);
     }
 
-    async function finalLead(extra){
-      const ok = await recordLead({ path:'have_subscription', ...extra });
+    // כתיבה סופית לשיטס + פידבק
+    async function finalizeLead(payload){
+      const toSend = {
+        ...payload,
+        source:'web-app',
+        status:'new',
+        createdAt: new Date().toISOString()
+      };
+      const okGS = await sendLeadToSheet(toSend);
+
       clear();
-      if(ok){ p('קיבלנו. הצוות יחזור אלייך בהקדם עם המענה המתאים.').classList.add('ok'); }
-      else  { p('לא הצלחנו לשמור את הבקשה. נסי שוב או פני אלינו בוואטסאפ 050-9570866.').classList.add('err'); }
+      if(okGS){
+        p('הבקשה נרשמה והתווספה לגיליון. המזכירות יצורו איתך קשר בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
+      }else{
+        p('לא הצלחנו לשמור את הבקשה לגיליון. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err');
+      }
       btn('לתפריט ראשי', goHome, 'btn primary');
     }
 

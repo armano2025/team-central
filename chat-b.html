@@ -5,115 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>צ'ט משופר – Firestore</title>
 
-  <!-- גופנים ועיצוב בסיס -->
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#0f172a" />
 
   <style>
     /* ---------- Design Tokens ---------- */
     :root{
-      --bg:            #0b1220;           /* Canvas */
-      --bg-grad-1:     #0b1220;
-      --bg-grad-2:     #101a33;
-      --glass:         rgba(255,255,255,0.06);
-      --glass-strong:  rgba(255,255,255,0.12);
-      --border:        rgba(255,255,255,0.16);
-      --text:          #e5edf8;
-      --muted:         #9fb1c8;
-      --primary:       #4cb5ff;
-      --primary-800:   #1c78b2;
-      --success:       #10b981;
-      --danger:        #ef4444;
-
-      --radius-xl:     22px;
-      --radius-lg:     16px;
-      --radius-md:     12px;
-      --shadow-xl:     0 20px 60px rgba(0,0,0,.35);
-      --shadow-md:     0 10px 30px rgba(0,0,0,.25);
-      --blur:          14px;
-      --speed:         .22s;
+      --bg:#0b1220; --bg-grad-1:#0b1220; --bg-grad-2:#101a33;
+      --glass:rgba(255,255,255,0.06); --glass-strong:rgba(255,255,255,0.12);
+      --border:rgba(255,255,255,0.16); --text:#e5edf8; --muted:#9fb1c8;
+      --primary:#4cb5ff; --primary-800:#1c78b2; --success:#10b981; --danger:#ef4444;
+      --radius-xl:22px; --radius-lg:16px; --radius-md:12px;
+      --shadow-xl:0 20px 60px rgba(0,0,0,.35);
+      --shadow-md:0 10px 30px rgba(0,0,0,.25);
+      --blur:14px; --speed:.22s;
     }
-
     @media (prefers-color-scheme: light){
       :root{
-        --bg:           #f3f6fb;
-        --bg-grad-1:    #eff4fb;
-        --bg-grad-2:    #e9f1fb;
-        --glass:        rgba(255,255,255,0.75);
-        --glass-strong: rgba(255,255,255,0.9);
-        --border:       rgba(15,23,42,0.12);
-        --text:         #0f172a;
-        --muted:        #475569;
-        --primary:      #2563eb;
-        --primary-800:  #1e40af;
-        --success:      #059669;
-        --danger:       #dc2626;
+        --bg:#f3f6fb; --bg-grad-1:#eff4fb; --bg-grad-2:#e9f1fb;
+        --glass:rgba(255,255,255,0.75); --glass-strong:rgba(255,255,255,0.9);
+        --border:rgba(15,23,42,0.12); --text:#0f172a; --muted:#475569;
+        --primary:#2563eb; --primary-800:#1e40af; --success:#059669; --danger:#dc2626;
       }
     }
 
     /* ---------- Base ---------- */
     html,body{height:100%}
     body{
-      margin:0;
-      font-family:'Rubik',system-ui,-apple-system,Segoe UI,Arial,Helvetica;
+      margin:0; font-family:'Rubik',system-ui,-apple-system,Segoe UI,Arial,Helvetica;
       color:var(--text);
-      background: radial-gradient(1200px 800px at 90% -10%, #153057 0%, transparent 60%),
-                  radial-gradient(1200px 800px at -10% 100%, #0a6bd9 0%, transparent 55%),
-                  linear-gradient(160deg, var(--bg-grad-1), var(--bg-grad-2));
+      background:
+        radial-gradient(1200px 800px at 90% -10%, #153057 0%, transparent 60%),
+        radial-gradient(1200px 800px at -10% 100%, #0a6bd9 0%, transparent 55%),
+        linear-gradient(160deg, var(--bg-grad-1), var(--bg-grad-2));
       background-attachment: fixed;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
     *{box-sizing:border-box}
-    a{color:inherit}
 
     /* ---------- Layout ---------- */
-    .wrap{
-      max-width:880px;
-      margin:28px auto;
-      padding:0 16px;
-    }
+    .wrap{max-width:880px;margin:28px auto;padding:0 16px}
     .card{
-      position:relative;
-      border-radius:var(--radius-xl);
-      background:var(--glass);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow-xl);
-      backdrop-filter: blur(var(--blur));
+      position:relative; border-radius:var(--radius-xl);
+      background:var(--glass); border:1px solid var(--border);
+      box-shadow:var(--shadow-xl); backdrop-filter: blur(var(--blur));
       overflow:hidden;
     }
     .head{
-      position:relative;
-      padding:20px 22px;
-      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 22px; display:flex; align-items:center; justify-content:space-between;
       background:
         linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,0) 40%),
         linear-gradient(135deg, rgba(76,181,255,.22), rgba(76,181,255,0) 55%);
       border-bottom:1px solid var(--border);
     }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-    }
+    .brand{display:flex; align-items:center; gap:12px}
     .logo{
-      width:42px; height:42px; border-radius:50%;
-      display:grid; place-items:center;
+      width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
       background:linear-gradient(145deg, var(--primary), var(--primary-800));
+      color:#fff;font-weight:700;letter-spacing:.5px;
       box-shadow:inset 0 0 10px rgba(255,255,255,.25), 0 10px 24px rgba(76,181,255,.35);
-      color:white; font-weight:700;
-      letter-spacing:.5px;
     }
-    .title{font-weight:700; font-size:18px}
+    .title{font-weight:700;font-size:18px}
     .head a{
-      text-decoration:none; display:inline-flex; gap:8px; align-items:center;
-      padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+      text-decoration:none;display:inline-flex;gap:8px;align-items:center;
+      padding:10px 12px;border-radius:10px;border:1px solid var(--border);
       background:var(--glass-strong);
       transition:transform var(--speed), background var(--speed), border-color var(--speed);
+      color:inherit;
     }
     .head a:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,.35) }
 
     .body{
-      padding:22px; min-height:360px;
-      display:grid; align-items:start;
+      padding:22px; min-height:360px; display:grid; align-items:start;
       background:
         radial-gradient(800px 300px at 50% -30%, rgba(255,255,255,.08), transparent 60%),
         radial-gradient(700px 260px at 10% 120%, rgba(76,181,255,.10), transparent 60%);
@@ -126,69 +89,53 @@
     }
 
     /* ---------- Components ---------- */
-    .btn{
-      width:100%;
-      text-align:center;
-      padding:13px 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, var(--glass-strong), rgba(255,255,255,0.06));
-      color:var(--text);
-      font-size:16px;
-      cursor:pointer;
-      transition: transform var(--speed), box-shadow var(--speed), border-color var(--speed), background var(--speed);
-      box-shadow: var(--shadow-md);
-      will-change: transform;
-      user-select:none;
-    }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.35) }
-    .btn:active{ transform: translateY(0); }
-    .btn.primary{
-      background:linear-gradient(145deg, var(--primary), var(--primary-800));
-      color:#fff; border-color:transparent;
-      box-shadow:0 12px 24px rgba(76,181,255,.35);
-    }
-    .btn.primary:hover{ box-shadow:0 16px 36px rgba(76,181,255,.45) }
-
     .bubble{
       background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
       border:1px solid var(--border);
-      padding:14px 16px;
-      border-radius:16px;
-      margin:10px 0;
-      line-height:1.8;
-      box-shadow: var(--shadow-md);
+      padding:14px 16px; border-radius:16px; margin:10px 0;
+      line-height:1.8; box-shadow:var(--shadow-md);
     }
-    .bubble strong{ font-weight:700 }
-    .muted{ color:var(--muted) }
-    .ok   { background:linear-gradient(180deg, rgba(16,185,129,.18), rgba(16,185,129,.10)); border-color:rgba(16,185,129,.45) }
-    .err  { background:linear-gradient(180deg, rgba(239,68,68,.20), rgba(239,68,68,.10)); border-color:rgba(239,68,68,.45) }
+    .bubble strong{font-weight:700}
+    .muted{color:var(--muted)}
+    .ok{background:linear-gradient(180deg, rgba(16,185,129,.18), rgba(16,185,129,.10)); border-color:rgba(16,185,129,.45)}
+    .err{background:linear-gradient(180deg, rgba(239,68,68,.20), rgba(239,68,68,.10)); border-color:rgba(239,68,68,.45)}
 
-    .skeleton{
-      height:46px; border-radius:14px; margin:10px 0;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.10) 25%, rgba(255,255,255,.22) 37%, rgba(255,255,255,.10) 63%);
-      background-size:400% 100%;
-      animation:shimmer 1.1s ease infinite;
-      border:1px solid var(--border);
+    /* ---- Buttons: מודגש, “לחיץ”, בולט מהכרטיס ---- */
+    .btn{
+      width:100%; text-align:center; padding:13px 14px;
+      border-radius:14px; border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      color:var(--text); font-size:16px; cursor:pointer;
+      transition: transform var(--speed), box-shadow var(--speed), border-color var(--speed), background var(--speed);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      will-change: transform; user-select:none;
     }
-    @keyframes shimmer{ 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.35);
+      background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .btn:active{ transform: translateY(0) }
+
+    .btn.primary{
+      background:linear-gradient(145deg, var(--primary), var(--primary-800));
+      color:#fff; border-color:transparent;
+      box-shadow:0 8px 18px rgba(76,181,255,0.35);
+    }
+    .btn.primary:hover{ box-shadow:0 12px 24px rgba(76,181,255,0.45) }
 
     /* נגישות */
-    :focus{ outline:none }
-    .btn:focus-visible, a:focus-visible{
-      box-shadow:0 0 0 3px rgba(76,181,255,.55);
-    }
-    @media (prefers-reduced-motion: reduce){
-      *{ transition:none !important; animation:none !important }
-    }
+    :focus{outline:none}
+    .btn:focus-visible, a:focus-visible{ box-shadow:0 0 0 3px rgba(76,181,255,.55) }
+    @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
 
     /* מובייל */
     @media (max-width:540px){
-      .body{ padding:16px }
-      .footer{ padding:12px 16px }
-      .title{ font-size:16px }
-      .logo{ width:38px; height:38px }
+      .body{padding:16px}
+      .footer{padding:12px 16px}
+      .title{font-size:16px}
+      .logo{width:38px;height:38px}
     }
   </style>
 </head>
@@ -217,7 +164,6 @@
     </div>
   </div>
 
-  <!-- לוגיקת הצ'ט + Firestore: זהה לגרסה האחרונה שלך (הושאר 1:1) -->
   <script type="module">
     // Firebase config
     const firebaseConfig = {
@@ -243,16 +189,15 @@
     const backBtn = document.getElementById('backBtn');
     const homeBtn = document.getElementById('homeBtn');
     const clear   = () => area.innerHTML = '';
-    const skeleton= (n=3)=>{ clear(); for(let i=0;i<n;i++){ const d=document.createElement('div'); d.className='skeleton'; area.appendChild(d);} };
 
     // State
     const state = {
       history: [],
       data: { path:null, subject:null, planType:null, price:null, cta:null }
     };
-    const push = (fn)=> state.history.push(fn);
-    const goBack = ()=>{ if(state.history.length>1){ state.history.pop(); state.history.at(-1)(); } };
-    const goHome = ()=>{ state.history.length=0; state.data={path:null,subject:null,planType:null,price:null,cta:null}; step1(); };
+    const push  = (fn)=> state.history.push(fn);
+    const goBack= ()=>{ if(state.history.length>1){ state.history.pop(); state.history.at(-1)(); } };
+    const goHome= ()=>{ state.history.length=0; state.data={path:null,subject:null,planType:null,price:null,cta:null}; step1(); };
 
     backBtn.onclick = goBack;
     homeBtn.onclick = goHome;
@@ -267,55 +212,61 @@
       }catch(e){ console.error(e); return false; }
     }
 
-    // ---- FLOW ----
+    /* ================= FLOW ================= */
+
+    // STEP 1 – Opening (שאלה + הנחיה, ללא כפילות אפשרויות)
     function step1(){
       clear(); push(step1);
       p('<strong>היי, אני יוסטון</strong><br>אני העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.');
-      p('<strong>איך אוכל לעזור?</strong><br>1. ברשותי מנוי חודשי קבוע.<br>2. אני מעוניינת לקבל פרטים על מנוי חודשי.<br>3. אני מעוניינת בשיעור על בסיס מקום פנוי.').classList.add('muted');
-      btn('1. ברשותי מנוי חודשי קבוע', ()=>{ state.data.path='have_subscription'; stepHaveSubscription(); });
-      btn('2. פרטים על מנוי חודשי',     ()=>{ state.data.path='subscription_info'; stepChooseSubject(); });
-      btn('3. שיעור על בסיס מקום פנוי', ()=>{ state.data.path='on_demand'; stepOnDemandChoosePlan(); });
+      p('<strong>איך אוכל לעזור?</strong><br><span class="muted">בחרי אפשרות אחת מהכפתורים למטה.</span>');
+
+      btn('ברשותי מנוי חודשי קבוע', ()=>{ state.data.path='have_subscription'; stepHaveSubscription(); });
+      btn('פרטים על מנוי חודשי',     ()=>{ state.data.path='subscription_info'; stepChooseSubject(); });
+      btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path='on_demand'; stepOnDemandChoosePlan(); });
     }
 
+    // EXISTING SUBSCRIBER
     function stepHaveSubscription(){
       clear(); push(stepHaveSubscription);
-      p('<strong>ברוכה השבה!</strong> איך נוכל לעזור היום?');
-      btn('שינוי מועד שיעור',          ()=> finalLead({reason:'change_schedule'}));
-      btn('בירור תשלום/חשבונית',       ()=> finalLead({reason:'billing'}));
-      btn('שליחת הודעה למורה',         ()=> finalLead({reason:'message_to_teacher'}));
+      p('<strong>ברוכה השבה</strong><br><span class="muted">בחרי מה תרצי לעשות.</span>');
+      btn('שינוי מועד שיעור',    ()=> finalLead({reason:'change_schedule'}));
+      btn('בירור תשלום/חשבונית', ()=> finalLead({reason:'billing'}));
+      btn('שליחת הודעה למורה',   ()=> finalLead({reason:'message_to_teacher'}));
     }
 
+    // SUBJECT (for subscription_info path)
     function stepChooseSubject(){
       clear(); push(stepChooseSubject);
-      p('<strong>באיזה מקצוע תרצי ללמוד?</strong>');
-      [['אנגלית'],['מתמטיקה'],['פיזיקה'],['שפה'],['אנגלית מדוברת']].forEach(([label])=>{
+      p('<strong>באיזה מקצוע תרצי ללמוד?</strong><br><span class="muted">בחרי אפשרות אחת.</span>');
+      ['אנגלית','מתמטיקה','פיזיקה','שפה','אנגלית מדוברת'].forEach(label=>{
         btn(label, ()=>{ state.data.subject=label; stepSubscriptionOrOnDemand(); });
       });
       btn('חזרה', goBack);
     }
 
+    // SUBSCRIPTION or ON-DEMAND (question + hint only)
     function stepSubscriptionOrOnDemand(){
       clear(); push(stepSubscriptionOrOnDemand);
-      p('אנו עוזרים בשיעורי בית, הכנה למבחנים, השלמת פערים והתקדמות בלימודים.');
-      p('<strong>על מה תרצי לשמוע פרטים?</strong>').classList.add('muted');
+      p('<strong>על מה תרצי לשמוע פרטים?</strong><br><span class="muted">שיעור חד־פעמי או מנוי קבוע.</span>');
       btn('שיעור חד-פעמי על בסיס מקום פנוי', ()=>{ state.data.path='on_demand'; stepOnDemandChoosePlan(); });
       btn('מנוי קבוע – שיעור פעם בשבוע',       stepSubscriptionPlans);
+      btn('חזרה', goBack);
     }
 
+    // SUBSCRIPTION PLANS (group → triple → private)
     function stepSubscriptionPlans(){
       clear(); push(stepSubscriptionPlans);
-      p('המנוי הקבוע כולל שיעור פעם בשבוע, ביום ושעה קבועים מראש.');
-      p('<strong>בחרי מסלול</strong>').classList.add('muted');
+      p('<strong>מסלולי מנוי</strong><br><span class="muted">בחרי את המסלול המתאים.</span>');
       btn('מסלול קבוצה – עד 5 תלמידים – 295₪', ()=>{ state.data.planType='group';  state.data.price=295; stepCTA(); });
       btn('מסלול טריפל – עד 3 תלמידים – 385₪', ()=>{ state.data.planType='triple'; state.data.price=385; stepCTA(); });
       btn('מסלול פרטי – 685₪',                  ()=>{ state.data.planType='private';state.data.price=685; stepCTA(); });
       btn('חזרה', goBack);
     }
 
+    // ON-DEMAND: choose plan → choose subject → summary
     function stepOnDemandChoosePlan(){
       clear(); push(stepOnDemandChoosePlan);
-      p('<strong>שיעור על בסיס מקום פנוי</strong>');
-      p('בחרי מסלול חד־פעמי:').classList.add('muted');
+      p('<strong>שיעור על בסיס מקום פנוי</strong><br><span class="muted">בחרי מסלול חד־פעמי.</span>');
       btn('קבוצה – עד 5 תלמידים – 70₪',  ()=>{ state.data.planType='group';  state.data.price=70;  stepOnDemandSubject(); });
       btn('טריפל – עד 3 תלמידים – 100₪', ()=>{ state.data.planType='triple'; state.data.price=100; stepOnDemandSubject(); });
       btn('פרטי – 160₪',                   ()=>{ state.data.planType='private';state.data.price=160; stepOnDemandSubject(); });
@@ -324,7 +275,7 @@
 
     function stepOnDemandSubject(){
       clear(); push(stepOnDemandSubject);
-      p('<strong>איזה מקצוע תרצי לשיעור החד־פעמי?</strong>');
+      p('<strong>איזה מקצוע לשיעור החד־פעמי?</strong><br><span class="muted">בחרי מקצוע אחד.</span>');
       ['אנגלית','מתמטיקה','פיזיקה','שפה','אנגלית מדוברת'].forEach(l=>{
         btn(l, ()=>{ state.data.subject=l; stepOnDemandSummary(); });
       });
@@ -335,42 +286,44 @@
       clear(); push(stepOnDemandSummary);
       const {subject, planType, price} = state.data;
       const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
-      p(`<strong>סיכום</strong><br>שיעור חד־פעמי ב${subject} במסלול ${planHeb} – ${price}₪.`);
+      p(`<strong>סיכום</strong><br><span class="muted">בדקי שהכול נכון ואז אשרי.</span>`);
+      p(`שיעור חד־פעמי ב${subject} במסלול ${planHeb} – ${price}₪.`);
       btn('אשרי ושלחי למזכירות', async ()=>{
         const ok = await recordLead({ path:'on_demand', subject, planType, price, cta:'lesson_this_week' });
         clear();
-        if(ok){ p('הבקשה נרשמה. המזכירות יצורו איתך קשר בקרוב מאוד כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok'); }
+        if(ok){ p('הבקשה נרשמה. המזכירות יצורו איתך קשר בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok'); }
         else  { p('אירעה שגיאה בשמירת הבקשה. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err'); }
         btn('לתפריט ראשי', goHome, 'btn primary');
       }, 'btn primary');
       btn('חזרה', goBack);
     }
 
+    // CTA for subscription flow
     function stepCTA(){
       clear(); push(stepCTA);
       const {subject, planType, price} = state.data;
       const planHeb = planType==='group'?'קבוצה':planType==='triple'?'טריפל':'פרטי';
-      p(`<strong>בחירה מצוינת</strong><br>${subject ? 'מקצוע: '+subject+'<br>' : ''}מסלול: ${planHeb} – ${price}₪ לחודש.`);
-      p('<strong>מה תרצי לעשות עכשיו?</strong>').classList.add('muted');
+      p('<strong>מה תרצי לעשות עכשיו?</strong><br><span class="muted">בחרי פעולה.</span>');
+      p(`${subject ? 'מקצוע: '+subject+' · ' : ''}מסלול: ${planHeb} · ${price}₪ לחודש`);
 
-      btn('1. שיחזרו אליי עם פרטים נוספים', async ()=>{
+      btn('שיחזרו אליי עם פרטים נוספים', async ()=>{
         const ok = await recordLead({ path:'subscription_info', subject, planType, price, cta:'callback' });
         window.open('https://wordpress-1184560-4777160.cloudwaysapps.com/', '_blank', 'noopener');
         clear();
-        if(ok){ p('הטופס נפתח בחלון חדש. לאחר מילוי, נטע תחזור אלייך בהקדם.').classList.add('ok'); }
-        else  { p('הטופס נפתח, אך לא הצלחנו לשמור את הבקשה. נשמח שתעדכני אותנו אם לא יצרו קשר.').classList.add('err'); }
+        if(ok){ p('הטופס נפתח. לאחר מילוי, נטע תחזור אלייך בהקדם.').classList.add('ok'); }
+        else  { p('הטופס נפתח, אך לא הצלחנו לשמור את הבקשה. אם לא יצרו קשר — כתבי לנו.').classList.add('err'); }
         btn('לתפריט ראשי', goHome, 'btn primary');
       });
 
-      btn('2. אני רוצה שיעור כבר היום (או השבוע)', async ()=>{
+      btn('אני רוצה שיעור כבר היום (או השבוע)', async ()=>{
         const ok = await recordLead({ path:'subscription_info', subject, planType, price, cta:'lesson_this_week' });
         clear();
-        if(ok){ p('מצוין. המזכירות יצורו איתך קשר בקרוב מאוד כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok'); }
-        else  { p('לא הצלחנו לשמור את הבקשה. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050-9570866.').classList.add('err'); }
+        if(ok){ p('מצוין. המזכירות יצורו איתך קשר בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok'); }
+        else  { p('לא הצלחנו לשמור את הבקשה. נסי שוב או פני בוואטסאפ 050-9570866.').classList.add('err'); }
         btn('לתפריט ראשי', goHome, 'btn primary');
       });
 
-      btn('3. חזרה לתפריט הראשי', goHome);
+      btn('חזרה לתפריט הראשי', goHome);
       btn('חזרה', goBack);
     }
 

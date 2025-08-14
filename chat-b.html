@@ -92,31 +92,31 @@
       color:var(--text); font-size:16px; cursor:pointer;
       transition: transform var(--speed), box-shadow var(--speed), border-color var(--speed), background var(--speed);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      will-change: transform; user-select:none;
+      user-select:none;
     }
-    .btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,0.35);
-      background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    }
-    .btn:active{ transform: translateY(0) }
-    .btn.primary{
-      background:linear-gradient(145deg, var(--primary), var(--primary-800));
-      color:#fff; border-color:transparent;
-      box-shadow:0 8px 18px rgba(76,181,255,0.35);
-    }
+    .btn:hover{ transform:translateY(-1px); border-color:rgba(255,255,255,0.35); background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06)); box-shadow:0 6px 16px rgba(0,0,0,0.2)}
+    .btn:active{ transform:translateY(0) }
+    .btn.primary{ background:linear-gradient(145deg, var(--primary), var(--primary-800)); color:#fff; border-color:transparent; box-shadow:0 8px 18px rgba(76,181,255,0.35)}
     .btn.primary:hover{ box-shadow:0 12px 24px rgba(76,181,255,0.45) }
 
     .input-wrap{display:grid; gap:8px}
     .input-wrap label{font-weight:700}
-    .input{
+    .input, .textarea{
       padding:12px 14px; border-radius:12px; border:1px solid var(--border);
       background:rgba(255,255,255,0.06); color:var(--text);
     }
-    .textarea{
-      padding:12px 14px; border-radius:12px; border:1px solid var(--border);
-      background:rgba(255,255,255,0.06); color:var(--text); min-height:88px; resize:vertical;
+    .textarea{ min-height:88px; resize:vertical }
+
+    /* כרטיס סיכום קצר */
+    .summary{
+      display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+      padding:12px 14px; border-radius:14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+      border:1px solid var(--border); box-shadow:var(--shadow-md); margin:10px 0;
+    }
+    .chip{
+      padding:6px 10px; border-radius:999px; border:1px solid var(--border);
+      background:rgba(255,255,255,0.06); font-size:14px
     }
 
     @media (max-width:540px){
@@ -159,7 +159,7 @@
       status_new: 'חדש',
       plan: { group: 'קבוצה', triple: 'טריפל', private: 'פרטי' }
     };
-    const PRICES = { group: 80, triple: 100, private: 160 }; // קבוצה=80₪
+    const PRICES = { group: 80, triple: 100, private: 160 };
 
     /* ======== DOM ======== */
     const area    = document.getElementById('area');
@@ -171,12 +171,12 @@
     const state = {
       history: [],
       data: {
-        path: null,         // תמיד בעברית לענף זה
-        subject: null,      // בעברית
+        path: null,
+        subject: null,      // עברית
         planType: null,     // 'group' | 'triple' | 'private'
         price: null,        // מספר
         availability: null, // טקסט חופשי
-        message: null,      // מלל חופשי מהלקוח
+        message: null,      // אופציונלי
         fullName: null,
         phone: null,
         cta: null
@@ -185,30 +185,33 @@
     const push  = (fn)=> state.history.push(fn);
     const goBack= ()=>{ if(state.history.length>1){ state.history.pop(); state.history.at(-1)(); } };
     const goHome= ()=>{ state.history.length=0; state.data={ path:null,subject:null,planType:null,price:null,availability:null,message:null,fullName:null,phone:null,cta:null }; step1(); };
-
     backBtn.onclick = goBack;
     homeBtn.onclick = goHome;
 
     /* ======== UI helpers ======== */
-    function p(html){ const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; area.appendChild(b); return b; }
-    function btn(text, onClick, cls='btn'){ const b=document.createElement('button'); b.className=cls; b.textContent=text; b.onclick=onClick; area.appendChild(b); return b; }
+    const p   = html => { const b=document.createElement('div'); b.className='bubble'; b.innerHTML=html; area.appendChild(b); return b; };
+    const btn = (text, onClick, cls='btn') => { const b=document.createElement('button'); b.className=cls; b.textContent=text; b.onclick=onClick; area.appendChild(b); return b; };
 
     function inputRow(label, type='text', id, {dir='rtl', textarea=false, placeholder=''}={}){
-      const wrap=document.createElement('div'); wrap.className='bubble input-wrap';
+      const wrap=document.createElement('div'); wrap.className='input-wrap bubble';
       const l=document.createElement('label'); l.textContent=label;
       let i;
-      if (textarea){
-        i=document.createElement('textarea'); i.className='textarea';
-      } else {
-        i=document.createElement('input'); i.type=type; i.className='input';
-        i.autocomplete=(id==='phone'?'tel':'name');
-      }
+      if (textarea){ i=document.createElement('textarea'); i.className='textarea'; }
+      else { i=document.createElement('input'); i.type=type; i.className='input'; i.autocomplete=(id==='phone'?'tel':'name'); }
       i.id=id; i.dir=dir; if(placeholder) i.placeholder=placeholder;
       wrap.appendChild(l); wrap.appendChild(i); area.appendChild(wrap);
       return i;
     }
 
-    // phone helpers (IL)
+    function summaryCard(){
+      const s=document.createElement('div'); s.className='summary';
+      const ch1=document.createElement('div'); ch1.className='chip'; ch1.textContent=`מסלול: ${HE.plan[state.data.planType]} (${state.data.price}₪)`;
+      const ch2=document.createElement('div'); ch2.className='chip'; ch2.textContent=`מקצוע: ${state.data.subject}`;
+      s.appendChild(ch1); s.appendChild(ch2);
+      area.appendChild(s);
+    }
+
+    // טלפון ישראלי
     const normalizeILPhone = raw => {
       let p=(raw||'').toString().trim().replace(/[^\d+]/g,'');
       if(p.startsWith('+972')) p='0'+p.slice(4);
@@ -217,31 +220,12 @@
     };
     const validILPhone = p => /^0\d{8,9}$/.test(p||'');
 
-    // breadcrumb
-    function hebPlan(){ return HE.plan[state.data.planType] || ''; }
-    function pathText(){
-      const parts=[];
-      if (state.data.planType) parts.push(`מסלול: ${hebPlan()} (${state.data.price}₪)`);
-      if (state.data.subject)  parts.push(`מקצוע: ${state.data.subject}`);
-      if (state.data.availability) parts.push(`זמינות: ${state.data.availability}`);
-      if (state.data.message)  parts.push(`הודעה: ${state.data.message.slice(0,24)}${state.data.message.length>24?'…':''}`);
-      if (state.data.fullName) parts.push(`שם: ${state.data.fullName}`);
-      if (state.data.phone)    parts.push(`טלפון: ${state.data.phone}`);
-      return parts.join(' • ');
-    }
-    function showPath(){
-      const txt = pathText();
-      if (!txt) return;
-      const b = p(`<span class="muted">בחירה עד כה: ${txt}</span>`);
-      b.style.fontSize='14px';
-    }
-
-    /* ======== send to Sheets ======== */
+    // שליחה ל–Sheets
     async function sendLeadToSheet(payload){
       try{
         const res = await fetch(SHEETS_WEBAPP_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'text/plain' }, // מפחית Preflight
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify(payload)
         });
         const j = await res.json().catch(()=>({ok:false}));
@@ -252,152 +236,94 @@
       }
     }
 
-    /* ========== FLOW (ענף 1) ========== */
+    /* ========== FLOW (ענף 1 מקוצר) ========== */
 
-    // פתיח
     function step1(){
       clear(); push(step1);
-      p('<strong>היי, אני יוסטון 👨‍🚀</strong><br>העוזר הדיגיטלי של מרכז בראונשטיין.<br><br>אני כאן כדי לעזור לך עד כמה שאוכל.');
+      p('<strong>היי, אני יוסטון 👨‍🚀</strong><br>העוזר הדיגיטלי של מרכז בראונשטיין.');
       p('<strong>איך אוכל לעזור?</strong><br><span class="muted">בחרי אפשרות אחת מהכפתורים למטה.</span>');
-      btn('ברשותי מנוי חודשי קבוע', ()=>{ /* ענף אחר */ alert('ענף מנויה קבועה – מתמקדים כעת בשיעור חד־פעמי'); });
-      btn('פרטים על מנוי חודשי',     ()=>{ /* ענף אחר */ alert('ענף מנוי – מתמקדים כעת בשיעור חד־פעמי'); });
-      btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path = HE.path_on_demand; stepOnDemandChoosePlan(); });
+      btn('ברשותי מנוי חודשי קבוע', ()=>alert('כרגע מתמקדים בשיעור חד־פעמי'));
+      btn('פרטים על מנוי חודשי',     ()=>alert('כרגע מתמקדים בשיעור חד־פעמי'));
+      btn('שיעור על בסיס מקום פנוי', ()=>{ state.data.path = HE.path_on_demand; stepPlan(); });
     }
 
-    // בחירת מסלול חד־פעמי
-    function stepOnDemandChoosePlan(){
-      clear(); push(stepOnDemandChoosePlan);
+    // שלב 2 – בחירת מסלול
+    function stepPlan(){
+      clear(); push(stepPlan);
       p('<strong>שיעור על בסיס מקום פנוי</strong><br><span class="muted">בחרי מסלול חד־פעמי.</span>');
-      btn('קבוצה – עד 5 תלמידים – 80₪',  ()=>{ state.data.planType='group';  state.data.price=PRICES.group;  stepOnDemandSubject(); });
-      btn('טריפל – עד 3 תלמידים – 100₪', ()=>{ state.data.planType='triple'; state.data.price=PRICES.triple; stepOnDemandSubject(); });
-      btn('פרטי – 160₪',                   ()=>{ state.data.planType='private';state.data.price=PRICES.private;stepOnDemandSubject(); });
+      btn('קבוצה – עד 5 תלמידים – 80₪',  ()=>{ state.data.planType='group';  state.data.price=PRICES.group;  stepSubject(); });
+      btn('טריפל – עד 3 תלמידים – 100₪', ()=>{ state.data.planType='triple'; state.data.price=PRICES.triple; stepSubject(); });
+      btn('פרטי – 160₪',                   ()=>{ state.data.planType='private';state.data.price=PRICES.private;stepSubject(); });
       btn('חזרה', goBack);
-      showPath();
     }
 
-    // בחירת מקצוע
-    function stepOnDemandSubject(){
-      clear(); push(stepOnDemandSubject);
-      p('<strong>איזה מקצוע לשיעור החד־פעמי?</strong><br><span class="muted">בחרי מקצוע אחד.</span>');
+    // שלב 3 – בחירת מקצוע
+    function stepSubject(){
+      clear(); push(stepSubject);
+      p('<strong>איזה מקצוע לשיעור החד־פעמי?</strong>');
       ['אנגלית','מתמטיקה','פיזיקה','שפה','אנגלית מדוברת'].forEach(l=>{
-        btn(l, ()=>{ state.data.subject=l; stepOnDemandSummary(); });
+        btn(l, ()=>{ state.data.subject=l; stepDetailsOnePage(); });
       });
       btn('חזרה', goBack);
-      showPath();
     }
 
-    // סיכום ביניים + מעבר לזמינות
-    function stepOnDemandSummary(){
-      clear(); push(stepOnDemandSummary);
-      const planHeb = hebPlan();
-      p('<strong>סיכום</strong><br><span class="muted">בדקי שהכול נכון ואז נבקש זמינות.</span>');
-      p(`שיעור חד־פעמי ב<strong>${state.data.subject}</strong> במסלול <strong>${planHeb}</strong> – <strong>${state.data.price}₪</strong>.`);
-      btn('המשך לבחירת זמינות', stepAvailability, 'btn primary');
-      btn('חזרה', goBack);
-      showPath();
-    }
+    // שלב 4 – דף מאוחד: זמינות + הודעה + שם + טלפון + שליחה
+    function stepDetailsOnePage(){
+      clear(); push(stepDetailsOnePage);
+      p('<strong>פרטי שיבוץ</strong><br><span class="muted">מלאי את הפרטים ונשלח למזכירות.</span>');
+      summaryCard(); // סיכום אחד קצר בלבד
 
-    // זמינות (ימים ושעות)
-    function stepAvailability(){
-      clear(); push(stepAvailability);
-      p('<strong>זמינות לשיעור</strong><br><span class="muted">כתבי ימים ושעות שנוח לך (למשל: “א׳–ג׳ 15:00–19:00, ו׳ בוקר”).</span>');
-      const availInput = inputRow('ימי ושעות זמינות','text','availability',{dir:'rtl', textarea:true, placeholder:'לדוגמה: א׳–ג׳ 15:00–19:00; ו׳ בוקר'});
-      btn('המשך למסר חופשי', ()=>{
-        const txt = (availInput.value||'').trim();
-        if (!txt){ p('אנא כתבי זמינות (ימים ושעות).').classList.add('err'); return; }
-        state.data.availability = txt;
-        stepFreeMessage();
-      }, 'btn primary');
-      btn('חזרה', goBack);
-      showPath();
-    }
+      const avail = inputRow('ימי ושעות זמינות','text','availability',{dir:'rtl', textarea:true, placeholder:'לדוגמה: א׳–ג׳ 15:00–19:00; ו׳ בוקר'});
+      const msg   = inputRow('הודעה חופשית (לא חובה)','text','message',{dir:'rtl', textarea:true, placeholder:'העדפה למורה / רמה / הערות מיוחדות'});
+      const name  = inputRow('שם מלא','text','fullName',{dir:'rtl', placeholder:'לדוגמה: דנה לוי'});
+      const phone = inputRow('טלפון לחזרה','tel','phone',{dir:'rtl', placeholder:'לדוגמה: 0501234567'});
 
-    // מלל חופשי (חדש – לפני פרטי קשר)
-    function stepFreeMessage(){
-      clear(); push(stepFreeMessage);
-      p('<strong>יש לך מסר או בקשה?</strong><br><span class="muted">ספרי לנו כל דבר שיעזור לנו לשבץ אותך נכון (אופציונלי).</span>');
-      const msgInput = inputRow('הודעה חופשית (לא חובה)','text','message',{dir:'rtl', textarea:true, placeholder:'למשל: העדפה למורה מסוים/ת, רמת חומר, הערות מיוחדות'});
-      btn('המשך לפרטי קשר', ()=>{
-        const msg = (msgInput.value||'').trim();
-        state.data.message = msg || ''; // אופציונלי
-        stepCollectContact();
-      }, 'btn primary');
-      btn('חזרה', goBack);
-      showPath();
-    }
-
-    // פרטי קשר (RTL)
-    function stepCollectContact(){
-      clear(); push(stepCollectContact);
-      p('<strong>פרטי קשר</strong><br><span class="muted">מלאי שם מלא ומספר טלפון לחזרה.</span>');
-      const nameInput  = inputRow('שם מלא','text','fullName',{dir:'rtl', placeholder:'לדוגמה: דנה לוי'});
-      const phoneInput = inputRow('טלפון לחזרה','tel','phone',{dir:'rtl', placeholder:'לדוגמה: 0501234567'});
-
-      btn('המשך לאישור סופי', ()=>{
-        const fullName=(nameInput.value||'').trim();
-        const phoneRaw = (phoneInput.value||'').trim();
-        const phone = normalizeILPhone(phoneRaw);
+      const send = btn('שליחה למזכירות', async ()=>{
+        // ולידציה קצרה
+        const fullName=(name.value||'').trim();
+        const phoneNorm = normalizeILPhone(phone.value||'');
+        const availability=(avail.value||'').trim();
+        if(!availability){ p('אנא כתבי זמינות (ימים ושעות).').classList.add('err'); return; }
         if(!fullName){ p('יש להזין שם מלא.').classList.add('err'); return; }
-        if(!validILPhone(phone)){ p('מספר טלפון לא תקין (למשל 0501234567).').classList.add('err'); return; }
-        state.data.fullName=fullName; state.data.phone=phone;
-        stepFinalApprove();
-      }, 'btn primary');
-      btn('חזרה', goBack);
-      showPath();
-    }
+        if(!validILPhone(phoneNorm)){ p('מספר טלפון לא תקין (למשל 0501234567).').classList.add('err'); return; }
 
-    // אישור סופי
-    function stepFinalApprove(){
-      clear(); push(stepFinalApprove);
-      const planHeb = hebPlan();
-      p('<strong>נאשר שליחה למזכירות?</strong>');
-      p([
-        `מקצוע: <strong>${state.data.subject}</strong>`,
-        `מסלול: <strong>${planHeb}</strong>`,
-        `מחיר: <strong>${state.data.price}₪</strong>`,
-        `זמינות: <strong>${state.data.availability}</strong>`,
-        state.data.message ? `הודעה: <strong>${state.data.message}</strong>` : '',
-        `שם: <strong>${state.data.fullName}</strong>`,
-        `טלפון: <strong>${state.data.phone}</strong>`
-      ].filter(Boolean).join('<br>'));
+        // שמירה ב-state
+        state.data.availability = availability;
+        state.data.message = (msg.value||'').trim();
+        state.data.fullName = fullName;
+        state.data.phone = phoneNorm;
 
-      btn('שליחה למזכירות', finalizeLead, 'btn primary');
-      btn('חזרה', goBack);
-      showPath();
-    }
-
-    // שליחה לשיטס (בעברית) + פידבק
-    async function finalizeLead(){
-      const payload = {
-        path: HE.path_on_demand,                    // "שיעור על בסיס מקום פנוי"
-        planType: HE.plan[state.data.planType],     // "קבוצה" | "טריפל" | "פרטי"
-        price: `${state.data.price}₪`,              // "80₪" ...
-        subject: state.data.subject,                // עברית
-        availability: state.data.availability,      // טקסט חופשי
-        message: state.data.message || '',          // טקסט חופשי (אופציונלי)
-        fullName: state.data.fullName,              // RTL בתצוגה
-        phone: state.data.phone,                    // בפועל נשלח כמספר ישראלי
-        cta: HE.cta_on_demand,                      // "שיעור חד־פעמי"
-        source: HE.source,                          // "יוסטון – אתר"
-        status: HE.status_new,                      // "חדש"
-        createdAt: new Date().toISOString()
-      };
-
-      clear();
-      const sending = p('שולח בקשה...'); sending.classList.add('bubble');
-
-      const okGS = await sendLeadToSheet(payload);
-      clear();
-
-      if(okGS){
-        p('הבקשה נרשמה והועברה למזכירות 🛰️ נחזור אלייך בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
-        btn('לתפריט ראשי', goHome, 'btn primary');
-        btn('פתח/י את הגיליון', ()=> window.open('https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit#gid=0','_blank','noopener'));
-      }else{
+        // שליחה
+        send.disabled = true; send.textContent = 'שולח...';
+        const payload = {
+          path: HE.path_on_demand,
+          planType: HE.plan[state.data.planType],
+          price: `${state.data.price}₪`,
+          subject: state.data.subject,
+          availability: state.data.availability,
+          message: state.data.message || '',
+          fullName: state.data.fullName,
+          phone: state.data.phone,
+          cta: HE.cta_on_demand,
+          source: HE.source,
+          status: HE.status_new,
+          createdAt: new Date().toISOString()
+        };
+        const ok = await sendLeadToSheet(payload);
+        if(ok) return stepSuccess();
+        send.disabled = false; send.textContent = 'שליחה למזכירות';
         p('לא הצלחנו לשמור את הבקשה לגיליון. אפשר לנסות שוב או לפנות אלינו בוואטסאפ 050‑9570866.').classList.add('err');
-        btn('נסי שוב', stepFinalApprove, 'btn');
-        btn('לתפריט ראשי', goHome, 'btn primary');
-      }
+      }, 'btn primary');
+
+      btn('חזרה', goBack);
+    }
+
+    // הצלחה
+    function stepSuccess(){
+      clear(); push(stepSuccess);
+      p('הבקשה נרשמה והועברה למזכירות 🛰️ נחזור אלייך בקרוב כדי לבדוק זמינות ולהשריין שיעור.').classList.add('ok');
+      btn('לתפריט ראשי', goHome, 'btn primary');
+      btn('פתח/י את הגיליון', ()=> window.open('https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit#gid=0','_blank','noopener'));
     }
 
     // Start

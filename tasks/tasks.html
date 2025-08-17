@@ -1,191 +1,190 @@
-/* ===== Tasks – משתלב עם styles.css הראשי ===== */
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ניהול משימות – לוח ראשי</title>
 
-/* עוטף עמוד */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: var(--spacing);
-  text-align: start; /* עוקף text-align:center של body הכללי */
-}
+  <!-- עיצוב כללי של האפליקציה -->
+  <link rel="stylesheet" href="../styles.css" />
+  <!-- עיצוב מקומי של המסך -->
+  <link rel="stylesheet" href="./tasks.css" />
+  <meta name="theme-color" content="#2563eb" />
+</head>
+<body>
 
-/* כותרת עליונה */
-.page-header {
-  background: var(--color-surface);
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  border-radius: var(--border-radius);
-  padding: calc(var(--spacing)*.75) var(--spacing);
-  margin-bottom: var(--spacing);
-}
-.page-header h1 {
-  margin: 0 0 12px;
-  font-size: 1.5rem;
-}
+  <!-- HERO: דשבורד קצר -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>לוח המשימות</h2>
+      <p>סקירה מהירה של היקף העבודה וניווט מהיר לכל הרשימות.</p>
 
-/* חיפוש גלובלי */
-.search-wrap {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.search-wrap input[type="search"] {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid rgba(0,0,0,.12);
-  border-radius: 8px;
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-.btn {
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font: inherit;
-}
-.btn.primary { background: var(--color-primary); color: var(--color-surface); }
-.btn.primary:hover { background: var(--color-secondary); }
-.btn.ghost { background: transparent; color: var(--color-text); border: 1px solid rgba(0,0,0,.12); }
-.btn.ghost:hover { background: rgba(0,0,0,.04); }
+      <!-- סטטיסטיקות סיכום – לחיצות מסננות -->
+      <div class="stats" id="heroStats" hidden>
+        <a class="stat-link" id="linkTodo" href="./owner.html?owner=all&status=todo" title="לרשימת כל המשימות בסטטוס 'לטיפול'">
+          <span class="stat-pill">לטיפול: <strong id="statTodo">–</strong></span>
+        </a>
+        <a class="stat-link" id="linkInp" href="./owner.html?owner=all&status=inp" title="לרשימת כל המשימות בסטטוס 'בתהליך'">
+          <span class="stat-pill">בתהליך: <strong id="statInp">–</strong></span>
+        </a>
+      </div>
 
-/* ===== HERO DASHBOARD ===== */
-/* .hero מוגדר ב-styles.css – כאן רק תוספות */
-.hero .stats {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
+      <!-- קיצורים -->
+      <div class="actions">
+        <a class="btn-link" href="./owner.html?owner=all">רשימת כל המשימות</a>
+        <a class="btn-link" href="https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit?usp=drivesdk" target="_blank" rel="noopener">
+          פתיחה בגוגל שיטס
+        </a>
+      </div>
+    </div>
+  </header>
 
-/* מונה-כקישור (לסינון/ניווט) */
-.stat-link {
-  text-decoration: none;
-}
-.stat-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid rgba(0,0,0,.06);
-  font-size: 0.95rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-.stat-link:hover .stat-pill {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  border-color: rgba(0,0,0,.12);
-}
-.stat-pill strong { font-weight: 700; }
+  <!-- כותרת + חיפוש -->
+  <header class="page-header">
+    <div class="container">
+      <h1>ניהול משימות</h1>
+      <div class="search-wrap" role="search" aria-label="חיפוש משימות">
+        <input id="globalSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
+        <button id="btnSearch" class="btn primary">חיפוש</button>
+        <button id="btnClear" class="btn ghost">נקה</button>
+      </div>
+    </div>
+  </header>
 
-/* קבוצת כפתורים משנית מתחת ל-CTA */
-.hero .actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-.hero .btn-link {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: var(--border-radius);
-  background: rgba(0,0,0,.08);
-  color: var(--color-surface);
-  text-decoration: none;
-  transition: background-color .2s;
-}
-.hero .btn-link:hover { background: rgba(0,0,0,.14); }
+  <main class="container">
+    <!-- תוצאות חיפוש (מוסתר כברירת מחדל) -->
+    <section id="searchResults" class="card" style="display:none;">
+      <div class="card-head">
+        <h2>תוצאות חיפוש</h2>
+        <small id="searchCount"></small>
+      </div>
+      <div id="resultsList" class="results-list"></div>
+    </section>
 
-/* מצב כהה – ניגודיות */
-html.dark-mode .stat-pill { 
-  background: var(--color-surface);
-  border-color: rgba(255,255,255,.14);
-}
+    <!-- בועות -->
+    <section id="bubbles" aria-label="ביצועים לפי מטפל">
+      <div class="bubbles-grid">
+        <a class="bubble big" href="./owner.html?owner=unassigned">
+          <div class="bubble-title">לא משויך</div>
+          <div class="bubble-stats">
+            <div>לטיפול: <span id="u_todo">0</span></div>
+            <div>בתהליך: <span id="u_inp">0</span></div>
+          </div>
+        </a>
 
-/* ===== רשת "בועות" ===== */
-.bubbles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap: 14px;
-  margin-top: 16px;
-}
-.bubble {
-  display: block;
-  background: var(--color-surface);
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 16px;
-  padding: 16px;
-  text-decoration: none;
-  color: var(--color-text);
-  box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
-.bubble:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  border-color: rgba(0,0,0,.12);
-}
-.bubble-title {
-  font-weight: 700;
-  margin-bottom: 6px;
-  line-height: 1.3;
-}
-.bubble-stats {
-  display: flex;
-  gap: 16px;
-  color: rgba(0,0,0,.7);
-  font-size: .95rem;
-}
-.bubble-stats div span { font-weight: 700; }
-.bubble.big {
-  grid-column: 1 / -1;
-  border-inline-start: 6px solid var(--color-primary);
-}
-/* צבעי מטפלים */
-.b1 { border-inline-start: 6px solid #2563eb; }
-.b2 { border-inline-start: 6px solid #16a34a; }
-.b3 { border-inline-start: 6px solid #f59e0b; }
-.b4 { border-inline-start: 6px solid #ef4444; }
-.b5 { border-inline-start: 6px solid #0ea5e9; }
+        <a class="bubble b1" href="./owner.html?owner=חן">
+          <div class="bubble-title">חן</div>
+          <div class="bubble-stats">
+            <div>לטיפול: <span id="chen_todo">0</span></div>
+            <div>בתהליך: <span id="chen_inp">0</span></div>
+          </div>
+        </a>
 
-/* ===== תוצאות חיפוש ===== */
-.card {
-  background: var(--color-surface);
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 16px;
-  padding: 16px;
-  margin: 16px 0;
-}
-.card-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-}
-.card-head h2 { margin: 0; font-size: 1.25rem; }
-#searchCount { color: rgba(0,0,0,.6); }
-.results-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
-}
-.result-item {
-  padding: 12px;
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--color-surface);
-}
-.result-meta { color: rgba(0,0,0,.6); font-size: .9rem; }
+        <a class="bubble b2" href="./owner.html?owner=תמרה">
+          <div class="bubble-title">תמרה</div>
+          <div class="bubble-stats">
+            <div>לטיפול: <span id="tam_todo">0</span></div>
+            <div>בתהליך: <span id="tam_inp">0</span></div>
+          </div>
+        </a>
 
-/* מצב כהה – התאמות */
-html.dark-mode .page-header { border-color: rgba(255,255,255,.08); }
-html.dark-mode .search-wrap input[type="search"] { border-color: rgba(255,255,255,.18); }
-html.dark-mode .btn.ghost { border-color: rgba(255,255,255,.22); }
-html.dark-mode #searchCount,
-html.dark-mode .result-meta,
-html.dark-mode .bubble-stats { color: rgba(255,255,255,.8); }
+        <a class="bubble b3" href="./owner.html?owner=בלה">
+          <div class="bubble-title">בלה</div>
+          <div class="bubble-stats">
+            <div>לטיפול: <span id="bel_todo">0</span></div>
+            <div>בתהליך: <span id="bel_inp">0</span></div>
+          </div>
+        </a>
+
+        <a class="bubble b4" href="./owner.html?owner=ליאור">
+          <div class="bubble-title">ליאור</div>
+          <div class="bubble-stats">
+            <div>לטיפול: <span id="lio_todo">0</span></div>
+            <div>בתהליך: <span id="lio_inp">0</span></div>
+          </div>
+        </a>
+
+        <a class="bubble b5" href="./owner.html?owner=נטע">
+          <div class="bubble-title">נטע</div>
+          <div class="bubble-stats">
+            <div>לטיפול: <span id="net_todo">0</span></div>
+            <div>בתהליך: <span id="net_inp">0</span></div>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script src="./tasks.js"></script>
+
+  <!-- חישוב/טעינה של סיכום ל-Hero -->
+  <script>
+    // פונקציה שמחלצת מספר מתוך טקסט
+    function _toInt(txt) {
+      const n = parseInt(String(txt || '0').replace(/[^\d]/g, ''), 10);
+      return isNaN(n) ? 0 : n;
+    }
+
+    // מביא סיכומים מ-./stats.json או מ-window.tasksStats
+    // ואם אין — מסכם מתוך הבועות שבעמוד
+    (async function loadHeroSummary() {
+      const wrap   = document.getElementById('heroStats');
+      const elTodo = document.getElementById('statTodo');
+      const elInp  = document.getElementById('statInp');
+
+      const render = (todo, inp) => {
+        elTodo.textContent = typeof todo === 'number' ? todo : '–';
+        elInp.textContent  = typeof inp  === 'number' ? inp  : '–';
+        wrap.hidden = false;
+      };
+
+      // 1) ניסיון להביא JSON סטטי מאותו דומיין
+      try {
+        const res = await fetch('./stats.json', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          // תמיכה במפתחות שונים:
+          const todo = (data.totals && typeof data.totals.todo === 'number') ? data.totals.todo
+                      : (typeof data.todo === 'number' ? data.todo
+                      : (typeof data.ltipul === 'number' ? data.ltipul : undefined));
+          const inp  = (data.totals && typeof data.totals.inProgress === 'number') ? data.totals.inProgress
+                      : (typeof data.inProgress === 'number' ? data.inProgress
+                      : (typeof data.inp === 'number' ? data.inp : undefined));
+
+          if (typeof todo === 'number' || typeof inp === 'number') {
+            render(todo, inp);
+            return;
+          }
+        }
+      } catch (e) { /* ממשיכים ל-fallback */ }
+
+      // 2) window.tasksStats אם מוזן איפשהו (tasks.js/Firestore/Make)
+      if (window.tasksStats) {
+        const s = window.tasksStats;
+        const todo = (s.totals && typeof s.totals.todo === 'number') ? s.totals.todo
+                    : (typeof s.todo === 'number' ? s.todo
+                    : (typeof s.ltipul === 'number' ? s.ltipul : undefined));
+        const inp  = (s.totals && typeof s.totals.inProgress === 'number') ? s.totals.inProgress
+                    : (typeof s.inProgress === 'number' ? s.inProgress
+                    : (typeof s.inp === 'number' ? s.inp : undefined));
+        if (typeof todo === 'number' || typeof inp === 'number') {
+          render(todo, inp);
+          return;
+        }
+      }
+
+      // 3) חישוב מתוך הבועות שבדף
+      try {
+        const todoSpans = Array.from(document.querySelectorAll('[id$="_todo"]'));
+        const inpSpans  = Array.from(document.querySelectorAll('[id$="_inp"]'));
+        const sum = nodes => nodes.reduce((acc, el) => acc + _toInt(el.textContent), 0);
+        const todo = sum(todoSpans);
+        const inp  = sum(inpSpans);
+        render(todo, inp);
+      } catch (e) {
+        wrap.hidden = true; // אין נתונים כלל
+      }
+    })();
+  </script>
+</body>
+</html>

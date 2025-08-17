@@ -1,31 +1,23 @@
-/* /tasks/owner.js — V5 */
+/* /tasks/owner.js — V6 */
 
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
 
 /* ===== Helpers ===== */
 function norm(s) {
-  return String(s ?? '')
-    .replace(/[\u200E\u200F\u202A-\u202E]/g, '') // תווי כיווניות
-    .replace(/\u00A0/g, ' ')                      // NBSP -> space
-    .replace(/\s+/g, ' ')                         // איחוד רווחים
-    .trim();
+  return String(s ?? '').replace(/[\u200E\u200F\u202A-\u202E]/g,'').replace(/\u00A0/g,' ').replace(/\s+/g,' ').trim();
 }
 function escapeHTML(s) {
-  const str = String(s ?? ''); // <-- תיקון: להבטיח מחרוזת
-  return str.replace(/[&<>"']/g, m => (
-    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]
-  ));
+  const str = String(s ?? '');
+  return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 function show(el){ el.style.display='block'; }
 function hide(el){ el.style.display='none'; }
-
-async function fetchJSON(url) {
-  const res = await fetch(url, { credentials: 'omit' });
+async function fetchJSON(url, options) {
+  const res  = await fetch(url, { credentials: 'omit', ...(options||{}) });
   const text = await res.text();
-  if (!res.ok) throw new Error(text || `Network ${res.status}`);
-  try { return JSON.parse(text); }
-  catch { throw new Error('Bad JSON from server'); }
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  try { return JSON.parse(text); } catch { throw new Error('Bad JSON from server'); }
 }
 
 /* ===== Elements & params ===== */
@@ -59,35 +51,30 @@ els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא 
 /* ===== Load tasks ===== */
 async function loadTasks() {
   try {
-    hide(els.errBox);
-    show(els.loader);
-    els.list.innerHTML = '';
+    hide(els.errBox); show(els.loader); els.list.innerHTML = '';
 
     const q = norm(els.search.value);
-    const url = new URL(BASE_URL);
-    url.searchParams.set('path', 'tasks');
-    url.searchParams.set('owner', ownerParam === 'unassigned' ? 'unassigned' : ownerParam);
-    if (q) url.searchParams.set('q', q);
+    const u = new URL(BASE_URL);
+    u.searchParams.set('path', 'tasks');
+    u.searchParams.set('owner', ownerParam === 'unassigned' ? 'unassigned' : ownerParam);
+    if (q) u.searchParams.set('q', q);
 
-    const data  = await fetchJSON(url.toString());
+    const data  = await fetchJSON(u.toString());
     const items = Array.isArray(data.tasks) ? data.tasks : [];
 
-    // מיון: לטיפול → בתהליך → בוצע → בוטל
     const order = { 'לטיפול':0, 'בתהליך':1, 'בוצע':2, 'בוטל':3 };
     items.sort((a,b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
 
-    // ספירה
     const counts = { 'לטיפול':0, 'בתהליך':0, 'בוצע':0, 'בוטל':0 };
     items.forEach(t => counts[t.status] = (counts[t.status] || 0) + 1);
     els.stats.textContent =
       `לטיפול: ${counts['לטיפול']||0} | בתהליך: ${counts['בתהליך']||0} | בוצע: ${counts['בוצע']||0} | בוטל: ${counts['בוטל']||0}`;
 
-    if (items.length === 0) {
+    if (!items.length) {
       els.list.innerHTML = `<div class="card muted">אין משימות לתצוגה.</div>`;
       return;
     }
 
-    // רינדור
     els.list.innerHTML = items.map(t => {
       const ownerLabel = t.owner || 'לא משויך';
       return `
@@ -105,26 +92,24 @@ async function loadTasks() {
       `;
     }).join('');
 
-    // מאזיני פתיחה
     els.list.querySelectorAll('button[data-open]').forEach(btn => {
       btn.addEventListener('click', () => openDialog(btn.dataset.open));
     });
 
-    // פתיחה אוטומטית אם יש focus
     if (focusId) {
       const btn = els.list.querySelector(`button[data-open="${CSS.escape(String(focusId))}"]`);
       if (btn) btn.click();
     }
   } catch (err) {
     console.error(err);
-    els.errBox.textContent = `שגיאת טעינה מהשרת: ${String(err && err.message || err)}`;
+    els.errBox.textContent = `שגיאת טעינה מהשרת: ${err.message || err}`;
     show(els.errBox);
   } finally {
     hide(els.loader);
   }
 }
 
-/* ===== Dialog open & save ===== */
+/* ===== Dialog ===== */
 function openDialog(caseId) {
   const row = els.list.querySelector(`.result-item[data-id="${CSS.escape(String(caseId))}"]`);
   if (!row) return;
@@ -141,6 +126,7 @@ function openDialog(caseId) {
   els.dlg.showModal();
 }
 
+/* ===== Save (PATCH) ===== */
 async function saveTask() {
   const caseId = els.f_caseId.value;
   const body = {
@@ -149,18 +135,23 @@ async function saveTask() {
     adminNotes: els.f_notes.value
   };
   try {
-    const url = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}`;
-    const res = await fetch(url, {
+    els.btnSave.disabled = true;
+
+    const u = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}`;
+    const json = await fetchJSON(u, {
       method: 'POST',
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify(body)
     });
-    await res.json();
+
     showToast('עודכן בהצלחה');
-    await loadTasks(); // ריענון רשימה
+    await loadTasks();  // רענון הרשימה
   } catch (err) {
-    console.error(err);
+    console.error('saveTask failed:', err);
     showToast('שמירה נכשלה');
+    // אפשר גם להציג הודעה יותר מפורטת ב-errBox אם תרצה
+  } finally {
+    els.btnSave.disabled = false;
   }
 }
 

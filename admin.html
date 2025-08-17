@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>צוות בראונשטיין – ADMIN</title>
-  <meta name="description" content="עמוד ADMIN – ניהול הודעות תפוצה, תשלומים ודו''חות חכמים." />
+
+  <!-- SEO & Social -->
+  <meta name="description" content="עמוד ADMIN – ניהול הודעות תפוצה, תשלומים ודו״חות חכמים." />
   <link rel="canonical" href="https://brawnshtein-team.web.app/admin.html" />
   <meta property="og:title" content="צוות בראונשטיין – ADMIN" />
   <meta property="og:description" content="מערכת ניהול הודעות תפוצה, תשלומים ודיווחים חכמים." />
@@ -12,67 +14,44 @@
   <meta property="og:url" content="https://brawnshtein-team.web.app/admin.html" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- App Shell -->
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
   <link rel="manifest" href="icons/site.webmanifest" />
   <meta name="theme-color" content="#3498db" />
+  <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    .menu-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
+    .menu-toggle{background:none;border:none;cursor:pointer}
+    .dropdown-menu{
+      display:none;position:absolute;top:60px;right:10px;background-color:#fff;border:1px solid #ccc;z-index:1000;width:180px
     }
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      right: 10px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-      z-index: 1000;
-      width: 160px;
+    .dropdown-menu button{
+      display:flex;align-items:center;gap:8px;padding:10px;width:100%;background:none;border:none;text-align:right;font-family:inherit;font-size:14px;cursor:pointer
     }
-    .dropdown-menu button {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      width: 100%;
-      background: none;
-      border: none;
-      text-align: right;
-      font-family: inherit;
-      font-size: 14px;
-      cursor: pointer;
+    .top-right-controls{display:flex;justify-content:flex-end;align-items:center;padding:10px;gap:8px}
+    .icon-small{width:20px;height:20px;margin-left:6px}
+    .back-arrow{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:#3498db;font-size:14px;margin:8px 12px}
+    .back-arrow:hover{text-decoration:underline}
+
+    /* Hero single stat pill */
+    .hero .stats { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px }
+    .stat-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px;
+      background: var(--surface-2, #f3f4f6);
+      border:1px solid rgba(0,0,0,0.06);
+      font-size:14px
     }
-    .top-right-controls {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 10px;
-    }
-    .top-right-controls .menu-toggle {
-      margin-left: 10px;
-    }
-    .icon-small {
-      width: 20px;
-      height: 20px;
-      margin-left: 8px;
-    }
-    /* חץ חזרה */
-    .back-arrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      color: #3498db;
-      font-size: 14px;
-      margin: 8px 12px;
-    }
-    .back-arrow:hover {
-      text-decoration: underline;
-    }
+    .stat-pill strong{font-weight:700}
+
+    /* גריד כרטיסים (למקרה שלא קיים ב-styles.css) */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;padding:16px}
+
+    /* כהה – חיזוקים עדינים */
+    .dark-mode .dropdown-menu{background:#1f2937;border-color:#374151}
+    .dark-mode .stat-pill{background:#111827;border-color:#374151}
   </style>
 </head>
 <body>
@@ -82,33 +61,49 @@
     <i data-feather="arrow-right"></i> חזרה
   </a>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <header class="hero">
     <div class="hero-content">
-      <h2>הודעות תפוצה</h2>
-      <p>לחצו כאן כדי לגשת למסך הודעות תפוצה</p>
-      <a class="cta-button" href="send-message.html">שלח הודעה</a>
+      <h2>ניהול המשימות של הצוות</h2>
+      <p>פתחו, הקצו ועקבו אחרי משימות הצוות במקום אחד.</p>
+
+      <!-- כפתור ראשי -->
+      <a class="cta-button" href="/tasks/tasks.html">ניהול משימות</a>
+
+      <!-- מונה יחיד: פתוחות -->
+      <div id="taskStats" class="stats" hidden>
+        <div class="stat-pill" title="מספר המשימות במצב פתוח">
+          <i data-feather="alert-circle" class="icon-small"></i>
+          פתוחות: <strong id="statOpen">–</strong>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Top Menu with Hamburger -->
+  <!-- תפריט עליון -->
   <div class="top-right-controls">
     <a href="index.html" title="בית"><i data-feather="home" class="icon-small"></i></a>
-    <button class="menu-toggle" onclick="toggleMenu()"><i data-feather="menu"></i></button>
-    <div id="dropdownMenu" class="dropdown-menu">
+    <button class="menu-toggle" onclick="toggleMenu()" aria-haspopup="true" aria-expanded="false" aria-controls="dropdownMenu">
+      <i data-feather="menu"></i>
+    </button>
+    <div id="dropdownMenu" class="dropdown-menu" role="menu">
       <button id="share-button"><i data-feather="share-2" class="icon-small"></i> שתף</button>
       <button id="dark-toggle"><i data-feather="moon" class="icon-small"></i> מצב כהה</button>
     </div>
   </div>
 
-  <!-- Main Admin Cards -->
+  <!-- כרטיסים -->
   <main>
     <section class="cards-grid">
 
-      <!-- ניהול משימות חדש -->
       <a class="card" href="/tasks/tasks.html">
         <i data-feather="check-square"></i>
         <h3>ניהול משימות</h3>
+      </a>
+
+      <a class="card" href="send-message.html">
+        <i data-feather="send"></i>
+        <h3>הודעות תפוצה</h3>
       </a>
 
       <a class="card" href="payment-links.html">
@@ -117,7 +112,7 @@
       </a>
 
       <a class="card" href="https://wordpress-1184560-4777160.cloudwaysapps.com/">
-        <i data-feather="edit"></i>
+        <i data-feather="edit-3"></i>
         <h3>טופס רישום</h3>
       </a>
 
@@ -131,18 +126,7 @@
         <h3>יומנים קבועים</h3>
       </a>
 
-      <!-- צ'ט הישן (שיטס) -->
-      <a class="card" href="/chat.html">
-        <i data-feather="message-circle"></i>
-        <h3>צ'ט שאלות נפוצות</h3>
-      </a>
-
-      <!-- צ'ט חדש – Firestore -->
-      <a class="card" href="/chat-b.html">
-        <i data-feather="message-square"></i>
-        <h3>צ'ט משופר</h3>
-      </a>
-
+      <!-- כרטיסי הצ'ט הוסרו לפי בקשה -->
     </section>
   </main>
 
@@ -152,25 +136,82 @@
 
     function toggleMenu() {
       const menu = document.getElementById('dropdownMenu');
-      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      const isOpen = menu.style.display === 'block';
+      menu.style.display = isOpen ? 'none' : 'block';
+      document.querySelector('.menu-toggle').setAttribute('aria-expanded', String(!isOpen));
     }
 
+    // סגירת תפריט בלחיצה מחוץ/ESC
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('dropdownMenu');
+      const toggle = document.querySelector('.menu-toggle');
+      if (!menu) return;
+      if (menu.style.display === 'block' && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.style.display = 'none';
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const menu = document.getElementById('dropdownMenu');
+        const toggle = document.querySelector('.menu-toggle');
+        if (menu && menu.style.display === 'block') {
+          menu.style.display = 'none';
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
+    // מצב כהה
     const darkToggle = document.getElementById('dark-toggle');
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
     darkToggle.addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark
-        ? localStorage.setItem('dark-mode', '1')
-        : localStorage.removeItem('dark-mode');
+      isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
     });
 
+    // === HERO: מונה פתוחות בלבד ===
+    // פורמט צפוי: { open: number }
+    async function loadOpenCount() {
+      const wrap = document.getElementById('taskStats');
+      const elOpen = document.getElementById('statOpen');
+
+      function render(open){
+        if (typeof open !== 'number') return;
+        elOpen.textContent = open;
+        wrap.hidden = false;
+      }
+
+      try {
+        const res = await fetch('/tasks/stats.json', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (typeof data.open === 'number') {
+            render(data.open);
+            return;
+          }
+        }
+      } catch (e) { /* ממשיכים ל-fallback */ }
+
+      if (window.tasksStats && typeof window.tasksStats.open === 'number') {
+        render(window.tasksStats.open);
+        return;
+      }
+
+      // אין נתונים — נשאיר מוסתר
+      wrap.hidden = true;
+    }
+
+    loadOpenCount();
+
+    // Share
     document.getElementById('share-button').addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({
           title: 'צוות בראונשטיין',
-          text: 'עקבו אחרי ניהול הודעות תפוצה וכלי הניהול שלנו!',
+          text: 'ניהול הודעות תפוצה וכלי הניהול שלנו',
           url: location.href
         }).catch(console.error);
       } else {

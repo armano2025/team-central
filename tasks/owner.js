@@ -1,4 +1,4 @@
-/* tasks/owner.js — גרסה יציבה עם חזרה לאדמין + אנימציית טעינה */
+/* /tasks/owner.js — גרסה V4 יציבה ומעודכנת */
 
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
@@ -11,21 +11,26 @@ function norm(s) {
     .replace(/\s+/g, ' ')                         // איחוד רווחים
     .trim();
 }
-function escapeHTML(s = '') {
-  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
-async function fetchJSON(url) {
-  const res = await fetch(url, { credentials: 'omit' });
-  if (!res.ok) throw new Error(`Network ${res.status}`);
-  return res.json();
-}
+function escapeHTML(s=''){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function show(el){ el.style.display='block'; }
 function hide(el){ el.style.display='none'; }
 
+async function fetchJSON(url) {
+  const res = await fetch(url, { credentials: 'omit' });
+  let text;
+  try { text = await res.text(); } catch {}
+  if (!res.ok) {
+    // נציג את גוף השגיאה אם קיים כדי שיעזור בדיבאג
+    throw new Error(text || `Network ${res.status}`);
+  }
+  try { return JSON.parse(text); }
+  catch { throw new Error('Bad JSON from server'); }
+}
+
 /* ===== Elements & params ===== */
 const qs = new URLSearchParams(location.search);
-let ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned'));
-const focusId   = norm(qs.get('focus') || '');
+const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned')); // למשל "בלה" או "unassigned"
+const focusId    = norm(qs.get('focus') || '');
 
 const els = {
   title:    document.getElementById('ownerTitle'),
@@ -34,7 +39,6 @@ const els = {
   search:   document.getElementById('ownerSearch'),
   btnSearch:document.getElementById('btnOwnerSearch'),
   btnClear: document.getElementById('btnOwnerClear'),
-
   loader:   document.getElementById('loader'),
   errBox:   document.getElementById('errBox'),
 
@@ -49,6 +53,7 @@ const els = {
   btnClose: document.getElementById('btnClose'),
 };
 
+// כותרת
 els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : ownerParam}`;
 
 /* ===== Load tasks ===== */
@@ -61,7 +66,14 @@ async function loadTasks() {
     const q = norm(els.search.value);
     const url = new URL(BASE_URL);
     url.searchParams.set('path', 'tasks');
-    url.searchParams.set('owner', ownerParam);
+
+    // חשוב: גם ללא-משויך נשלח owner=unassigned כדי לקבל רק את הלא-משויכות
+    if (ownerParam === 'unassigned') {
+      url.searchParams.set('owner', 'unassigned');
+    } else {
+      url.searchParams.set('owner', ownerParam);
+    }
+
     if (q) url.searchParams.set('q', q);
 
     const data  = await fetchJSON(url.toString());
@@ -112,6 +124,7 @@ async function loadTasks() {
     }
   } catch (err) {
     console.error(err);
+    els.errBox.textContent = `שגיאת טעינה מהשרת: ${err.message || err}`;
     show(els.errBox);
   } finally {
     hide(els.loader);
@@ -149,7 +162,7 @@ async function saveTask() {
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify(body)
     });
-    await res.json();
+    const json = await res.json(); // לא חובה להשתמש בתוצאה
     showToast('עודכן בהצלחה');
     await loadTasks(); // ריענון רשימה
   } catch (err) {

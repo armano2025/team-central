@@ -1,35 +1,36 @@
-/* /tasks/owner.js — גרסה V4 יציבה ומעודכנת */
+/* /tasks/owner.js — V5 */
 
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
 
 /* ===== Helpers ===== */
 function norm(s) {
-  return String(s || '')
+  return String(s ?? '')
     .replace(/[\u200E\u200F\u202A-\u202E]/g, '') // תווי כיווניות
     .replace(/\u00A0/g, ' ')                      // NBSP -> space
     .replace(/\s+/g, ' ')                         // איחוד רווחים
     .trim();
 }
-function escapeHTML(s=''){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function escapeHTML(s) {
+  const str = String(s ?? ''); // <-- תיקון: להבטיח מחרוזת
+  return str.replace(/[&<>"']/g, m => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]
+  ));
+}
 function show(el){ el.style.display='block'; }
 function hide(el){ el.style.display='none'; }
 
 async function fetchJSON(url) {
   const res = await fetch(url, { credentials: 'omit' });
-  let text;
-  try { text = await res.text(); } catch {}
-  if (!res.ok) {
-    // נציג את גוף השגיאה אם קיים כדי שיעזור בדיבאג
-    throw new Error(text || `Network ${res.status}`);
-  }
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `Network ${res.status}`);
   try { return JSON.parse(text); }
   catch { throw new Error('Bad JSON from server'); }
 }
 
 /* ===== Elements & params ===== */
 const qs = new URLSearchParams(location.search);
-const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned')); // למשל "בלה" או "unassigned"
+const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned')); // "בלה" | "unassigned"
 const focusId    = norm(qs.get('focus') || '');
 
 const els = {
@@ -53,7 +54,6 @@ const els = {
   btnClose: document.getElementById('btnClose'),
 };
 
-// כותרת
 els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : ownerParam}`;
 
 /* ===== Load tasks ===== */
@@ -66,14 +66,7 @@ async function loadTasks() {
     const q = norm(els.search.value);
     const url = new URL(BASE_URL);
     url.searchParams.set('path', 'tasks');
-
-    // חשוב: גם ללא-משויך נשלח owner=unassigned כדי לקבל רק את הלא-משויכות
-    if (ownerParam === 'unassigned') {
-      url.searchParams.set('owner', 'unassigned');
-    } else {
-      url.searchParams.set('owner', ownerParam);
-    }
-
+    url.searchParams.set('owner', ownerParam === 'unassigned' ? 'unassigned' : ownerParam);
     if (q) url.searchParams.set('q', q);
 
     const data  = await fetchJSON(url.toString());
@@ -103,9 +96,9 @@ async function loadTasks() {
              data-task='${escapeHTML(JSON.stringify(t))}'
              ${focusId && String(t.caseId)===focusId ? 'style="outline:2px solid #2563eb;"' : ''}>
           <div>
-            <div><strong>${escapeHTML(t.subject || '(ללא כותרת)')}</strong></div>
-            <div class="result-meta">#${escapeHTML(t.caseId)} • ${escapeHTML(t.fullName||'')} • ${escapeHTML(t.phone||'')}</div>
-            <div class="result-meta">סטטוס: ${escapeHTML(t.status||'')} • מטפל: ${escapeHTML(ownerLabel)}</div>
+            <div><strong>${escapeHTML(t.subject ?? '(ללא כותרת)')}</strong></div>
+            <div class="result-meta">#${escapeHTML(t.caseId)} • ${escapeHTML(t.fullName ?? '')} • ${escapeHTML(t.phone ?? '')}</div>
+            <div class="result-meta">סטטוס: ${escapeHTML(t.status ?? '')} • מטפל: ${escapeHTML(ownerLabel)}</div>
           </div>
           <button class="btn" data-open="${escapeHTML(String(t.caseId))}">פתח</button>
         </div>
@@ -124,7 +117,7 @@ async function loadTasks() {
     }
   } catch (err) {
     console.error(err);
-    els.errBox.textContent = `שגיאת טעינה מהשרת: ${err.message || err}`;
+    els.errBox.textContent = `שגיאת טעינה מהשרת: ${String(err && err.message || err)}`;
     show(els.errBox);
   } finally {
     hide(els.loader);
@@ -138,12 +131,12 @@ function openDialog(caseId) {
   const t = JSON.parse(row.dataset.task || '{}');
 
   document.getElementById('dlgTitle').textContent = t.subject || '(ללא כותרת)';
-  els.f_caseId.value = t.caseId || '';
-  els.f_status.value = t.status || 'לטיפול';
-  els.f_owner.value  = (t.owner === 'לא משויך' ? '' : (t.owner || ''));
-  els.f_name.value   = t.fullName || '';
-  els.f_phone.value  = t.phone || '';
-  els.f_notes.value  = t.adminNotes || '';
+  els.f_caseId.value = t.caseId ?? '';
+  els.f_status.value = t.status ?? 'לטיפול';
+  els.f_owner.value  = (t.owner === 'לא משויך' ? '' : (t.owner ?? ''));
+  els.f_name.value   = t.fullName ?? '';
+  els.f_phone.value  = t.phone ?? '';
+  els.f_notes.value  = t.adminNotes ?? '';
 
   els.dlg.showModal();
 }
@@ -162,7 +155,7 @@ async function saveTask() {
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify(body)
     });
-    const json = await res.json(); // לא חובה להשתמש בתוצאה
+    await res.json();
     showToast('עודכן בהצלחה');
     await loadTasks(); // ריענון רשימה
   } catch (err) {

@@ -1,44 +1,144 @@
-/* משתלב עם styles.css הראשי שלך */
-.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
-.page-header { background: #fff; border-bottom: 1px solid #eee; }
-.page-header h1 { margin: 0 0 12px; }
-.search-wrap { display: flex; gap: 8px; align-items: center; }
-.search-wrap input[type="search"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+/* ===== Tasks – משתלב עם styles.css הראשי ===== */
 
+/* עוטף עמוד */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--spacing);
+  text-align: start; /* עוקף text-align:center של body הכללי */
+}
+
+/* כותרת עליונה */
+.page-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing)*.75) var(--spacing);
+  margin-bottom: var(--spacing);
+}
+.page-header h1 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+/* חיפוש גלובלי */
+.search-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.search-wrap input[type="search"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.btn {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+}
+.btn.primary { background: var(--color-primary); color: var(--color-surface); }
+.btn.primary:hover { background: var(--color-secondary); }
+.btn.ghost { background: transparent; color: var(--color-text); border: 1px solid rgba(0,0,0,.12); }
+.btn.ghost:hover { background: rgba(0,0,0,.04); }
+
+/* בועות – רשת */
 .bubbles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
   gap: 14px;
   margin-top: 16px;
 }
 
+/* בועה */
 .bubble {
   display: block;
-  background: #fff;
-  border: 1px solid #eaeaea;
+  background: var(--color-surface);
+  border: 1px solid rgba(0,0,0,.08);
   border-radius: 16px;
   padding: 16px;
   text-decoration: none;
-  color: inherit;
+  color: var(--color-text);
   box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
-.bubble:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.08); }
-.bubble.big { grid-column: 1 / -1; border-left: 6px solid #7c3aed; }
+.bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  border-color: rgba(0,0,0,.12);
+}
 
-.bubble .bubble-title { font-weight: 700; margin-bottom: 6px; }
-.bubble .bubble-stats { display: flex; gap: 16px; color: #555; }
+/* כותרת וסטטיסטיקות */
+.bubble-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.bubble-stats {
+  display: flex;
+  gap: 16px;
+  color: rgba(0,0,0,.7);
+  font-size: .95rem;
+}
+.bubble-stats div span {
+  font-weight: 700;
+}
 
-/* צבעים שונים לכל מטפל (תחתית/גבול) */
-.b1 { border-left: 6px solid #2563eb; }
-.b2 { border-left: 6px solid #16a34a; }
-.b3 { border-left: 6px solid #f59e0b; }
-.b4 { border-left: 6px solid #ef4444; }
-.b5 { border-left: 6px solid #0ea5e9; }
+/* בועה רחבה */
+.bubble.big {
+  grid-column: 1 / -1;
+  border-inline-start: 6px solid var(--color-primary);
+}
 
-/* תוצאות חיפוש */
-.card { background:#fff; border:1px solid #eee; border-radius:16px; padding:16px; margin:16px 0; }
-.card-head { display:flex; align-items:center; gap:16px; }
-.results-list { display:grid; gap:10px; margin-top:10px; }
-.result-item { padding:12px; border:1px solid #eee; border-radius:12px; display:flex; justify-content:space-between; align-items:center; }
-.result-meta { color:#666; font-size:.9rem; }
+/* צבעי מטפל – RTL ידידותי */
+.b1 { border-inline-start: 6px solid #2563eb; } /* כחול */
+.b2 { border-inline-start: 6px solid #16a34a; } /* ירוק */
+.b3 { border-inline-start: 6px solid #f59e0b; } /* כתום */
+.b4 { border-inline-start: 6px solid #ef4444; } /* אדום */
+.b5 { border-inline-start: 6px solid #0ea5e9; } /* תכלת */
+
+/* כרטיס תוצאות חיפוש */
+.card {
+  background: var(--color-surface);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.card-head h2 { margin: 0; font-size: 1.25rem; }
+#searchCount { color: rgba(0,0,0,.6); }
+
+.results-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+.result-item {
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface);
+}
+.result-meta { color: rgba(0,0,0,.6); font-size: .9rem; }
+
+/* מצב כהה – התאמות ניגודיות */
+html.dark-mode .page-header { border-color: rgba(255,255,255,.08); }
+html.dark-mode .search-wrap input[type="search"] { border-color: rgba(255,255,255,.18); }
+html.dark-mode .btn.ghost { border-color: rgba(255,255,255,.22); }
+html.dark-mode #searchCount,
+html.dark-mode .result-meta,
+html.dark-mode .bubble-stats { color: rgba(255,255,255,.8); }

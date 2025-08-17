@@ -1,368 +1,196 @@
-/* owner.js – לוח משימות לפי בעלים/סטטוס
-   פרמטרים ב-URL:
-   - owner=all | unassigned | חן | תמרה | ...  (ברירת מחדל: all)
-   - status=todo | inp | done | canceled      (אופציונלי)
-   טעינת נתונים (לפי סדר ניסיון):
-   1) JSON מקומי (data.json / tasks.json ...)
-   2) Google Sheets (GViz JSON) – SHEET_ID / SHEET_GID
-   3) window.tasksData / window.tasks.items
-*/
+/* /tasks/owner.js — V9 (Debug + no-preflight save) */
+const BASE_URL =
+  'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
 
-(function () {
-  // ====== CONFIG: Google Sheets ======
-  // ודא שהשיתופיות של ה־Sheet היא "Anyone with the link – Viewer", אחרת הדפדפן יחסום את הבקשה.
-  const SHEET_ID  = '1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4'; // החלף אם צריך
-  const SHEET_GID = null;     // אם תרצה לשאוב לשונית ספציפית: מספר gid (למשל "0"). null = הלשונית הראשית
+/* Helpers */
+const qs = new URLSearchParams(location.search);
+const DEBUG = qs.get('debug') === '1';
 
-  // ====== DOM ======
-  const $  = (sel) => document.querySelector(sel);
-  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+function norm(s){ return String(s ?? '').replace(/[\u200E\u200F\u202A-\u202E]/g,'').replace(/\u00A0/g,' ').replace(/\s+/g,' ').trim(); }
+function escapeHTML(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+function show(el){ el.style.display='block'; } function hide(el){ el.style.display='none'; }
 
-  const elTitle      = $('#ownerTitle');
-  const elSearch     = $('#ownerSearch');
-  const btnSearch    = $('#btnOwnerSearch');
-  const btnClear     = $('#btnOwnerClear');
-  const elStats      = $('#ownerStats');
-  const elList       = $('#tasksList');
-  const elErr        = $('#errBox');
-  const elLoaderWrap = $('#loader');
+async function fetchJSON(url){
+  const res  = await fetch(url, { credentials:'omit' });
+  const text = await res.text();
+  if(DEBUG) appendDebug('GET '+url, text, res.status);
+  if(!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  try { return JSON.parse(text); } catch { throw new Error('Bad JSON'); }
+}
 
-  // Dialog fields
-  const dlg      = $('#taskDialog');
-  const form     = $('#taskForm');
-  const dlgTitle = $('#dlgTitle');
-  const f_status = $('#f_status');
-  const f_owner  = $('#f_owner');
-  const f_name   = $('#f_name');
-  const f_phone  = $('#f_phone');
-  const f_notes  = $('#f_notes');
-  const f_caseId = $('#f_caseId');
-  const btnSave  = $('#btnSave');
+/* Elements */
+const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned'));
+const focusId    = norm(qs.get('focus') || '');
 
-  // ====== Helpers ======
-  const STATUS_LABELS = { todo: 'לטיפול', inp: 'בתהליך', done: 'בוצע', canceled: 'בוטל' };
-  const STATUS_KEYS_BY_HE = { 'לטיפול': 'todo', 'בתהליך': 'inp', 'בוצע': 'done', 'בוטל': 'canceled' };
+const els = {
+  title: document.getElementById('ownerTitle'),
+  stats: document.getElementById('ownerStats'),
+  list:  document.getElementById('tasksList'),
+  search: document.getElementById('ownerSearch'),
+  btnSearch: document.getElementById('btnOwnerSearch'),
+  btnClear:  document.getElementById('btnOwnerClear'),
+  loader: document.getElementById('loader'),
+  errBox: document.getElementById('errBox'),
+  dlg: document.getElementById('taskDialog'),
+  f_status: document.getElementById('f_status'),
+  f_owner:  document.getElementById('f_owner'),
+  f_name:   document.getElementById('f_name'),
+  f_phone:  document.getElementById('f_phone'),
+  f_notes:  document.getElementById('f_notes'),
+  f_caseId: document.getElementById('f_caseId'),
+  btnSave:  document.getElementById('btnSave'),
+  btnClose: document.getElementById('btnClose'),
+};
 
-  function getParam(name, def = undefined) {
-    const url = new URL(location.href);
-    const val = url.searchParams.get(name);
-    return val != null ? decodeURIComponent(val) : def;
-  }
+/* Debug panel (optional, ?debug=1) */
+let dbg;
+function ensureDebug(){
+  if(!DEBUG || dbg) return;
+  dbg = document.createElement('pre');
+  dbg.style.cssText = 'position:fixed;left:8px;bottom:8px;max-height:40vh;max-width:90vw;overflow:auto;background:#0b1020;color:#9fe; padding:8px 10px;border-radius:8px; font:12px/1.45 ui-monospace,monospace; z-index:9999';
+  document.body.appendChild(dbg);
+}
+function appendDebug(title, payload, status){
+  ensureDebug();
+  if(!DEBUG) return;
+  const time = new Date().toLocaleTimeString();
+  dbg.textContent += `\n[${time}] ${title} (status ${status})\n${payload}\n`;
+}
 
-  function titleForOwner(ownerParam) {
-    if (!ownerParam || ownerParam === 'all') return 'משימות – כל המטפלים';
-    if (ownerParam === 'unassigned') return 'משימות – לא משויך';
-    return `משימות – ${ownerParam}`;
-  }
+/* Title */
+els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : ownerParam}`;
 
-  function mapStatusParamToHeb(param) {
-    if (!param) return null;
-    const k = String(param).toLowerCase();
-    return STATUS_LABELS[k] || null;
-  }
+/* Load tasks */
+async function loadTasks(){
+  try{
+    hide(els.errBox); show(els.loader); els.list.innerHTML = '';
+    const q = norm(els.search.value);
+    const u = new URL(BASE_URL);
+    u.searchParams.set('path','tasks');
+    u.searchParams.set('owner', ownerParam === 'unassigned' ? 'unassigned' : ownerParam);
+    if(q) u.searchParams.set('q', q);
 
-  function fmtDate(d) {
-    try {
-      const dt = typeof d === 'string' ? new Date(d) : d;
-      if (isNaN(dt)) return '';
-      return dt.toLocaleString('he-IL', { hour: '2-digit', minute: '2-digit' }) +
-             ' · ' + dt.toLocaleDateString('he-IL');
-    } catch { return ''; }
-  }
+    const data = await fetchJSON(u.toString());
+    const items = Array.isArray(data.tasks) ? data.tasks : [];
 
-  function normalizeStr(s) { return (s || '').toString().toLowerCase(); }
+    const order = {'לטיפול':0,'בתהליך':1,'בוצע':2,'בוטל':3};
+    items.sort((a,b)=>(order[a.status]??9)-(order[b.status]??9));
 
-  function matchesQuery(task, q) {
-    if (!q) return true;
-    const hay = [
-      task.caseId, task.name, task.phone, task.subject, task.owner, task.status, task.notes
-    ].map(normalizeStr).join(' • ');
-    return hay.includes(normalizeStr(q));
-  }
+    const counts = {'לטיפול':0,'בתהליך':0,'בוצע':0,'בוטל':0};
+    items.forEach(t=> counts[t.status]=(counts[t.status]||0)+1);
+    els.stats.textContent =
+      `לטיפול: ${counts['לטיפול']||0} | בתהליך: ${counts['בתהליך']||0} | בוצע: ${counts['בוצע']||0} | בוטל: ${counts['בוטל']||0}`;
 
-  // ====== Loaders ======
-  async function fetchLocalJSON() {
-    const endpoints = [
-      './data.json',
-      './tasks.json',
-      '../tasks.json',
-      '/tasks/data.json',
-      '/tasks/tasks.json',
-    ];
-    for (const url of endpoints) {
-      try {
-        const res = await fetch(url, { cache: 'no-store' });
-        if (res.ok) {
-          const json = await res.json();
-          if (Array.isArray(json)) return json;
-          if (Array.isArray(json?.items)) return json.items;
-          if (Array.isArray(json?.tasks)) return json.tasks;
-        }
-      } catch (_) { /* continue */ }
-    }
-    return null;
-  }
-
-  // --- Google Sheets (GViz JSON) ---
-  // פורמט: https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:json[&gid=...]
-  async function fetchFromGoogleSheets(sheetId, gid = null) {
-    if (!sheetId) return null;
-    const base = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/gviz/tq?tqx=out:json`;
-    const url  = gid ? `${base}&gid=${encodeURIComponent(gid)}` : base;
-
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return null;
-
-    // gviz מחזיר טקסט עטוף בפונקציה; נחלץ את ה-JSON
-    const txt = await res.text();
-    const start = txt.indexOf('{');
-    const end   = txt.lastIndexOf('}');
-    if (start === -1 || end === -1) return null;
-
-    const payload = JSON.parse(txt.slice(start, end + 1));
-    const cols = (payload.table?.cols || []).map(c => (c.label || '').trim());
-    const rows = payload.table?.rows || [];
-
-    if (!cols.length || !rows.length) return [];
-
-    // מיפוי שמות עמודות גמיש (עברית/אנגלית)
-    const keyFor = (label) => {
-      const k = normalizeStr(label);
-      if (!k) return null;
-      if (/(case\s*id|caseid|id|מזהה|מספר|תיק)/.test(k)) return 'caseId';
-      if (/(name|full\s*name|שם)/.test(k)) return 'name';
-      if (/(phone|טלפון|נייד|מספר\s*טלפון)/.test(k)) return 'phone';
-      if (/(subject|topic|נושא)/.test(k)) return 'subject';
-      if (/(owner|assignee|מטפל|משויך)/.test(k)) return 'owner';
-      if (/(status|סטטוס)/.test(k)) return 'status';
-      if (/(updated|עדכון|תאריך|timestamp|time)/.test(k)) return 'updatedAt';
-      if (/(notes|admin\s*notes|הערות)/.test(k)) return 'notes';
-      return null; // עמודות נוספות יישמרו אם נרצה להרחיב
-    };
-
-    const colIdx = {};
-    cols.forEach((label, i) => {
-      const key = keyFor(label);
-      if (key && colIdx[key] == null) colIdx[key] = i;
-    });
-
-    const getCell = (row, idx) => (idx == null ? null : (row.c[idx]?.v ?? null));
-
-    // המר לשורת אובייקט עם נרמול סטטוס
-    const out = rows.map(r => {
-      const raw = {
-        caseId:    getCell(r, colIdx.caseId),
-        name:      getCell(r, colIdx.name),
-        phone:     getCell(r, colIdx.phone),
-        subject:   getCell(r, colIdx.subject),
-        owner:     getCell(r, colIdx.owner),
-        status:    getCell(r, colIdx.status),
-        updatedAt: getCell(r, colIdx.updatedAt),
-        notes:     getCell(r, colIdx.notes),
-      };
-
-      // נרמול תאריך
-      if (raw.updatedAt && typeof raw.updatedAt === 'object' && raw.updatedAt.f) {
-        // gviz לפעמים מחזיר גם formatted
-        raw.updatedAt = raw.updatedAt.f;
-      }
-
-      // נרמול סטטוס
-      const s = (raw.status || '').toString();
-      const sLow = s.toLowerCase();
-      if (STATUS_LABELS[sLow]) raw.status = STATUS_LABELS[sLow];
-      else if (STATUS_KEYS_BY_HE[s]) raw.status = STATUS_LABELS[STATUS_KEYS_BY_HE[s]] || s;
-      else if (!s) raw.status = 'לטיפול';
-
-      return raw;
-    });
-
-    // סינון שורות ריקות לגמרי
-    return out.filter(t =>
-      t.caseId || t.name || t.phone || t.subject || t.owner || t.status || t.notes
-    );
-  }
-
-  async function loadTasksData() {
-    // 1) JSON מקומי
-    const local = await fetchLocalJSON();
-    if (local && local.length) return local;
-
-    // 2) Google Sheets (GViz)
-    try {
-      const sheetRows = await fetchFromGoogleSheets(SHEET_ID, SHEET_GID);
-      if (sheetRows && sheetRows.length) return sheetRows;
-    } catch (e) {
-      console.warn('Sheets fetch failed:', e);
-    }
-
-    // 3) גלובלי
-    if (Array.isArray(window.tasksData)) return window.tasksData;
-    if (Array.isArray(window.tasks?.items)) return window.tasks.items;
-
-    throw new Error('no-data');
-  }
-
-  // ====== State ======
-  let ALL = [];
-  let FILTERED = [];
-  let CURRENT_OWNER;
-  let CURRENT_STATUS;   // heb label ('לטיפול'/'בתהליך'/...)
-  let CURRENT_QUERY = '';
-
-  // ====== Rendering ======
-  function renderCounts(list) {
-    const counts = { 'לטיפול': 0, 'בתהליך': 0, 'בוצע': 0, 'בוטל': 0 };
-    list.forEach(t => { if (counts[t.status] != null) counts[t.status] += 1; });
-    elStats.textContent =
-      `לטיפול: ${counts['לטיפול']} | בתהליך: ${counts['בתהליך']} | בוצע: ${counts['בוצע']} | בוטל: ${counts['בוטל']}`;
-  }
-
-  function renderList(list) {
-    elList.innerHTML = '';
-    if (!list.length) {
-      elList.innerHTML = `<div class="result-item"><span>לא נמצאו משימות תואמות</span><span class="result-meta">נסה/י לשנות חיפוש או מסננים</span></div>`;
+    if(!items.length){
+      els.list.innerHTML = `<div class="card muted">אין משימות לתצוגה.</div>`;
       return;
     }
-    for (const t of list) {
-      const name     = t.name || '—';
-      const phone    = t.phone || '';
-      const subj     = t.subject || '';
-      const owner    = t.owner || 'לא משויך';
-      const status   = t.status || '—';
-      const updated  = fmtDate(t.updatedAt || t.updated_at || t.timestamp);
 
-      const row = document.createElement('div');
-      row.className = 'result-item';
-      row.tabIndex = 0;
-      row.dataset.caseId = t.caseId || t.id || '';
+    els.list.innerHTML = items.map(t=>{
+      const ownerLabel = t.owner || 'לא משויך';
+      return `
+        <div class="result-item" data-id="${escapeHTML(String(t.caseId))}"
+             data-task='${escapeHTML(JSON.stringify(t))}'
+             ${focusId && String(t.caseId)===focusId ? 'style="outline:2px solid #2563eb;"' : ''}>
+          <div>
+            <div><strong>${escapeHTML(t.subject ?? '(ללא כותרת)')}</strong></div>
+            <div class="result-meta">#${escapeHTML(t.caseId)} • ${escapeHTML(t.fullName ?? '')} • ${escapeHTML(t.phone ?? '')}</div>
+            <div class="result-meta">סטטוס: ${escapeHTML(t.status ?? '')} • מטפל: ${escapeHTML(ownerLabel)}</div>
+          </div>
+          <button class="btn" data-open="${escapeHTML(String(t.caseId))}">פתח</button>
+        </div>`;
+    }).join('');
 
-      const left = document.createElement('span');
-      left.innerHTML = `
-        <strong>${name}</strong>${phone ? ' · ' + phone : ''} — ${subj || 'ללא נושא'}
-        <span class="result-meta"> · ${owner} · ${status}${updated ? ' · ' + updated : ''}</span>
-      `;
-
-      const btn = document.createElement('button');
-      btn.className = 'btn ghost';
-      btn.textContent = 'פתח';
-      btn.addEventListener('click', (e) => { e.stopPropagation(); openDialog(t); });
-
-      row.addEventListener('click', () => openDialog(t));
-      row.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') openDialog(t); });
-
-      row.appendChild(left);
-      row.appendChild(btn);
-      elList.appendChild(row);
-    }
-  }
-
-  function applyFilters() {
-    const owner  = CURRENT_OWNER;
-    const status = CURRENT_STATUS; // heb label or null
-    const q      = CURRENT_QUERY;
-
-    FILTERED = ALL.filter(t => {
-      const okOwner =
-        owner === 'all' ||
-        (owner === 'unassigned' && (!t.owner || t.owner === '')) ||
-        t.owner === owner;
-
-      const okStatus = !status || t.status === status;
-      const okQuery  = matchesQuery(t, q);
-
-      return okOwner && okStatus && okQuery;
+    els.list.querySelectorAll('button[data-open]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openDialog(btn.dataset.open));
     });
 
-    renderCounts(FILTERED);
-    renderList(FILTERED);
-  }
-
-  // ====== Dialog ======
-  function openDialog(task) {
-    dlgTitle.textContent = `משימה #${task.caseId || task.id || ''}`;
-    // ערכי ה-<select> אצלך בעברית, ניישר אליהם
-    const s = task.status || 'לטיפול';
-    f_status.value = STATUS_LABELS[STATUS_KEYS_BY_HE[s]] || s;
-
-    f_owner.value = task.owner || '';
-    f_name.value  = task.name  || '';
-    f_phone.value = task.phone || '';
-    f_notes.value = task.notes || '';
-    f_caseId.value = task.caseId || task.id || '';
-
-    if (typeof dlg.showModal === 'function') dlg.showModal();
-    else dlg.setAttribute('open', 'open');
-
-    btnSave.onclick = () => {
-      const key = f_caseId.value;
-      const idx = ALL.findIndex(x => String(x.caseId || x.id || '') === String(key));
-      if (idx >= 0) {
-        ALL[idx] = {
-          ...ALL[idx],
-          status: f_status.value,
-          owner: f_owner.value,
-          notes: f_notes.value,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      // כאן אפשר לבצע POST לשרת שלך אם צריך
-      applyFilters();
-      closeDialog();
-    };
-  }
-
-  function closeDialog() {
-    if (typeof dlg.close === 'function') dlg.close();
-    else dlg.removeAttribute('open');
-  }
-  $('#btnClose')?.addEventListener('click', (e) => { e.preventDefault(); closeDialog(); });
-
-  // ====== Search ======
-  btnSearch.addEventListener('click', () => { CURRENT_QUERY = elSearch.value.trim(); applyFilters(); });
-  btnClear.addEventListener('click', () => { elSearch.value = ''; CURRENT_QUERY = ''; applyFilters(); });
-  elSearch.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); CURRENT_QUERY = elSearch.value.trim(); applyFilters(); } });
-
-  // ====== Init ======
-  (async function init() {
-    try {
-      elLoaderWrap.style.display = 'block';
-      elErr.style.display = 'none';
-
-      CURRENT_OWNER  = getParam('owner', 'all');
-      CURRENT_STATUS = mapStatusParamToHeb(getParam('status', null));
-      elTitle.textContent = titleForOwner(CURRENT_OWNER);
-
-      // טען נתונים (לפי סדר ניסיון)
-      const raw = await loadTasksData();
-
-      // normalize records
-      ALL = raw.map(t => ({
-        id:        t.id ?? t.caseId ?? '',
-        caseId:    t.caseId ?? t.id ?? '',
-        name:      t.name ?? t.fullName ?? '',
-        phone:     t.phone ?? t.tel ?? '',
-        subject:   t.subject ?? t.topic ?? '',
-        owner:     t.owner ?? t.assignee ?? '',
-        status:    (() => {
-          const s = (t.status || '').toString();
-          const sLow = s.toLowerCase();
-          if (STATUS_LABELS[sLow]) return STATUS_LABELS[sLow];
-          if (STATUS_KEYS_BY_HE[s]) return STATUS_LABELS[STATUS_KEYS_BY_HE[s]] || s;
-          if (!s) return 'לטיפול';
-          return s;
-        })(),
-        updatedAt: t.updatedAt ?? t.updated_at ?? t.timestamp ?? null,
-        notes:     t.notes ?? t.adminNotes ?? '',
-      }));
-
-      applyFilters();
-    } catch (err) {
-      console.error(err);
-      elErr.style.display = 'block';
-      elList.innerHTML = '';
-    } finally {
-      elLoaderWrap.style.display = 'none';
+    if(focusId){
+      const btn = els.list.querySelector(`button[data-open="${CSS.escape(String(focusId))}"]`);
+      if(btn) btn.click();
     }
-  })();
-})();
+  }catch(err){
+    els.errBox.textContent = `שגיאת טעינה מהשרת: ${err.message || err}`;
+    show(els.errBox);
+    appendDebug('LOAD ERROR', String(err), 0);
+  }finally{
+    hide(els.loader);
+  }
+}
+
+/* Dialog */
+function openDialog(caseId){
+  const row = els.list.querySelector(`.result-item[data-id="${CSS.escape(String(caseId))}"]`);
+  if(!row) return;
+  const t = JSON.parse(row.dataset.task || '{}');
+
+  document.getElementById('dlgTitle').textContent = t.subject || '(ללא כותרת)';
+  els.f_caseId.value = t.caseId ?? '';
+  els.f_status.value = t.status ?? 'לטיפול';
+  els.f_owner.value  = (t.owner === 'לא משויך' ? '' : (t.owner ?? ''));
+  els.f_name.value   = t.fullName ?? '';
+  els.f_phone.value  = t.phone ?? '';
+  els.f_notes.value  = t.adminNotes ?? '';
+
+  els.dlg.showModal();
+}
+
+/* Save (no-preflight) */
+async function saveTask(){
+  const caseId = els.f_caseId.value;
+  const body = {
+    status: els.f_status.value,
+    owner:  els.f_owner.value,
+    adminNotes: els.f_notes.value
+  };
+
+  try{
+    els.btnSave.disabled = true;
+
+    const url = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}`;
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=UTF-8' }, // אין OPTIONS
+      body: JSON.stringify(body),
+      credentials:'omit'
+    });
+
+    const text = await res.text();
+    appendDebug('POST '+url+'\n'+JSON.stringify(body,null,2), text, res.status);
+
+    let json = null; try { json = JSON.parse(text); } catch {}
+
+    if(!res.ok || (json && json.error)){
+      const msg = (json && json.error) ? json.error : (text || `HTTP ${res.status}`);
+      showToast('שמירה נכשלה: ' + msg);
+      throw new Error(msg);
+    }
+
+    showToast('עודכן בהצלחה');
+    await loadTasks();
+    els.dlg.close();
+  }catch(err){
+    console.error('saveTask failed:', err);
+  }finally{
+    els.btnSave.disabled = false;
+  }
+}
+
+/* Toast */
+function showToast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:16px;right:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:.95;z-index:9999';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+/* Events */
+els.btnSearch.addEventListener('click', loadTasks);
+els.search.addEventListener('keydown', e=>{ if(e.key==='Enter') loadTasks(); });
+els.btnClear.addEventListener('click', ()=>{ els.search.value=''; loadTasks(); });
+els.btnSave.addEventListener('click', saveTask);
+els.btnClose.addEventListener('click', ()=> els.dlg.close());
+
+/* Init */
+loadTasks();

@@ -1,0 +1,44 @@
+/* משתלב עם styles.css הראשי שלך */
+.container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.page-header { background: #fff; border-bottom: 1px solid #eee; }
+.page-header h1 { margin: 0 0 12px; }
+.search-wrap { display: flex; gap: 8px; align-items: center; }
+.search-wrap input[type="search"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+
+.bubbles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.bubble {
+  display: block;
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 16px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.bubble:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+.bubble.big { grid-column: 1 / -1; border-left: 6px solid #7c3aed; }
+
+.bubble .bubble-title { font-weight: 700; margin-bottom: 6px; }
+.bubble .bubble-stats { display: flex; gap: 16px; color: #555; }
+
+/* צבעים שונים לכל מטפל (תחתית/גבול) */
+.b1 { border-left: 6px solid #2563eb; }
+.b2 { border-left: 6px solid #16a34a; }
+.b3 { border-left: 6px solid #f59e0b; }
+.b4 { border-left: 6px solid #ef4444; }
+.b5 { border-left: 6px solid #0ea5e9; }
+
+/* תוצאות חיפוש */
+.card { background:#fff; border:1px solid #eee; border-radius:16px; padding:16px; margin:16px 0; }
+.card-head { display:flex; align-items:center; gap:16px; }
+.results-list { display:grid; gap:10px; margin-top:10px; }
+.result-item { padding:12px; border:1px solid #eee; border-radius:12px; display:flex; justify-content:space-between; align-items:center; }
+.result-meta { color:#666; font-size:.9rem; }

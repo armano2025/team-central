@@ -1,4 +1,4 @@
-/* tasks/owner.js — גרסה יציבה עם BASE_URL מעודכן */
+/* tasks/owner.js — גרסה יציבה עם חזרה לאדמין + אנימציית טעינה */
 
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
@@ -19,6 +19,8 @@ async function fetchJSON(url) {
   if (!res.ok) throw new Error(`Network ${res.status}`);
   return res.json();
 }
+function show(el){ el.style.display='block'; }
+function hide(el){ el.style.display='none'; }
 
 /* ===== Elements & params ===== */
 const qs = new URLSearchParams(location.search);
@@ -32,6 +34,9 @@ const els = {
   search:   document.getElementById('ownerSearch'),
   btnSearch:document.getElementById('btnOwnerSearch'),
   btnClear: document.getElementById('btnOwnerClear'),
+
+  loader:   document.getElementById('loader'),
+  errBox:   document.getElementById('errBox'),
 
   dlg:      document.getElementById('taskDialog'),
   f_status: document.getElementById('f_status'),
@@ -49,6 +54,10 @@ els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא 
 /* ===== Load tasks ===== */
 async function loadTasks() {
   try {
+    hide(els.errBox);
+    show(els.loader);
+    els.list.innerHTML = '';
+
     const q = norm(els.search.value);
     const url = new URL(BASE_URL);
     url.searchParams.set('path', 'tasks');
@@ -103,10 +112,9 @@ async function loadTasks() {
     }
   } catch (err) {
     console.error(err);
-    els.list.innerHTML = `
-      <div class="card" style="border-color:#ef4444;color:#ef4444;">
-        שגיאת טעינה מהשרת. בדוק/י את כתובת ה-API או את החיבור לרשת.
-      </div>`;
+    show(els.errBox);
+  } finally {
+    hide(els.loader);
   }
 }
 
@@ -141,9 +149,9 @@ async function saveTask() {
       headers: { 'Content-Type':'application/json' },
       body: JSON.stringify(body)
     });
-    await res.json(); // לא נדרש להשתמש בפלט
+    await res.json();
     showToast('עודכן בהצלחה');
-    await loadTasks(); // ריענון רשימה (המודאל נשאר פתוח)
+    await loadTasks(); // ריענון רשימה
   } catch (err) {
     console.error(err);
     showToast('שמירה נכשלה');

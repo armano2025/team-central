@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>משימות – בעלים</title>
+
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="./tasks.css" />
+  <meta name="theme-color" content="#2563eb" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="container">
+      <a href="./tasks.html" class="btn ghost">חזרה</a>
+      <h1 id="ownerTitle">משימות</h1>
+      <div class="search-wrap">
+        <input id="ownerSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
+        <button id="btnOwnerSearch" class="btn">סנן</button>
+        <button id="btnOwnerClear" class="btn ghost">נקה</button>
+      </div>
+      <div id="ownerStats" class="muted" style="margin-top:8px;"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="tasksList" class="results-list"></section>
+  </main>
+
+  <!-- מודאל עריכת משימה -->
+  <dialog id="taskDialog">
+    <form method="dialog" id="taskForm" class="card">
+      <h3 id="dlgTitle">משימה</h3>
+      <div class="grid-2">
+        <label>סטטוס
+          <select id="f_status">
+            <option>לטיפול</option>
+            <option>בתהליך</option>
+            <option>בוצע</option>
+            <option>בוטל</option>
+          </select>
+        </label>
+        <label>מטפל
+          <select id="f_owner">
+            <option value="">לא משויך</option>
+            <option>חן</option>
+            <option>תמרה</option>
+            <option>בלה</option>
+            <option>ליאור</option>
+            <option>נטע</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>שם
+          <input id="f_name" type="text" disabled />
+        </label>
+        <label>טלפון
+          <input id="f_phone" type="text" disabled />
+        </label>
+      </div>
+
+      <label>הערות אדמין
+        <textarea id="f_notes" rows="5" placeholder="רשום כאן הערות לניהול פנימי…"></textarea>
+      </label>
+
+      <div class="actions">
+        <button type="button" id="btnSave" class="btn primary">שמירה</button>
+        <button id="btnClose" class="btn ghost">סגור</button>
+      </div>
+      <input type="hidden" id="f_caseId" />
+    </form>
+  </dialog>
+
+  <script src="./owner.js"></script>
+</body>
+</html>

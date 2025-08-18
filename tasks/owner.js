@@ -1,4 +1,4 @@
-/* /tasks/owner.js — V10 (Refresh button + top loader) */
+/* /tasks/owner.js — V11 (supports owner=all + top loader) */
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
 
@@ -19,7 +19,8 @@ async function fetchJSON(url){
 }
 
 /* Elements */
-const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned'));
+const ownerParamRaw = decodeURIComponent(qs.get('owner') || 'unassigned');
+const ownerParam = norm(ownerParamRaw);            // 'unassigned' | שם בעלים | 'all'
 const focusId    = norm(qs.get('focus') || '');
 
 const els = {
@@ -60,7 +61,8 @@ function appendDebug(title, payload, status){
 }
 
 /* Title */
-els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : ownerParam}`;
+els.title.textContent =
+  `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : (ownerParam === 'all' ? 'כל המשימות' : ownerParam)}`;
 
 /* Loader helper */
 function topLoad(on){ if (els.topLoader) els.topLoader.hidden = !on; }
@@ -74,7 +76,13 @@ async function loadTasks(){
     const q = norm(els.search.value);
     const u = new URL(BASE_URL);
     u.searchParams.set('path','tasks');
-    u.searchParams.set('owner', ownerParam === 'unassigned' ? 'unassigned' : ownerParam);
+
+    // תמיכה ב-all: לא שולחים owner בכלל כדי לקבל את הכול
+    if (ownerParam === 'unassigned') {
+      u.searchParams.set('owner', 'unassigned');
+    } else if (ownerParam !== 'all') {
+      u.searchParams.set('owner', ownerParam);
+    }
     if(q) u.searchParams.set('q', q);
 
     const data = await fetchJSON(u.toString());

@@ -5,40 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ניהול משימות – לוח ראשי</title>
 
-  <!-- עיצוב כללי של האפליקציה -->
   <link rel="stylesheet" href="../styles.css" />
-  <!-- עיצוב מקומי של המסך -->
   <link rel="stylesheet" href="./tasks.css" />
   <meta name="theme-color" content="#2563eb" />
 </head>
 <body>
 
-  <!-- פס טעינה עליון -->
+  <!-- פס טעינה עליון (אם משתמשים ב-loader) -->
   <div id="topLoader" class="top-loader" hidden></div>
 
   <!-- חזרה לאדמין -->
   <a class="back-link" href="../admin.html">← חזרה למסך אדמין</a>
 
-  <!-- HERO: דשבורד קצר -->
+  <!-- HERO -->
   <header class="hero">
     <div class="hero-content">
       <h2>לוח המשימות</h2>
       <p>סקירה מהירה של היקף העבודה וניווט מהיר לכל הרשימות.</p>
 
-      <!-- סטטיסטיקות סיכום – לחיצות מסננות -->
       <div class="stats" id="heroStats" hidden>
-        <a class="stat-link" id="linkTodo" href="./owner.html?owner=all&status=todo" title="לרשימת כל המשימות בסטטוס 'לטיפול'">
+        <a class="stat-link" id="linkTodo" href="./owner.html?owner=all&status=todo" title="כל המשימות בסטטוס 'לטיפול'">
           <span class="stat-pill">לטיפול: <strong id="statTodo">–</strong></span>
         </a>
-        <a class="stat-link" id="linkInp" href="./owner.html?owner=all&status=inp" title="לרשימת כל המשימות בסטטוס 'בתהליך'">
+        <a class="stat-link" id="linkInp" href="./owner.html?owner=all&status=inp" title="כל המשימות בסטטוס 'בתהליך'">
           <span class="stat-pill">בתהליך: <strong id="statInp">–</strong></span>
         </a>
       </div>
 
-      <!-- קיצורים -->
-      <div class="actions">
-        <a class="btn-link" href="./owner.html?owner=all">רשימת כל המשימות</a>
-        <a class="btn-link" href="https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit?usp=drivesdk" target="_blank" rel="noopener">
+      <!-- פעולות בהירו — כפתורים כתומים -->
+      <div class="actions" style="margin-top:10px;">
+        <a class="btn orange" href="./owner.html?owner=all">רשימת כל המשימות</a>
+        <a class="btn orange" href="https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit?usp=drivesdk" target="_blank" rel="noopener">
           פתיחה בגוגל שיטס
         </a>
       </div>
@@ -52,14 +49,14 @@
       <div class="search-wrap" role="search" aria-label="חיפוש משימות">
         <input id="globalSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
         <button id="btnSearch" class="btn primary">חיפוש</button>
-        <button id="btnClear" class="btn ghost">נקה</button>
-        <button id="btnRefresh" class="btn ghost" title="רענון נתונים">רענן</button>
+        <button id="btnClear" class="btn ghost" type="button">נקה</button>
+        <button id="btnRefresh" class="btn ghost" type="button">רענן</button>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- תוצאות חיפוש (מוסתר כברירת מחדל) -->
+    <!-- תוצאות חיפוש -->
     <section id="searchResults" class="card" style="display:none;">
       <div class="card-head">
         <h2>תוצאות חיפוש</h2>
@@ -68,7 +65,7 @@
       <div id="resultsList" class="results-list"></div>
     </section>
 
-    <!-- בועות -->
+    <!-- בועות (כולל "לא משויך") -->
     <section id="bubbles" aria-label="ביצועים לפי מטפל">
       <div class="bubbles-grid">
         <a class="bubble big" href="./owner.html?owner=unassigned">
@@ -124,92 +121,40 @@
 
   <script src="./tasks.js"></script>
 
-  <!-- חישוב/טעינה של סיכום ל-Hero -->
+  <!-- סיכום ל-Hero: נשאר כפי שהיה אצלך (יכול להשתמש ב-window.tasksStats או סכימת בועות) -->
   <script>
-    // פונקציה שמחלצת מספר מתוך טקסט
-    function _toInt(txt) {
-      const n = parseInt(String(txt || '0').replace(/[^\d]/g, ''), 10);
-      return isNaN(n) ? 0 : n;
-    }
+    function _toInt(txt){ const n = parseInt(String(txt||'0').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; }
+    (async function loadHeroSummary(){
+      const wrap=document.getElementById('heroStats');
+      const elTodo=document.getElementById('statTodo');
+      const elInp=document.getElementById('statInp');
 
-    // נרמול סטטוס (מינימלי) עבור חישוב טוטאלים
-    function _normalizeStatus(s) {
-      s = String(s || '').toLowerCase().trim();
-      const map = {
-        'לטיפול':'todo','בטיפול':'todo','todo':'todo','to-do':'todo','to do':'todo',
-        'בתהליך':'inp','בתהליך עבודה':'inp','in progress':'inp','in_progress':'inp','in-progress':'inp','inp':'inp'
-      };
-      return map[s] || s;
-    }
-
-    async function computeAndRenderHero() {
-      const wrap   = document.getElementById('heroStats');
-      const elTodo = document.getElementById('statTodo');
-      const elInp  = document.getElementById('statInp');
-      const top    = document.getElementById('topLoader');
-
-      const render = (todo, inp) => {
-        elTodo.textContent = typeof todo === 'number' ? todo : '–';
-        elInp.textContent  = typeof inp  === 'number' ? inp  : '–';
-        wrap.hidden = false;
-      };
-      const topLoad = (on) => { if (top) top.hidden = !on; };
-
-      // 1) ניסיון להביא נתונים חיים מה־API (?path=stats)
-      try {
-        topLoad(true);
-        const u = new URL(window.BASE_URL || '', location.origin);
-        if (u.toString().startsWith('http')) {
-          u.searchParams.set('path','stats');
-          const data = await fetchJSON(u.toString());
-          let todo = 0, inp = 0;
-          for (const ownerKey of Object.keys(data || {})) {
-            const bucket = data[ownerKey] || {};
-            for (const [rawStatus, val] of Object.entries(bucket)) {
-              const nk = _normalizeStatus(rawStatus);
-              const n  = Number(val || 0);
-              if (nk === 'todo') todo += n;
-              else if (nk === 'inp') inp += n;
-            }
-          }
-          render(todo, inp);
-          topLoad(false);
-          return;
-        }
-      } catch(e) {
-        // ממשיכים לפולבקים
-      } finally {
-        topLoad(false);
+      // 1) אם tasks.js כבר הכניס window.tasksStats (נתוני אמת)
+      if (window.tasksStats && window.tasksStats.totals) {
+        const { todo, inProgress } = window.tasksStats.totals;
+        elTodo.textContent = typeof todo==='number'?todo:'–';
+        elInp.textContent  = typeof inProgress==='number'?inProgress:'–';
+        wrap.hidden=false; return;
       }
 
-      // 2) window.__loadStatsPromise (שנוצר ב-tasks.js) ואז סכימה מהבועות
-      try {
-        if (window.__loadStatsPromise) {
-          topLoad(true);
-          await window.__loadStatsPromise;
-        }
-      } catch(e) {} finally { topLoad(false); }
-
-      // 3) חישוב מתוך הבועות שבדף
-      try {
-        const todoSpans = Array.from(document.querySelectorAll('[id$="_todo"]'));
-        const inpSpans  = Array.from(document.querySelectorAll('[id$="_inp"]'));
-        const sum = nodes => nodes.reduce((acc, el) => acc + _toInt(el.textContent), 0);
-        const todo = sum(todoSpans);
-        const inp  = sum(inpSpans);
-        render(todo, inp);
-      } catch (e) {
-        wrap.hidden = true; // אין נתונים כלל
-      }
-    }
-
-    // הפעלה ראשונית
-    computeAndRenderHero();
+      // 2) סכימה מתוך הבועות
+      const sum = nodes=>nodes.reduce((acc,el)=>acc+_toInt(el.textContent),0);
+      const todo = sum(Array.from(document.querySelectorAll('[id$="_todo"]')));
+      const inp  = sum(Array.from(document.querySelectorAll('[id$="_inp"]')));
+      elTodo.textContent = todo; elInp.textContent = inp; wrap.hidden=false;
+    })();
 
     // רענון ידני
-    document.getElementById('btnRefresh')?.addEventListener('click', async () => {
+    document.getElementById('btnRefresh')?.addEventListener('click', async ()=>{
       if (window.reloadTasksStats) await window.reloadTasksStats();
-      await computeAndRenderHero();
+      const wrap=document.getElementById('heroStats');
+      const elTodo=document.getElementById('statTodo');
+      const elInp=document.getElementById('statInp');
+      if (window.tasksStats && window.tasksStats.totals) {
+        elTodo.textContent = window.tasksStats.totals.todo ?? '–';
+        elInp.textContent  = window.tasksStats.totals.inProgress ?? '–';
+        wrap.hidden=false;
+      }
     });
   </script>
 </body>

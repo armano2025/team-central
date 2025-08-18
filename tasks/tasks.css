@@ -8,6 +8,30 @@
   text-align: start; /* עוקף text-align:center של body הכללי */
 }
 
+/* פס טעינה עליון */
+.top-loader {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-primary));
+  background-size: 200% 100%;
+  animation: topRun 1.1s linear infinite;
+  z-index: 10000;
+}
+.top-loader[hidden] { display: none; }
+@keyframes topRun {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* כפתור חזרה (נפוץ בדפים) */
+.back-link {
+  display:inline-flex; align-items:center; gap:6px;
+  text-decoration:none; color:var(--color-primary); margin:8px 12px;
+  font-size:14px;
+}
+.back-link:hover { text-decoration: underline; }
+
 /* כותרת עליונה */
 .page-header {
   background: var(--color-surface);
@@ -26,9 +50,11 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 .search-wrap input[type="search"] {
   flex: 1;
+  min-width: 260px;
   padding: 10px;
   border: 1px solid rgba(0,0,0,.12);
   border-radius: 8px;
@@ -85,9 +111,7 @@
   color: rgba(0,0,0,.7);
   font-size: .95rem;
 }
-.bubble-stats div span {
-  font-weight: 700;
-}
+.bubble-stats div span { font-weight: 700; }
 
 /* בועה רחבה */
 .bubble.big {
@@ -142,3 +166,15 @@ html.dark-mode .btn.ghost { border-color: rgba(255,255,255,.22); }
 html.dark-mode #searchCount,
 html.dark-mode .result-meta,
 html.dark-mode .bubble-stats { color: rgba(255,255,255,.8); }
+
+/* HERO – מספרים גדולים יותר */
+.hero .stat-pill strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+.hero .stat-pill {
+  display:inline-flex; align-items:baseline; gap:6px;
+  padding: 6px 10px; border-radius: 999px;
+  background: rgba(0,0,0,.04);
+}
+html.dark-mode .hero .stat-pill { background: rgba(255,255,255,.08); }

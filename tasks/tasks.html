@@ -13,6 +13,12 @@
 </head>
 <body>
 
+  <!-- פס טעינה עליון -->
+  <div id="topLoader" class="top-loader" hidden></div>
+
+  <!-- חזרה לאדמין -->
+  <a class="back-link" href="../admin.html">← חזרה למסך אדמין</a>
+
   <!-- HERO: דשבורד קצר -->
   <header class="hero">
     <div class="hero-content">
@@ -47,6 +53,7 @@
         <input id="globalSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
         <button id="btnSearch" class="btn primary">חיפוש</button>
         <button id="btnClear" class="btn ghost">נקה</button>
+        <button id="btnRefresh" class="btn ghost" title="רענון נתונים">רענן</button>
       </div>
     </div>
   </header>
@@ -125,53 +132,63 @@
       return isNaN(n) ? 0 : n;
     }
 
-    // מביא סיכומים מ-./stats.json או מ-window.tasksStats
-    // ואם אין — מסכם מתוך הבועות שבעמוד
-    (async function loadHeroSummary() {
+    // נרמול סטטוס (מינימלי) עבור חישוב טוטאלים
+    function _normalizeStatus(s) {
+      s = String(s || '').toLowerCase().trim();
+      const map = {
+        'לטיפול':'todo','בטיפול':'todo','todo':'todo','to-do':'todo','to do':'todo',
+        'בתהליך':'inp','בתהליך עבודה':'inp','in progress':'inp','in_progress':'inp','in-progress':'inp','inp':'inp'
+      };
+      return map[s] || s;
+    }
+
+    async function computeAndRenderHero() {
       const wrap   = document.getElementById('heroStats');
       const elTodo = document.getElementById('statTodo');
       const elInp  = document.getElementById('statInp');
+      const top    = document.getElementById('topLoader');
 
       const render = (todo, inp) => {
         elTodo.textContent = typeof todo === 'number' ? todo : '–';
         elInp.textContent  = typeof inp  === 'number' ? inp  : '–';
         wrap.hidden = false;
       };
+      const topLoad = (on) => { if (top) top.hidden = !on; };
 
-      // 1) ניסיון להביא JSON סטטי מאותו דומיין
+      // 1) ניסיון להביא נתונים חיים מה־API (?path=stats)
       try {
-        const res = await fetch('./stats.json', { cache: 'no-store' });
-        if (res.ok) {
-          const data = await res.json();
-          // תמיכה במפתחות שונים:
-          const todo = (data.totals && typeof data.totals.todo === 'number') ? data.totals.todo
-                      : (typeof data.todo === 'number' ? data.todo
-                      : (typeof data.ltipul === 'number' ? data.ltipul : undefined));
-          const inp  = (data.totals && typeof data.totals.inProgress === 'number') ? data.totals.inProgress
-                      : (typeof data.inProgress === 'number' ? data.inProgress
-                      : (typeof data.inp === 'number' ? data.inp : undefined));
-
-          if (typeof todo === 'number' || typeof inp === 'number') {
-            render(todo, inp);
-            return;
+        topLoad(true);
+        const u = new URL(window.BASE_URL || '', location.origin);
+        if (u.toString().startsWith('http')) {
+          u.searchParams.set('path','stats');
+          const data = await fetchJSON(u.toString());
+          let todo = 0, inp = 0;
+          for (const ownerKey of Object.keys(data || {})) {
+            const bucket = data[ownerKey] || {};
+            for (const [rawStatus, val] of Object.entries(bucket)) {
+              const nk = _normalizeStatus(rawStatus);
+              const n  = Number(val || 0);
+              if (nk === 'todo') todo += n;
+              else if (nk === 'inp') inp += n;
+            }
           }
-        }
-      } catch (e) { /* ממשיכים ל-fallback */ }
-
-      // 2) window.tasksStats אם מוזן איפשהו (tasks.js/Firestore/Make)
-      if (window.tasksStats) {
-        const s = window.tasksStats;
-        const todo = (s.totals && typeof s.totals.todo === 'number') ? s.totals.todo
-                    : (typeof s.todo === 'number' ? s.todo
-                    : (typeof s.ltipul === 'number' ? s.ltipul : undefined));
-        const inp  = (s.totals && typeof s.totals.inProgress === 'number') ? s.totals.inProgress
-                    : (typeof s.inProgress === 'number' ? s.inProgress
-                    : (typeof s.inp === 'number' ? s.inp : undefined));
-        if (typeof todo === 'number' || typeof inp === 'number') {
           render(todo, inp);
+          topLoad(false);
           return;
         }
+      } catch(e) {
+        // ממשיכים לפולבקים
+      } finally {
+        topLoad(false);
       }
+
+      // 2) window.__loadStatsPromise (שנוצר ב-tasks.js) ואז סכימה מהבועות
+      try {
+        if (window.__loadStatsPromise) {
+          topLoad(true);
+          await window.__loadStatsPromise;
+        }
+      } catch(e) {} finally { topLoad(false); }
 
       // 3) חישוב מתוך הבועות שבדף
       try {
@@ -184,7 +201,16 @@
       } catch (e) {
         wrap.hidden = true; // אין נתונים כלל
       }
-    })();
+    }
+
+    // הפעלה ראשונית
+    computeAndRenderHero();
+
+    // רענון ידני
+    document.getElementById('btnRefresh')?.addEventListener('click', async () => {
+      if (window.reloadTasksStats) await window.reloadTasksStats();
+      await computeAndRenderHero();
+    });
   </script>
 </body>
 </html>

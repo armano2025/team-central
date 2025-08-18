@@ -1,4 +1,4 @@
-/* /tasks/owner.js — V9 (Debug + no-preflight save) */
+/* /tasks/owner.js — V10 (Refresh button + top loader) */
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
 
@@ -29,6 +29,7 @@ const els = {
   search: document.getElementById('ownerSearch'),
   btnSearch: document.getElementById('btnOwnerSearch'),
   btnClear:  document.getElementById('btnOwnerClear'),
+  btnRefresh: document.getElementById('btnOwnerRefresh'),
   loader: document.getElementById('loader'),
   errBox: document.getElementById('errBox'),
   dlg: document.getElementById('taskDialog'),
@@ -40,6 +41,7 @@ const els = {
   f_caseId: document.getElementById('f_caseId'),
   btnSave:  document.getElementById('btnSave'),
   btnClose: document.getElementById('btnClose'),
+  topLoader: document.getElementById('topLoader'),
 };
 
 /* Debug panel (optional, ?debug=1) */
@@ -60,10 +62,15 @@ function appendDebug(title, payload, status){
 /* Title */
 els.title.textContent = `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : ownerParam}`;
 
+/* Loader helper */
+function topLoad(on){ if (els.topLoader) els.topLoader.hidden = !on; }
+
 /* Load tasks */
 async function loadTasks(){
   try{
     hide(els.errBox); show(els.loader); els.list.innerHTML = '';
+    topLoad(true);
+
     const q = norm(els.search.value);
     const u = new URL(BASE_URL);
     u.searchParams.set('path','tasks');
@@ -115,6 +122,7 @@ async function loadTasks(){
     appendDebug('LOAD ERROR', String(err), 0);
   }finally{
     hide(els.loader);
+    topLoad(false);
   }
 }
 
@@ -146,6 +154,7 @@ async function saveTask(){
 
   try{
     els.btnSave.disabled = true;
+    topLoad(true);
 
     const url = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}`;
     const res = await fetch(url, {
@@ -173,6 +182,7 @@ async function saveTask(){
     console.error('saveTask failed:', err);
   }finally{
     els.btnSave.disabled = false;
+    topLoad(false);
   }
 }
 
@@ -189,6 +199,7 @@ function showToast(msg){
 els.btnSearch.addEventListener('click', loadTasks);
 els.search.addEventListener('keydown', e=>{ if(e.key==='Enter') loadTasks(); });
 els.btnClear.addEventListener('click', ()=>{ els.search.value=''; loadTasks(); });
+els.btnRefresh?.addEventListener('click', loadTasks);
 els.btnSave.addEventListener('click', saveTask);
 els.btnClose.addEventListener('click', ()=> els.dlg.close());
 

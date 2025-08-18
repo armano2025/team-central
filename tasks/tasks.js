@@ -61,21 +61,32 @@ async function loadStats() {
   const u = new URL(BASE_URL);
   u.searchParams.set('path', 'stats');
 
-  const data = await fetchJSON(u.toString()); // { "":{לטיפול:x, בתהליך:y}, "חן":{...}, ... }
-  const get = (owner, key) => (data[owner] && data[owner][key]) || 0;
+  const data = await fetchJSON(u.toString()); 
+  // דוגמה: { "חן":{לטיפול:1,בתהליך:0}, "תמרה":{...}, "לא משויך":{...} }
 
-  els.u_todo.textContent     = get('', 'לטיפול');
-  els.u_inp.textContent      = get('', 'בתהליך');
-  els.chen_todo.textContent  = get('חן', 'לטיפול');
-  els.chen_inp.textContent   = get('חן', 'בתהליך');
-  els.tam_todo.textContent   = get('תמרה', 'לטיפול');
-  els.tam_inp.textContent    = get('תמרה', 'בתהליך');
-  els.bel_todo.textContent   = get('בלה', 'לטיפול');
-  els.bel_inp.textContent    = get('בלה', 'בתהליך');
-  els.lio_todo.textContent   = get('ליאור', 'לטיפול');
-  els.lio_inp.textContent    = get('ליאור', 'בתהליך');
-  els.net_todo.textContent   = get('נטע', 'לטיפול');
-  els.net_inp.textContent    = get('נטע', 'בתהליך');
+  // --- סיכום עליון מכל הבעלים ---
+  let totalTodo = 0, totalInp = 0;
+  for (const owner of Object.keys(data)) {
+    const o = data[owner] || {};
+    totalTodo += Number(o['לטיפול']  ?? 0);
+    totalInp  += Number(o['בתהליך'] ?? 0);
+  }
+  els.u_todo.textContent = totalTodo;
+  els.u_inp.textContent  = totalInp;
+
+  // --- ספציפיים לבעלים ---
+  const get = (ownerName, key) => (data[ownerName] && data[ownerName][key]) || 0;
+
+  els.chen_todo.textContent = get('חן', 'לטיפול');
+  els.chen_inp.textContent  = get('חן', 'בתהליך');
+  els.tam_todo.textContent  = get('תמרה', 'לטיפול');
+  els.tam_inp.textContent   = get('תמרה', 'בתהליך');
+  els.bel_todo.textContent  = get('בלה', 'לטיפול');
+  els.bel_inp.textContent   = get('בלה', 'בתהליך');
+  els.lio_todo.textContent  = get('ליאור', 'לטיפול');
+  els.lio_inp.textContent   = get('ליאור', 'בתהליך');
+  els.net_todo.textContent  = get('נטע', 'לטיפול');
+  els.net_inp.textContent   = get('נטע', 'בתהליך');
 }
 
 /* ===== Global Search ===== */

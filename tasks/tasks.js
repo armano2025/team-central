@@ -1,8 +1,9 @@
-/* /tasks/tasks.js — V3 (חוסן ושקט תעשייתי) */
+/* /tasks/tasks.js — V4 (API fix + unassigned fix + loader + refresh hook) */
 
 /* ===== CONFIG ===== */
 const BASE_URL =
-  'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWנ5iMAWSjC2XXLN4_ZdOhRw/exec';
+  'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
+window.BASE_URL = BASE_URL; // לשימוש בסקריפטים מוטמעים
 
 /* ===== Helpers ===== */
 function norm(s) {
@@ -109,19 +110,24 @@ const els = {
   lio_inp:   document.getElementById('lio_inp'),
   net_todo:  document.getElementById('net_todo'),
   net_inp:   document.getElementById('net_inp'),
+  topLoader: document.getElementById('topLoader'),
 };
+
+/* ===== Loader helpers ===== */
+function topLoad(on){ if (els.topLoader) els.topLoader.hidden = !on; }
 
 /* ===== Stats ===== */
 async function loadStats() {
   const u = new URL(BASE_URL);
   u.searchParams.set('path', 'stats');
 
-  const data = await fetchJSON(u.toString());
+  topLoad(true);
+  const data = await fetchJSON(u.toString()).finally(()=> topLoad(false));
 
   // לוג מפורט לראות בדיוק מה מגיע מה־API (פתח קונסול)
   console.log('[tasks] Raw stats data:', JSON.stringify(data, null, 2));
 
-  // --- סיכום עליון: סכום כל הבעלים אחרי נורמליזציה של סטטוסים ---
+  // --- סיכום עליון (לשימוש פנימי/אימות בלבד) ---
   let totalTodo = 0, totalInp = 0;
   for (const ownerKey of Object.keys(data || {})) {
     const bucket = data[ownerKey] || {};
@@ -132,10 +138,13 @@ async function loadStats() {
       else if (nk === 'inp') totalInp += n;
     }
   }
-  if (els.u_todo) els.u_todo.textContent = totalTodo;
-  if (els.u_inp)  els.u_inp.textContent  = totalInp;
+  // שים לב: לא כותבים כאן ל-#statTodo/#statInp (זה נעשה ב-HERO script).
+  // כאן מעדכנים רק את הבועות של כל בעלים.
 
-  // --- ספציפיים לבעלים (נורמליזציה גם כאן) ---
+  // --- ספציפיים לבעלים (כולל "לא משויך") ---
+  if (els.u_todo) els.u_todo.textContent = getCountByOwnerAndStatus(data, 'לא משויך', 'לטיפול');
+  if (els.u_inp)  els.u_inp.textContent  = getCountByOwnerAndStatus(data, 'לא משויך', 'בתהליך');
+
   if (els.chen_todo) els.chen_todo.textContent = getCountByOwnerAndStatus(data, 'חן', 'לטיפול');
   if (els.chen_inp)  els.chen_inp.textContent  = getCountByOwnerAndStatus(data, 'חן', 'בתהליך');
 
@@ -182,7 +191,8 @@ async function runGlobalSearch() {
   u.searchParams.set('path', 'tasks');
   u.searchParams.set('q', q);
 
-  const data = await fetchJSON(u.toString());
+  topLoad(true);
+  const data = await fetchJSON(u.toString()).finally(()=> topLoad(false));
   const list = Array.isArray(data.tasks) ? data.tasks : [];
 
   els.resultsCount.textContent = `נמצאו ${list.length} תוצאות`;
@@ -215,5 +225,9 @@ if (els.btnClear)   els.btnClear.addEventListener('click', () => {
   els.resultsList.innerHTML = '';
 });
 
-/* ===== Init ===== */
-loadStats().catch(err => console.error('loadStats failed:', err));
+/* ===== Init + Refresh hook ===== */
+window.__loadStatsPromise = loadStats().catch(err => console.error('loadStats failed:', err));
+window.reloadTasksStats = async () => {
+  try { topLoad(true); return await loadStats(); }
+  finally { topLoad(false); }
+};

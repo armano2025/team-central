@@ -2,7 +2,7 @@
 
 /* ===== CONFIG ===== */
 const BASE_URL =
-  'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
+  'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWנ5iMAWSjC2XXLN4_ZdOhRw/exec';
 
 /* ===== Helpers ===== */
 function norm(s) {
@@ -32,6 +32,61 @@ async function fetchJSON(url) {
   }
 }
 
+/* === Helpers נוספים לנורמליזציה (סטטוסים/בעלים) === */
+// מיפוי וריאציות של סטטוסים לערכים לוגיים אחידים
+const STATUS_MAP = {
+  // עברית
+  'לטיפול': 'todo',
+  'בטיפול': 'todo',
+  'בתהליך': 'inp',
+  'בתהליך עבודה': 'inp',
+  // אנגלית/קיצורים
+  'todo': 'todo',
+  'to-do': 'todo',
+  'to do': 'todo',
+  'in progress': 'inp',
+  'in_progress': 'inp',
+  'in-progress': 'inp',
+  'inp': 'inp'
+};
+
+// מנרמל מפתח סטטוס גולמי לערך אחיד
+function normalizeStatusKey(rawKey) {
+  const k = norm(rawKey).toLowerCase();
+  return STATUS_MAP[k] || k; // אם לא מצא – מחזיר את המחרוזת (אחרי נרמול)
+}
+
+// מאתר את המפתח המדויק של בעלים בתוך data לפי שם מבוקש (אחרי נרמול)
+function findOwnerKey(data, wanted) {
+  const wantedNorm = norm(wanted);
+  for (const key of Object.keys(data || {})) {
+    if (norm(key) === wantedNorm) return key;
+  }
+  // כיסוי ל"לא משויך"
+  if (wantedNorm === 'לא משויך') {
+    const candidates = ['', 'לא משויך', 'unassigned', '—', '-'];
+    for (const key of Object.keys(data || {})) {
+      if (candidates.includes(norm(key))) return key;
+    }
+  }
+  return null;
+}
+
+// מחזיר ספירה לפי בעלים+סטטוס (עם נורמליזציה של מפתחות בתוך האובייקט)
+function getCountByOwnerAndStatus(data, ownerWanted, statusWanted) {
+  const ownerKey = findOwnerKey(data, ownerWanted);
+  if (!ownerKey) return 0;
+  const o = data[ownerKey] || {};
+  const wantedNorm = normalizeStatusKey(statusWanted);
+  let sum = 0;
+  for (const [rawKey, val] of Object.entries(o)) {
+    if (normalizeStatusKey(rawKey) === wantedNorm) {
+      sum += Number(val || 0);
+    }
+  }
+  return sum;
+}
+
 /* ===== Elements ===== */
 const els = {
   searchInput:  document.getElementById('globalSearch'),
@@ -41,7 +96,7 @@ const els = {
   resultsList:  document.getElementById('resultsList'),
   resultsCount: document.getElementById('searchCount'),
 
-  // Counters
+  // Counters (Hero + Owners)
   u_todo:    document.getElementById('u_todo'),
   u_inp:     document.getElementById('u_inp'),
   chen_todo: document.getElementById('chen_todo'),
@@ -61,32 +116,57 @@ async function loadStats() {
   const u = new URL(BASE_URL);
   u.searchParams.set('path', 'stats');
 
-  const data = await fetchJSON(u.toString()); 
-  // דוגמה: { "חן":{לטיפול:1,בתהליך:0}, "תמרה":{...}, "לא משויך":{...} }
+  const data = await fetchJSON(u.toString());
 
-  // --- סיכום עליון מכל הבעלים ---
+  // לוג מפורט לראות בדיוק מה מגיע מה־API (פתח קונסול)
+  console.log('[tasks] Raw stats data:', JSON.stringify(data, null, 2));
+
+  // --- סיכום עליון: סכום כל הבעלים אחרי נורמליזציה של סטטוסים ---
   let totalTodo = 0, totalInp = 0;
-  for (const owner of Object.keys(data)) {
-    const o = data[owner] || {};
-    totalTodo += Number(o['לטיפול']  ?? 0);
-    totalInp  += Number(o['בתהליך'] ?? 0);
+  for (const ownerKey of Object.keys(data || {})) {
+    const bucket = data[ownerKey] || {};
+    for (const [rawStatusKey, val] of Object.entries(bucket)) {
+      const nk = normalizeStatusKey(rawStatusKey);
+      const n = Number(val || 0);
+      if (nk === 'todo') totalTodo += n;
+      else if (nk === 'inp') totalInp += n;
+    }
   }
-  els.u_todo.textContent = totalTodo;
-  els.u_inp.textContent  = totalInp;
+  if (els.u_todo) els.u_todo.textContent = totalTodo;
+  if (els.u_inp)  els.u_inp.textContent  = totalInp;
 
-  // --- ספציפיים לבעלים ---
-  const get = (ownerName, key) => (data[ownerName] && data[ownerName][key]) || 0;
+  // --- ספציפיים לבעלים (נורמליזציה גם כאן) ---
+  if (els.chen_todo) els.chen_todo.textContent = getCountByOwnerAndStatus(data, 'חן', 'לטיפול');
+  if (els.chen_inp)  els.chen_inp.textContent  = getCountByOwnerAndStatus(data, 'חן', 'בתהליך');
 
-  els.chen_todo.textContent = get('חן', 'לטיפול');
-  els.chen_inp.textContent  = get('חן', 'בתהליך');
-  els.tam_todo.textContent  = get('תמרה', 'לטיפול');
-  els.tam_inp.textContent   = get('תמרה', 'בתהליך');
-  els.bel_todo.textContent  = get('בלה', 'לטיפול');
-  els.bel_inp.textContent   = get('בלה', 'בתהליך');
-  els.lio_todo.textContent  = get('ליאור', 'לטיפול');
-  els.lio_inp.textContent   = get('ליאור', 'בתהליך');
-  els.net_todo.textContent  = get('נטע', 'לטיפול');
-  els.net_inp.textContent   = get('נטע', 'בתהליך');
+  if (els.tam_todo) els.tam_todo.textContent = getCountByOwnerAndStatus(data, 'תמרה', 'לטיפול');
+  if (els.tam_inp)  els.tam_inp.textContent  = getCountByOwnerAndStatus(data, 'תמרה', 'בתהליך');
+
+  if (els.bel_todo) els.bel_todo.textContent = getCountByOwnerAndStatus(data, 'בלה', 'לטיפול');
+  if (els.bel_inp)  els.bel_inp.textContent  = getCountByOwnerAndStatus(data, 'בלה', 'בתהליך');
+
+  if (els.lio_todo) els.lio_todo.textContent = getCountByOwnerAndStatus(data, 'ליאור', 'לטיפול');
+  if (els.lio_inp)  els.lio_inp.textContent  = getCountByOwnerAndStatus(data, 'ליאור', 'בתהליך');
+
+  if (els.net_todo) els.net_todo.textContent = getCountByOwnerAndStatus(data, 'נטע', 'לטיפול');
+  if (els.net_inp)  els.net_inp.textContent  = getCountByOwnerAndStatus(data, 'נטע', 'בתהליך');
+
+  // דיאגנוסטיקה קצרה: טבלה מסודרת לראות את כל הבעלים והערכים המנורמלים
+  try {
+    const diag = Object.keys(data || {}).map(ownerKey => {
+      const o = data[ownerKey] || {};
+      let todo = 0, inp = 0;
+      for (const [k, v] of Object.entries(o)) {
+        const nk = normalizeStatusKey(k);
+        if (nk === 'todo') todo += Number(v || 0);
+        else if (nk === 'inp') inp += Number(v || 0);
+      }
+      return { owner: ownerKey, todo, inp, raw: o };
+    });
+    console.table(diag);
+  } catch (e) {
+    console.warn('diag failed:', e);
+  }
 }
 
 /* ===== Global Search ===== */
@@ -127,9 +207,9 @@ async function runGlobalSearch() {
 }
 
 /* ===== Events ===== */
-els.btnSearch.addEventListener('click', runGlobalSearch);
-els.searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') runGlobalSearch(); });
-els.btnClear.addEventListener('click', () => {
+if (els.btnSearch)  els.btnSearch.addEventListener('click', runGlobalSearch);
+if (els.searchInput) els.searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') runGlobalSearch(); });
+if (els.btnClear)   els.btnClear.addEventListener('click', () => {
   els.searchInput.value = '';
   els.resultsBox.style.display = 'none';
   els.resultsList.innerHTML = '';

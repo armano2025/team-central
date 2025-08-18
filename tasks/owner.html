@@ -25,26 +25,22 @@
         rgba(255,255,255,.5) 50%, rgba(255,255,255,0) 100%);
       animation: shimmer 1.2s infinite;
     }
-    @keyframes shimmer {
-      100% { transform: translateX(100%); }
-    }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+
     /* הודעת שגיאה */
     .error-card {
       border:1px solid #ef4444; color:#ef4444; background:#fff;
       padding:14px; border-radius:12px; margin:16px 0;
     }
-    /* כפתור חזרה */
-    .back-link {
-      display:inline-flex; align-items:center; gap:6px;
-      text-decoration:none; color:#2563eb; margin:8px 12px;
-      font-size:14px;
-    }
-    .back-link:hover { text-decoration: underline; }
+
     .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
     @media (max-width:720px){ .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
+
+  <!-- פס טעינה עליון -->
+  <div id="topLoader" class="top-loader" hidden></div>
 
   <!-- חזרה לאדמין -->
   <a class="back-link" href="../admin.html">← חזרה למסך אדמין</a>
@@ -57,6 +53,7 @@
         <input id="ownerSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
         <button id="btnOwnerSearch" class="btn">סנן</button>
         <button id="btnOwnerClear" class="btn ghost">נקה</button>
+        <button id="btnOwnerRefresh" class="btn ghost" title="רענון נתונים">רענן</button>
       </div>
 
       <div id="ownerStats" class="muted" style="margin-top:8px;">
@@ -130,6 +127,6 @@
   </dialog>
 
   <!-- שבירת קאש לגרסה -->
-  <script src="./owner.js?v=3"></script>
+  <script src="./owner.js?v=4"></script>
 </body>
 </html>

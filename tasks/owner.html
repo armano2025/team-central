@@ -32,9 +32,6 @@
       border:1px solid #ef4444; color:#ef4444; background:#fff;
       padding:14px; border-radius:12px; margin:16px 0;
     }
-
-    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-    @media (max-width:720px){ .grid-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -45,17 +42,40 @@
   <!-- חזרה לאדמין -->
   <a class="back-link" href="../admin.html">← חזרה למסך אדמין</a>
 
-  <header class="page-header">
-    <div class="container">
-      <h1 id="ownerTitle">משימות</h1>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2 id="ownerTitle">משימות</h2>
 
-      <div class="search-wrap" style="margin-top:8px;">
-        <input id="ownerSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
-        <button id="btnOwnerSearch" class="btn">סנן</button>
-        <button id="btnOwnerClear" class="btn ghost">נקה</button>
-        <button id="btnOwnerRefresh" class="btn ghost" title="רענון נתונים">רענן</button>
+      <!-- ספינר בתוך ההירו -->
+      <div id="ownerHeroSpinner" class="hero-spinner" hidden aria-live="polite" aria-label="טוען נתונים">
+        <span class="hero-dot"></span><span class="hero-dot"></span><span class="hero-dot"></span>
       </div>
 
+      <!-- סטטיסטיקות לפי הדף הנוכחי (owner/status) -->
+      <div class="stats" id="ownerHeroStats" hidden>
+        <a class="stat-link" id="linkOwnerTodo" href="#" data-show-spinner>
+          <span class="stat-pill">לטיפול: <strong id="ownerStatTodo">–</strong></span>
+        </a>
+        <a class="stat-link" id="linkOwnerInp" href="#" data-show-spinner>
+          <span class="stat-pill">בתהליך: <strong id="ownerStatInp">–</strong></span>
+        </a>
+      </div>
+
+      <div class="actions" style="margin-top:10px;">
+        <button id="btnOwnerRefresh" class="btn ghost" type="button">רענן</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- חיפוש + פילטרים -->
+  <header class="page-header">
+    <div class="container">
+      <div class="search-wrap" role="search" aria-label="חיפוש משימות">
+        <input id="ownerSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
+        <button id="btnOwnerSearch" class="btn">סנן</button>
+        <button id="btnOwnerClear" class="btn ghost" type="button">נקה</button>
+      </div>
       <div id="ownerStats" class="muted" style="margin-top:8px;">
         לטיפול: 0 | בתהליך: 0 | בוצע: 0 | בוטל: 0
       </div>
@@ -126,7 +146,13 @@
     </form>
   </dialog>
 
-  <!-- שבירת קאש לגרסה -->
-  <script src="./owner.js?v=4"></script>
+  <script src="./owner.js?v=13"></script>
+  <script>
+    // הצגת ספינר ההירו מיידית בעת לחיצה על פילי הסטטוס
+    const ohs = document.getElementById('ownerHeroSpinner');
+    document.querySelectorAll('[data-show-spinner]').forEach(a=>{
+      a.addEventListener('click', ()=> { if (ohs) ohs.hidden = false; });
+    });
+  </script>
 </body>
 </html>

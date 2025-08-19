@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- פס טעינה עליון (אם משתמשים ב-loader) -->
+  <!-- פס טעינה עליון (נשלט ע"י JS) -->
   <div id="topLoader" class="top-loader" hidden></div>
 
   <!-- חזרה לאדמין -->
@@ -23,18 +23,24 @@
       <h2>לוח המשימות</h2>
       <p>סקירה מהירה של היקף העבודה וניווט מהיר לכל הרשימות.</p>
 
+      <!-- ספינר בתוך ההירו -->
+      <div id="heroSpinner" class="hero-spinner" hidden aria-live="polite" aria-label="טוען נתונים">
+        <span class="hero-dot"></span><span class="hero-dot"></span><span class="hero-dot"></span>
+      </div>
+
+      <!-- סטטיסטיקות -->
       <div class="stats" id="heroStats" hidden>
-        <a class="stat-link" id="linkTodo" href="./owner.html?owner=all&status=todo" title="כל המשימות בסטטוס 'לטיפול'">
+        <a class="stat-link" id="linkTodo" href="./owner.html?owner=all&status=todo" data-show-spinner>
           <span class="stat-pill">לטיפול: <strong id="statTodo">–</strong></span>
         </a>
-        <a class="stat-link" id="linkInp" href="./owner.html?owner=all&status=inp" title="כל המשימות בסטטוס 'בתהליך'">
+        <a class="stat-link" id="linkInp" href="./owner.html?owner=all&status=inp" data-show-spinner>
           <span class="stat-pill">בתהליך: <strong id="statInp">–</strong></span>
         </a>
       </div>
 
-      <!-- פעולות בהירו — כפתורים כתומים -->
+      <!-- פעולות -->
       <div class="actions" style="margin-top:10px;">
-        <a class="btn orange" href="./owner.html?owner=all">רשימת כל המשימות</a>
+        <a class="btn orange" id="btnAll" href="./owner.html?owner=all" data-show-spinner>רשימת כל המשימות</a>
         <a class="btn orange" href="https://docs.google.com/spreadsheets/d/1vQGA0aeXj9yncK2ZbuYZjrvQgPdpp7qN5FCxWBSAUd4/edit?usp=drivesdk" target="_blank" rel="noopener">
           פתיחה בגוגל שיטס
         </a>
@@ -42,33 +48,11 @@
     </div>
   </header>
 
-  <!-- כותרת + חיפוש -->
-  <header class="page-header">
-    <div class="container">
-      <h1>ניהול משימות</h1>
-      <div class="search-wrap" role="search" aria-label="חיפוש משימות">
-        <input id="globalSearch" type="search" placeholder="חפש לפי שם / טלפון / נושא / caseId…" />
-        <button id="btnSearch" class="btn primary">חיפוש</button>
-        <button id="btnClear" class="btn ghost" type="button">נקה</button>
-        <button id="btnRefresh" class="btn ghost" type="button">רענן</button>
-      </div>
-    </div>
-  </header>
-
+  <!-- בועות -->
   <main class="container">
-    <!-- תוצאות חיפוש -->
-    <section id="searchResults" class="card" style="display:none;">
-      <div class="card-head">
-        <h2>תוצאות חיפוש</h2>
-        <small id="searchCount"></small>
-      </div>
-      <div id="resultsList" class="results-list"></div>
-    </section>
-
-    <!-- בועות (כולל "לא משויך") -->
     <section id="bubbles" aria-label="ביצועים לפי מטפל">
       <div class="bubbles-grid">
-        <a class="bubble big" href="./owner.html?owner=unassigned">
+        <a class="bubble big" href="./owner.html?owner=unassigned" data-show-spinner>
           <div class="bubble-title">לא משויך</div>
           <div class="bubble-stats">
             <div>לטיפול: <span id="u_todo">0</span></div>
@@ -76,7 +60,7 @@
           </div>
         </a>
 
-        <a class="bubble b1" href="./owner.html?owner=חן">
+        <a class="bubble b1" href="./owner.html?owner=חן" data-show-spinner>
           <div class="bubble-title">חן</div>
           <div class="bubble-stats">
             <div>לטיפול: <span id="chen_todo">0</span></div>
@@ -84,7 +68,7 @@
           </div>
         </a>
 
-        <a class="bubble b2" href="./owner.html?owner=תמרה">
+        <a class="bubble b2" href="./owner.html?owner=תמרה" data-show-spinner>
           <div class="bubble-title">תמרה</div>
           <div class="bubble-stats">
             <div>לטיפול: <span id="tam_todo">0</span></div>
@@ -92,7 +76,7 @@
           </div>
         </a>
 
-        <a class="bubble b3" href="./owner.html?owner=בלה">
+        <a class="bubble b3" href="./owner.html?owner=בלה" data-show-spinner>
           <div class="bubble-title">בלה</div>
           <div class="bubble-stats">
             <div>לטיפול: <span id="bel_todo">0</span></div>
@@ -100,7 +84,7 @@
           </div>
         </a>
 
-        <a class="bubble b4" href="./owner.html?owner=ליאור">
+        <a class="bubble b4" href="./owner.html?owner=ליאור" data-show-spinner>
           <div class="bubble-title">ליאור</div>
           <div class="bubble-stats">
             <div>לטיפול: <span id="lio_todo">0</span></div>
@@ -108,7 +92,7 @@
           </div>
         </a>
 
-        <a class="bubble b5" href="./owner.html?owner=נטע">
+        <a class="bubble b5" href="./owner.html?owner=נטע" data-show-spinner>
           <div class="bubble-title">נטע</div>
           <div class="bubble-stats">
             <div>לטיפול: <span id="net_todo">0</span></div>
@@ -119,42 +103,13 @@
     </section>
   </main>
 
-  <script src="./tasks.js"></script>
+  <script src="./tasks.js?v=9"></script>
 
-  <!-- סיכום ל-Hero: נשאר כפי שהיה אצלך (יכול להשתמש ב-window.tasksStats או סכימת בועות) -->
+  <!-- מראה ספינר בעת ניווט -->
   <script>
-    function _toInt(txt){ const n = parseInt(String(txt||'0').replace(/[^\d]/g,''),10); return isNaN(n)?0:n; }
-    (async function loadHeroSummary(){
-      const wrap=document.getElementById('heroStats');
-      const elTodo=document.getElementById('statTodo');
-      const elInp=document.getElementById('statInp');
-
-      // 1) אם tasks.js כבר הכניס window.tasksStats (נתוני אמת)
-      if (window.tasksStats && window.tasksStats.totals) {
-        const { todo, inProgress } = window.tasksStats.totals;
-        elTodo.textContent = typeof todo==='number'?todo:'–';
-        elInp.textContent  = typeof inProgress==='number'?inProgress:'–';
-        wrap.hidden=false; return;
-      }
-
-      // 2) סכימה מתוך הבועות
-      const sum = nodes=>nodes.reduce((acc,el)=>acc+_toInt(el.textContent),0);
-      const todo = sum(Array.from(document.querySelectorAll('[id$="_todo"]')));
-      const inp  = sum(Array.from(document.querySelectorAll('[id$="_inp"]')));
-      elTodo.textContent = todo; elInp.textContent = inp; wrap.hidden=false;
-    })();
-
-    // רענון ידני
-    document.getElementById('btnRefresh')?.addEventListener('click', async ()=>{
-      if (window.reloadTasksStats) await window.reloadTasksStats();
-      const wrap=document.getElementById('heroStats');
-      const elTodo=document.getElementById('statTodo');
-      const elInp=document.getElementById('statInp');
-      if (window.tasksStats && window.tasksStats.totals) {
-        elTodo.textContent = window.tasksStats.totals.todo ?? '–';
-        elInp.textContent  = window.tasksStats.totals.inProgress ?? '–';
-        wrap.hidden=false;
-      }
+    const heroSpinner = document.getElementById('heroSpinner');
+    document.querySelectorAll('[data-show-spinner]').forEach(a=>{
+      a.addEventListener('click', () => { if (heroSpinner) heroSpinner.hidden = false; });
     });
   </script>
 </body>

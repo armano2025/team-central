@@ -177,4 +177,85 @@ async function loadTasks(){
   }catch(err){
     els.errBox.textContent = `שגיאת טעינה מהשרת: ${err.message || err}`;
     show(els.errBox);
-    appendDebug('LOAD ERROR', String(err), 
+    appendDebug('LOAD ERROR', String(err), 0);
+  }finally{
+    hide(els.loader);
+    topLoad(false); heroLoad(false);
+  }
+}
+
+/* Dialog */
+function openDialog(caseId){
+  const row = els.list.querySelector(`.result-item[data-id="${CSS.escape(String(caseId))}"]`);
+  if(!row) return;
+  const t = JSON.parse(row.dataset.task || '{}');
+
+  document.getElementById('dlgTitle').textContent = t.subject || '(ללא כותרת)';
+  els.f_caseId.value = t.caseId ?? '';
+  els.f_status.value = t.status ?? 'לטיפול';
+  els.f_owner.value  = (norm(t.owner) ? t.owner : '');
+  els.f_name.value   = t.fullName ?? '';
+  els.f_phone.value  = t.phone ?? '';
+  els.f_notes.value  = t.adminNotes ?? '';
+
+  els.dlg.showModal();
+}
+
+/* Save (no-preflight) */
+async function saveTask(){
+  const caseId = els.f_caseId.value;
+  const body = { status: els.f_status.value, owner: els.f_owner.value, adminNotes: els.f_notes.value };
+
+  try{
+    els.btnSave.disabled = true; topLoad(true);
+
+    const url = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}&_=${Date.now()}`;
+    const res = await fetch(url, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=UTF-8' }, // אין OPTIONS
+      body: JSON.stringify(body),
+      credentials:'omit',
+      cache: 'no-store'
+    });
+
+    const text = await res.text();
+    appendDebug('POST '+url+'\n'+JSON.stringify(body,null,2), text, res.status);
+
+    let json = null; try { json = JSON.parse(text); } catch {}
+
+    if(!res.ok || (json && json.error)){
+      const msg = (json && json.error) ? json.error : (text || `HTTP ${res.status}`);
+      showToast('שמירה נכשלה: ' + msg);
+      throw new Error(msg);
+    }
+
+    showToast('עודכן בהצלחה');
+    await loadTasks();
+    els.dlg.close();
+  }catch(err){
+    console.error('saveTask failed:', err);
+  }finally{
+    els.btnSave.disabled = false;
+    topLoad(false);
+  }
+}
+
+/* Toast */
+function showToast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:16px;right:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:.95;z-index:9999';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+/* Events */
+els.btnSearch.addEventListener('click', loadTasks);
+els.search.addEventListener('keydown', e=>{ if(e.key==='Enter') loadTasks(); });
+els.btnClear.addEventListener('click', ()=>{ els.search.value=''; loadTasks(); });
+els.btnRefresh?.addEventListener('click', loadTasks);
+els.btnSave.addEventListener('click', saveTask);
+els.btnClose.addEventListener('click', ()=> els.dlg.close());
+
+/* Init */
+loadTasks();

@@ -1,4 +1,4 @@
-/* /tasks/owner.js — V11 (supports owner=all + top loader) */
+/* /tasks/owner.js — V12 (owner=all + status filter) */
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
 
@@ -18,11 +18,12 @@ async function fetchJSON(url){
   try { return JSON.parse(text); } catch { throw new Error('Bad JSON'); }
 }
 
-/* Elements */
-const ownerParamRaw = decodeURIComponent(qs.get('owner') || 'unassigned');
-const ownerParam = norm(ownerParamRaw);            // 'unassigned' | שם בעלים | 'all'
+/* URL params */
+const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned')); // 'all' / 'unassigned' / שם
+const statusParam = norm((qs.get('status') || '').toLowerCase());              // '' | 'todo' | 'inp'
 const focusId    = norm(qs.get('focus') || '');
 
+/* Elements */
 const els = {
   title: document.getElementById('ownerTitle'),
   stats: document.getElementById('ownerStats'),
@@ -62,10 +63,21 @@ function appendDebug(title, payload, status){
 
 /* Title */
 els.title.textContent =
-  `משימות – ${ownerParam === 'unassigned' ? 'לא משויך' : (ownerParam === 'all' ? 'כל המשימות' : ownerParam)}`;
+  `משימות – ${
+    ownerParam === 'unassigned' ? 'לא משויך' :
+    ownerParam === 'all' ? 'כל המשימות' : ownerParam
+  }${
+    statusParam ? ` – ${statusParam==='todo'?'לטיפול':'בתהליך'}` : ''
+  }`;
 
 /* Loader helper */
 function topLoad(on){ if (els.topLoader) els.topLoader.hidden = !on; }
+
+/* מיפוי סטטוסים לפילטר */
+const STATUS_FILTERS = {
+  todo: new Set(['לטיפול','בטיפול','todo','to-do','to do']),
+  inp:  new Set(['בתהליך','בתהליך עבודה','in progress','in_progress','in-progress','inp'])
+};
 
 /* Load tasks */
 async function loadTasks(){
@@ -77,7 +89,7 @@ async function loadTasks(){
     const u = new URL(BASE_URL);
     u.searchParams.set('path','tasks');
 
-    // תמיכה ב-all: לא שולחים owner בכלל כדי לקבל את הכול
+    // owner: אם all – לא שולחים כדי לקבל הכול
     if (ownerParam === 'unassigned') {
       u.searchParams.set('owner', 'unassigned');
     } else if (ownerParam !== 'all') {
@@ -86,9 +98,15 @@ async function loadTasks(){
     if(q) u.searchParams.set('q', q);
 
     const data = await fetchJSON(u.toString());
-    const items = Array.isArray(data.tasks) ? data.tasks : [];
+    let items = Array.isArray(data.tasks) ? data.tasks : [];
 
-    const order = {'לטיפול':0,'בתהליך':1,'בוצע':2,'בוטל':3};
+    // סינון לפי status אם הגיע מה־URL
+    if (statusParam && STATUS_FILTERS[statusParam]) {
+      const set = STATUS_FILTERS[statusParam];
+      items = items.filter(t => set.has(norm(t.status)));
+    }
+
+    const order = {'לטיפול':0,'בטיפול':0,'בתהליך':1,'בוצע':2,'בוטל':3};
     items.sort((a,b)=>(order[a.status]??9)-(order[b.status]??9));
 
     const counts = {'לטיפול':0,'בתהליך':0,'בוצע':0,'בוטל':0};
@@ -102,7 +120,7 @@ async function loadTasks(){
     }
 
     els.list.innerHTML = items.map(t=>{
-      const ownerLabel = t.owner || 'לא משויך';
+      const ownerLabel = (t.owner && t.owner.trim()) ? t.owner : 'לא משויך';
       return `
         <div class="result-item" data-id="${escapeHTML(String(t.caseId))}"
              data-task='${escapeHTML(JSON.stringify(t))}'
@@ -143,7 +161,7 @@ function openDialog(caseId){
   document.getElementById('dlgTitle').textContent = t.subject || '(ללא כותרת)';
   els.f_caseId.value = t.caseId ?? '';
   els.f_status.value = t.status ?? 'לטיפול';
-  els.f_owner.value  = (t.owner === 'לא משויך' ? '' : (t.owner ?? ''));
+  els.f_owner.value  = (t.owner && t.owner.trim()) ? t.owner : '';
   els.f_name.value   = t.fullName ?? '';
   els.f_phone.value  = t.phone ?? '';
   els.f_notes.value  = t.adminNotes ?? '';
@@ -167,7 +185,7 @@ async function saveTask(){
     const url = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}`;
     const res = await fetch(url, {
       method:'POST',
-      headers:{ 'Content-Type':'text/plain;charset=UTF-8' }, // אין OPTIONS
+      headers:{ 'Content-Type':'text/plain;charset=UTF-8' },
       body: JSON.stringify(body),
       credentials:'omit'
     });

@@ -1,16 +1,16 @@
-/* /tasks/tasks.js — V4 (API fix + unassigned fix + loader + refresh hook) */
+/* /tasks/tasks.js — V5 (totals from tasks, counts include empty owner, refresh hook) */
 
 /* ===== CONFIG ===== */
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
-window.BASE_URL = BASE_URL; // לשימוש בסקריפטים מוטמעים
+window.BASE_URL = BASE_URL;
 
 /* ===== Helpers ===== */
 function norm(s) {
   return String(s ?? '')
-    .replace(/[\u200E\u200F\u202A-\u202E]/g, '') // תווי כיווניות
-    .replace(/\u00A0/g, ' ')                      // NBSP -> space
-    .replace(/\s+/g, ' ')                         // איחוד רווחים
+    .replace(/[\u200E\u200F\u202A-\u202E]/g, '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 function escapeHTML(s) {
@@ -22,74 +22,21 @@ function escapeHTML(s) {
 async function fetchJSON(url) {
   const res  = await fetch(url, { credentials: 'omit' });
   const text = await res.text();
-  if (!res.ok) {
-    console.error('API error:', res.status, text);
-    throw new Error(text || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
   try { return JSON.parse(text); }
-  catch {
-    console.error('Bad JSON from API:', text);
-    throw new Error('Bad JSON');
-  }
+  catch { throw new Error('Bad JSON'); }
 }
 
-/* === Helpers נוספים לנורמליזציה (סטטוסים/בעלים) === */
-// מיפוי וריאציות של סטטוסים לערכים לוגיים אחידים
-const STATUS_MAP = {
-  // עברית
-  'לטיפול': 'todo',
-  'בטיפול': 'todo',
-  'בתהליך': 'inp',
-  'בתהליך עבודה': 'inp',
-  // אנגלית/קיצורים
-  'todo': 'todo',
-  'to-do': 'todo',
-  'to do': 'todo',
-  'in progress': 'inp',
-  'in_progress': 'inp',
-  'in-progress': 'inp',
-  'inp': 'inp'
+/* נרמול סטטוס לבאקטים לוגיים */
+const STATUS_TO_BUCKET = {
+  'לטיפול':'todo', 'בטיפול':'todo', 'todo':'todo', 'to-do':'todo', 'to do':'todo',
+  'בתהליך':'inp', 'בתהליך עבודה':'inp', 'in progress':'inp','in_progress':'inp','in-progress':'inp','inp':'inp'
 };
-
-// מנרמל מפתח סטטוס גולמי לערך אחיד
-function normalizeStatusKey(rawKey) {
-  const k = norm(rawKey).toLowerCase();
-  return STATUS_MAP[k] || k; // אם לא מצא – מחזיר את המחרוזת (אחרי נרמול)
-}
-
-// מאתר את המפתח המדויק של בעלים בתוך data לפי שם מבוקש (אחרי נרמול)
-function findOwnerKey(data, wanted) {
-  const wantedNorm = norm(wanted);
-  for (const key of Object.keys(data || {})) {
-    if (norm(key) === wantedNorm) return key;
-  }
-  // כיסוי ל"לא משויך"
-  if (wantedNorm === 'לא משויך') {
-    const candidates = ['', 'לא משויך', 'unassigned', '—', '-'];
-    for (const key of Object.keys(data || {})) {
-      if (candidates.includes(norm(key))) return key;
-    }
-  }
-  return null;
-}
-
-// מחזיר ספירה לפי בעלים+סטטוס (עם נורמליזציה של מפתחות בתוך האובייקט)
-function getCountByOwnerAndStatus(data, ownerWanted, statusWanted) {
-  const ownerKey = findOwnerKey(data, ownerWanted);
-  if (!ownerKey) return 0;
-  const o = data[ownerKey] || {};
-  const wantedNorm = normalizeStatusKey(statusWanted);
-  let sum = 0;
-  for (const [rawKey, val] of Object.entries(o)) {
-    if (normalizeStatusKey(rawKey) === wantedNorm) {
-      sum += Number(val || 0);
-    }
-  }
-  return sum;
-}
+function bucketStatus(s){ return STATUS_TO_BUCKET[norm(s).toLowerCase()] || norm(s); }
 
 /* ===== Elements ===== */
 const els = {
+  // חיפוש
   searchInput:  document.getElementById('globalSearch'),
   btnSearch:    document.getElementById('btnSearch'),
   btnClear:     document.getElementById('btnClear'),
@@ -97,7 +44,7 @@ const els = {
   resultsList:  document.getElementById('resultsList'),
   resultsCount: document.getElementById('searchCount'),
 
-  // Counters (Hero + Owners)
+  // Counters (bubbles)
   u_todo:    document.getElementById('u_todo'),
   u_inp:     document.getElementById('u_inp'),
   chen_todo: document.getElementById('chen_todo'),
@@ -110,71 +57,64 @@ const els = {
   lio_inp:   document.getElementById('lio_inp'),
   net_todo:  document.getElementById('net_todo'),
   net_inp:   document.getElementById('net_inp'),
-  topLoader: document.getElementById('topLoader'),
 };
 
-/* ===== Loader helpers ===== */
-function topLoad(on){ if (els.topLoader) els.topLoader.hidden = !on; }
+/* ===== חישוב סיכומים מתוך /tasks (כולל owner ריק) ===== */
+function aggregateFromTasks(list){
+  const agg = {
+    totals: { todo:0, inProgress:0 },
+    owners: {} // { '<ownerLabel>': { todo, inp } }
+  };
 
-/* ===== Stats ===== */
-async function loadStats() {
-  const u = new URL(BASE_URL);
-  u.searchParams.set('path', 'stats');
+  for (const t of list) {
+    const bucket = bucketStatus(t.status);
+    if (bucket !== 'todo' && bucket !== 'inp') continue;
 
-  topLoad(true);
-  const data = await fetchJSON(u.toString()).finally(()=> topLoad(false));
+    // בעלים: אם ריק/undefined/— → "לא משויך"
+    const rawOwner = (t.owner ?? '').trim();
+    const ownerLabel = rawOwner ? rawOwner : 'לא משויך';
 
-  // לוג מפורט לראות בדיוק מה מגיע מה־API (פתח קונסול)
-  console.log('[tasks] Raw stats data:', JSON.stringify(data, null, 2));
+    // totals
+    if (bucket === 'todo') agg.totals.todo++;
+    else if (bucket === 'inp') agg.totals.inProgress++;
 
-  // --- סיכום עליון (לשימוש פנימי/אימות בלבד) ---
-  let totalTodo = 0, totalInp = 0;
-  for (const ownerKey of Object.keys(data || {})) {
-    const bucket = data[ownerKey] || {};
-    for (const [rawStatusKey, val] of Object.entries(bucket)) {
-      const nk = normalizeStatusKey(rawStatusKey);
-      const n = Number(val || 0);
-      if (nk === 'todo') totalTodo += n;
-      else if (nk === 'inp') totalInp += n;
-    }
+    // per owner
+    if (!agg.owners[ownerLabel]) agg.owners[ownerLabel] = { todo:0, inp:0 };
+    agg.owners[ownerLabel][bucket === 'todo' ? 'todo' : 'inp']++;
   }
-  // שים לב: לא כותבים כאן ל-#statTodo/#statInp (זה נעשה ב-HERO script).
-  // כאן מעדכנים רק את הבועות של כל בעלים.
 
-  // --- ספציפיים לבעלים (כולל "לא משויך") ---
-  if (els.u_todo) els.u_todo.textContent = getCountByOwnerAndStatus(data, 'לא משויך', 'לטיפול');
-  if (els.u_inp)  els.u_inp.textContent  = getCountByOwnerAndStatus(data, 'לא משויך', 'בתהליך');
+  return agg;
+}
 
-  if (els.chen_todo) els.chen_todo.textContent = getCountByOwnerAndStatus(data, 'חן', 'לטיפול');
-  if (els.chen_inp)  els.chen_inp.textContent  = getCountByOwnerAndStatus(data, 'חן', 'בתהליך');
+/* ===== טוען את כל המשימות לצורך סיכומים ובועות ===== */
+async function loadAllForStats(){
+  const u = new URL(BASE_URL);
+  u.searchParams.set('path','tasks'); // בלי owner -> כל המשימות
+  const data = await fetchJSON(u.toString());
+  const list = Array.isArray(data.tasks) ? data.tasks : [];
+  const agg  = aggregateFromTasks(list);
 
-  if (els.tam_todo) els.tam_todo.textContent = getCountByOwnerAndStatus(data, 'תמרה', 'לטיפול');
-  if (els.tam_inp)  els.tam_inp.textContent  = getCountByOwnerAndStatus(data, 'תמרה', 'בתהליך');
+  // חשיפה ל-Hero
+  window.tasksStats = { totals: { todo: agg.totals.todo, inProgress: agg.totals.inProgress } };
 
-  if (els.bel_todo) els.bel_todo.textContent = getCountByOwnerAndStatus(data, 'בלה', 'לטיפול');
-  if (els.bel_inp)  els.bel_inp.textContent  = getCountByOwnerAndStatus(data, 'בלה', 'בתהליך');
+  // עדכון בועות
+  const get = (name, key) => (agg.owners[name]?.[key] ?? 0);
+  if (els.u_todo)  els.u_todo.textContent  = get('לא משויך','todo');
+  if (els.u_inp)   els.u_inp.textContent   = get('לא משויך','inp');
+  if (els.chen_todo) els.chen_todo.textContent = get('חן','todo');
+  if (els.chen_inp)  els.chen_inp.textContent  = get('חן','inp');
+  if (els.tam_todo)  els.tam_todo.textContent  = get('תמרה','todo');
+  if (els.tam_inp)   els.tam_inp.textContent   = get('תמרה','inp');
+  if (els.bel_todo)  els.bel_todo.textContent  = get('בלה','todo');
+  if (els.bel_inp)   els.bel_inp.textContent   = get('בלה','inp');
+  if (els.lio_todo)  els.lio_todo.textContent  = get('ליאור','todo');
+  if (els.lio_inp)   els.lio_inp.textContent   = get('ליאור','inp');
+  if (els.net_todo)  els.net_todo.textContent  = get('נטע','todo');
+  if (els.net_inp)   els.net_inp.textContent   = get('נטע','inp');
 
-  if (els.lio_todo) els.lio_todo.textContent = getCountByOwnerAndStatus(data, 'ליאור', 'לטיפול');
-  if (els.lio_inp)  els.lio_inp.textContent  = getCountByOwnerAndStatus(data, 'ליאור', 'בתהליך');
-
-  if (els.net_todo) els.net_todo.textContent = getCountByOwnerAndStatus(data, 'נטע', 'לטיפול');
-  if (els.net_inp)  els.net_inp.textContent  = getCountByOwnerAndStatus(data, 'נטע', 'בתהליך');
-
-  // דיאגנוסטיקה קצרה: טבלה מסודרת לראות את כל הבעלים והערכים המנורמלים
-  try {
-    const diag = Object.keys(data || {}).map(ownerKey => {
-      const o = data[ownerKey] || {};
-      let todo = 0, inp = 0;
-      for (const [k, v] of Object.entries(o)) {
-        const nk = normalizeStatusKey(k);
-        if (nk === 'todo') todo += Number(v || 0);
-        else if (nk === 'inp') inp += Number(v || 0);
-      }
-      return { owner: ownerKey, todo, inp, raw: o };
-    });
-    console.table(diag);
-  } catch (e) {
-    console.warn('diag failed:', e);
+  // אם ל-Hero יש סקריפט שמאזין – יעדכן מיד
+  if (typeof window.__updateHeroFromStats === 'function') {
+    window.__updateHeroFromStats();
   }
 }
 
@@ -191,13 +131,12 @@ async function runGlobalSearch() {
   u.searchParams.set('path', 'tasks');
   u.searchParams.set('q', q);
 
-  topLoad(true);
-  const data = await fetchJSON(u.toString()).finally(()=> topLoad(false));
+  const data = await fetchJSON(u.toString());
   const list = Array.isArray(data.tasks) ? data.tasks : [];
 
   els.resultsCount.textContent = `נמצאו ${list.length} תוצאות`;
   els.resultsList.innerHTML = list.map(t => {
-    const ownerLabel = t.owner || 'לא משויך';
+    const ownerLabel = (t.owner && t.owner.trim()) ? t.owner : 'לא משויך';
     const linkOwner  = ownerLabel === 'לא משויך' ? 'unassigned' : encodeURIComponent(ownerLabel);
     const focusId    = encodeURIComponent(String(t.caseId ?? ''));
     return `
@@ -226,8 +165,5 @@ if (els.btnClear)   els.btnClear.addEventListener('click', () => {
 });
 
 /* ===== Init + Refresh hook ===== */
-window.__loadStatsPromise = loadStats().catch(err => console.error('loadStats failed:', err));
-window.reloadTasksStats = async () => {
-  try { topLoad(true); return await loadStats(); }
-  finally { topLoad(false); }
-};
+window.__loadStatsPromise = loadAllForStats().catch(err => console.error('stats load failed:', err));
+window.reloadTasksStats = async () => loadAllForStats();

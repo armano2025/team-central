@@ -1,233 +1,190 @@
-/* /tasks/owner.js — V12 (owner=all + status filter) */
+/* /tasks/tasks.js — V7 (hero totals + top loader spinner) */
+
+/* ===== CONFIG ===== */
 const BASE_URL =
   'https://script.google.com/macros/s/AKfycbybBJXB1vTEv9EDjyRXJnU674ZSCoUCT5MB9g9CTbDAiLKWn5iMAWSjC2XXLN4_ZdOhRw/exec';
+window.BASE_URL = BASE_URL;
 
-/* Helpers */
-const qs = new URLSearchParams(location.search);
-const DEBUG = qs.get('debug') === '1';
-
-function norm(s){ return String(s ?? '').replace(/[\u200E\u200F\u202A-\u202E]/g,'').replace(/\u00A0/g,' ').replace(/\s+/g,' ').trim(); }
-function escapeHTML(s){ return String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-function show(el){ el.style.display='block'; } function hide(el){ el.style.display='none'; }
-
-async function fetchJSON(url){
-  const res  = await fetch(url, { credentials:'omit' });
+/* ===== Helpers ===== */
+function norm(s) {
+  return String(s ?? '')
+    .replace(/[\u200E\u200F\u202A-\u202E]/g, '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function escapeHTML(s) {
+  const str = String(s ?? '');
+  return str.replace(/[&<>"']/g, m => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]
+  ));
+}
+async function fetchJSON(url) {
+  const res  = await fetch(url, { credentials: 'omit' });
   const text = await res.text();
-  if(DEBUG) appendDebug('GET '+url, text, res.status);
-  if(!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
   try { return JSON.parse(text); } catch { throw new Error('Bad JSON'); }
 }
 
-/* URL params */
-const ownerParam = norm(decodeURIComponent(qs.get('owner') || 'unassigned')); // 'all' / 'unassigned' / שם
-const statusParam = norm((qs.get('status') || '').toLowerCase());              // '' | 'todo' | 'inp'
-const focusId    = norm(qs.get('focus') || '');
+/* spinner (top loader) */
+const topLoaderEl = document.getElementById('topLoader');
+function topLoad(on){ if (topLoaderEl) topLoaderEl.hidden = !on; }
 
-/* Elements */
+/* נרמול סטטוס לבאקטים לוגיים */
+const STATUS_TO_BUCKET = {
+  'לטיפול':'todo', 'בטיפול':'todo', 'todo':'todo', 'to-do':'todo', 'to do':'todo',
+  'בתהליך':'inp', 'בתהליך עבודה':'inp', 'in progress':'inp','in_progress':'inp','in-progress':'inp','inp':'inp'
+};
+function bucketStatus(s){ return STATUS_TO_BUCKET[norm(s).toLowerCase()] || norm(s); }
+
+/* ===== Elements ===== */
 const els = {
-  title: document.getElementById('ownerTitle'),
-  stats: document.getElementById('ownerStats'),
-  list:  document.getElementById('tasksList'),
-  search: document.getElementById('ownerSearch'),
-  btnSearch: document.getElementById('btnOwnerSearch'),
-  btnClear:  document.getElementById('btnOwnerClear'),
-  btnRefresh: document.getElementById('btnOwnerRefresh'),
-  loader: document.getElementById('loader'),
-  errBox: document.getElementById('errBox'),
-  dlg: document.getElementById('taskDialog'),
-  f_status: document.getElementById('f_status'),
-  f_owner:  document.getElementById('f_owner'),
-  f_name:   document.getElementById('f_name'),
-  f_phone:  document.getElementById('f_phone'),
-  f_notes:  document.getElementById('f_notes'),
-  f_caseId: document.getElementById('f_caseId'),
-  btnSave:  document.getElementById('btnSave'),
-  btnClose: document.getElementById('btnClose'),
-  topLoader: document.getElementById('topLoader'),
+  // חיפוש
+  searchInput:  document.getElementById('globalSearch'),
+  btnSearch:    document.getElementById('btnSearch'),
+  btnClear:     document.getElementById('btnClear'),
+  resultsBox:   document.getElementById('searchResults'),
+  resultsList:  document.getElementById('resultsList'),
+  resultsCount: document.getElementById('searchCount'),
+
+  // Counters (bubbles)
+  u_todo:    document.getElementById('u_todo'),
+  u_inp:     document.getElementById('u_inp'),
+  chen_todo: document.getElementById('chen_todo'),
+  chen_inp:  document.getElementById('chen_inp'),
+  tam_todo:  document.getElementById('tam_todo'),
+  tam_inp:   document.getElementById('tam_inp'),
+  bel_todo:  document.getElementById('bel_todo'),
+  bel_inp:   document.getElementById('bel_inp'),
+  lio_todo:  document.getElementById('lio_todo'),
+  lio_inp:   document.getElementById('lio_inp'),
+  net_todo:  document.getElementById('net_todo'),
+  net_inp:   document.getElementById('net_inp'),
+
+  // Hero
+  heroWrap:  document.getElementById('heroStats'),
+  statTodo:  document.getElementById('statTodo'),
+  statInp:   document.getElementById('statInp'),
 };
 
-/* Debug panel (optional, ?debug=1) */
-let dbg;
-function ensureDebug(){
-  if(!DEBUG || dbg) return;
-  dbg = document.createElement('pre');
-  dbg.style.cssText = 'position:fixed;left:8px;bottom:8px;max-height:40vh;max-width:90vw;overflow:auto;background:#0b1020;color:#9fe; padding:8px 10px;border-radius:8px; font:12px/1.45 ui-monospace,monospace; z-index:9999';
-  document.body.appendChild(dbg);
-}
-function appendDebug(title, payload, status){
-  ensureDebug();
-  if(!DEBUG) return;
-  const time = new Date().toLocaleTimeString();
-  dbg.textContent += `\n[${time}] ${title} (status ${status})\n${payload}\n`;
-}
-
-/* Title */
-els.title.textContent =
-  `משימות – ${
-    ownerParam === 'unassigned' ? 'לא משויך' :
-    ownerParam === 'all' ? 'כל המשימות' : ownerParam
-  }${
-    statusParam ? ` – ${statusParam==='todo'?'לטיפול':'בתהליך'}` : ''
-  }`;
-
-/* Loader helper */
-function topLoad(on){ if (els.topLoader) els.topLoader.hidden = !on; }
-
-/* מיפוי סטטוסים לפילטר */
-const STATUS_FILTERS = {
-  todo: new Set(['לטיפול','בטיפול','todo','to-do','to do']),
-  inp:  new Set(['בתהליך','בתהליך עבודה','in progress','in_progress','in-progress','inp'])
-};
-
-/* Load tasks */
-async function loadTasks(){
-  try{
-    hide(els.errBox); show(els.loader); els.list.innerHTML = '';
-    topLoad(true);
-
-    const q = norm(els.search.value);
-    const u = new URL(BASE_URL);
-    u.searchParams.set('path','tasks');
-
-    // owner: אם all – לא שולחים כדי לקבל הכול
-    if (ownerParam === 'unassigned') {
-      u.searchParams.set('owner', 'unassigned');
-    } else if (ownerParam !== 'all') {
-      u.searchParams.set('owner', ownerParam);
-    }
-    if(q) u.searchParams.set('q', q);
-
-    const data = await fetchJSON(u.toString());
-    let items = Array.isArray(data.tasks) ? data.tasks : [];
-
-    // סינון לפי status אם הגיע מה־URL
-    if (statusParam && STATUS_FILTERS[statusParam]) {
-      const set = STATUS_FILTERS[statusParam];
-      items = items.filter(t => set.has(norm(t.status)));
-    }
-
-    const order = {'לטיפול':0,'בטיפול':0,'בתהליך':1,'בוצע':2,'בוטל':3};
-    items.sort((a,b)=>(order[a.status]??9)-(order[b.status]??9));
-
-    const counts = {'לטיפול':0,'בתהליך':0,'בוצע':0,'בוטל':0};
-    items.forEach(t=> counts[t.status]=(counts[t.status]||0)+1);
-    els.stats.textContent =
-      `לטיפול: ${counts['לטיפול']||0} | בתהליך: ${counts['בתהליך']||0} | בוצע: ${counts['בוצע']||0} | בוטל: ${counts['בוטל']||0}`;
-
-    if(!items.length){
-      els.list.innerHTML = `<div class="card muted">אין משימות לתצוגה.</div>`;
-      return;
-    }
-
-    els.list.innerHTML = items.map(t=>{
-      const ownerLabel = (t.owner && t.owner.trim()) ? t.owner : 'לא משויך';
-      return `
-        <div class="result-item" data-id="${escapeHTML(String(t.caseId))}"
-             data-task='${escapeHTML(JSON.stringify(t))}'
-             ${focusId && String(t.caseId)===focusId ? 'style="outline:2px solid #2563eb;"' : ''}>
-          <div>
-            <div><strong>${escapeHTML(t.subject ?? '(ללא כותרת)')}</strong></div>
-            <div class="result-meta">#${escapeHTML(t.caseId)} • ${escapeHTML(t.fullName ?? '')} • ${escapeHTML(t.phone ?? '')}</div>
-            <div class="result-meta">סטטוס: ${escapeHTML(t.status ?? '')} • מטפל: ${escapeHTML(ownerLabel)}</div>
-          </div>
-          <button class="btn" data-open="${escapeHTML(String(t.caseId))}">פתח</button>
-        </div>`;
-    }).join('');
-
-    els.list.querySelectorAll('button[data-open]').forEach(btn=>{
-      btn.addEventListener('click', ()=> openDialog(btn.dataset.open));
-    });
-
-    if(focusId){
-      const btn = els.list.querySelector(`button[data-open="${CSS.escape(String(focusId))}"]`);
-      if(btn) btn.click();
-    }
-  }catch(err){
-    els.errBox.textContent = `שגיאת טעינה מהשרת: ${err.message || err}`;
-    show(els.errBox);
-    appendDebug('LOAD ERROR', String(err), 0);
-  }finally{
-    hide(els.loader);
-    topLoad(false);
-  }
-}
-
-/* Dialog */
-function openDialog(caseId){
-  const row = els.list.querySelector(`.result-item[data-id="${CSS.escape(String(caseId))}"]`);
-  if(!row) return;
-  const t = JSON.parse(row.dataset.task || '{}');
-
-  document.getElementById('dlgTitle').textContent = t.subject || '(ללא כותרת)';
-  els.f_caseId.value = t.caseId ?? '';
-  els.f_status.value = t.status ?? 'לטיפול';
-  els.f_owner.value  = (t.owner && t.owner.trim()) ? t.owner : '';
-  els.f_name.value   = t.fullName ?? '';
-  els.f_phone.value  = t.phone ?? '';
-  els.f_notes.value  = t.adminNotes ?? '';
-
-  els.dlg.showModal();
-}
-
-/* Save (no-preflight) */
-async function saveTask(){
-  const caseId = els.f_caseId.value;
-  const body = {
-    status: els.f_status.value,
-    owner:  els.f_owner.value,
-    adminNotes: els.f_notes.value
+/* ===== אגרגציה מתוך כל המשימות (כולל owner ריק) ===== */
+function aggregateFromTasks(list){
+  const agg = {
+    totals: { todo:0, inProgress:0 },
+    owners: {} // { '<ownerLabel>': { todo, inp } }
   };
 
-  try{
-    els.btnSave.disabled = true;
-    topLoad(true);
+  for (const t of list) {
+    const bucket = bucketStatus(t.status);
+    if (bucket !== 'todo' && bucket !== 'inp') continue;
 
-    const url = `${BASE_URL}?path=tasks/${encodeURIComponent(caseId)}`;
-    const res = await fetch(url, {
-      method:'POST',
-      headers:{ 'Content-Type':'text/plain;charset=UTF-8' },
-      body: JSON.stringify(body),
-      credentials:'omit'
-    });
+    // owner: אם ריק/undefined/— → "לא משויך"
+    const ownerLabel = norm(t.owner) ? t.owner : 'לא משויך';
 
-    const text = await res.text();
-    appendDebug('POST '+url+'\n'+JSON.stringify(body,null,2), text, res.status);
+    // totals
+    if (bucket === 'todo') agg.totals.todo++;
+    else if (bucket === 'inp') agg.totals.inProgress++;
 
-    let json = null; try { json = JSON.parse(text); } catch {}
+    // per owner
+    if (!agg.owners[ownerLabel]) agg.owners[ownerLabel] = { todo:0, inp:0 };
+    if (bucket === 'todo') agg.owners[ownerLabel].todo++;
+    else agg.owners[ownerLabel].inp++;
+  }
 
-    if(!res.ok || (json && json.error)){
-      const msg = (json && json.error) ? json.error : (text || `HTTP ${res.status}`);
-      showToast('שמירה נכשלה: ' + msg);
-      throw new Error(msg);
+  return agg;
+}
+
+/* ===== טוען את כל המשימות → מעדכן Hero + בועות ===== */
+async function loadAllForStats(){
+  const u = new URL(BASE_URL);
+  u.searchParams.set('path','tasks'); // בלי owner -> כל המשימות
+
+  topLoad(true);
+  try {
+    const data = await fetchJSON(u.toString());
+    const list = Array.isArray(data.tasks) ? data.tasks : [];
+    const agg  = aggregateFromTasks(list);
+
+    // --- Hero: נתוני אמת ---
+    window.tasksStats = { totals: { todo: agg.totals.todo, inProgress: agg.totals.inProgress } };
+    if (els.statTodo) els.statTodo.textContent = agg.totals.todo;
+    if (els.statInp)  els.statInp.textContent  = agg.totals.inProgress;
+    if (els.heroWrap) els.heroWrap.hidden = false;
+
+    // --- Bubbles ---
+    const get = (name, key) => (agg.owners[name]?.[key] ?? 0);
+    if (els.u_todo)    els.u_todo.textContent    = get('לא משויך','todo');
+    if (els.u_inp)     els.u_inp.textContent     = get('לא משויך','inp');
+    if (els.chen_todo) els.chen_todo.textContent = get('חן','todo');
+    if (els.chen_inp)  els.chen_inp.textContent  = get('חן','inp');
+    if (els.tam_todo)  els.tam_todo.textContent  = get('תמרה','todo');
+    if (els.tam_inp)   els.tam_inp.textContent   = get('תמרה','inp');
+    if (els.bel_todo)  els.bel_todo.textContent  = get('בלה','todo');
+    if (els.bel_inp)   els.bel_inp.textContent   = get('בלה','inp');
+    if (els.lio_todo)  els.lio_todo.textContent  = get('ליאור','todo');
+    if (els.lio_inp)   els.lio_inp.textContent   = get('ליאור','inp');
+    if (els.net_todo)  els.net_todo.textContent  = get('נטע','todo');
+    if (els.net_inp)   els.net_inp.textContent   = get('נטע','inp');
+
+    if (typeof window.__updateHeroFromStats === 'function') {
+      window.__updateHeroFromStats();
     }
-
-    showToast('עודכן בהצלחה');
-    await loadTasks();
-    els.dlg.close();
-  }catch(err){
-    console.error('saveTask failed:', err);
-  }finally{
-    els.btnSave.disabled = false;
+  } finally {
     topLoad(false);
   }
 }
 
-/* Toast */
-function showToast(msg){
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:16px;right:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;opacity:.95;z-index:9999';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2200);
+/* ===== Global Search ===== */
+async function runGlobalSearch() {
+  const q = norm(els.searchInput.value);
+  if (!q) {
+    els.resultsBox.style.display = 'none';
+    els.resultsList.innerHTML = '';
+    return;
+  }
+
+  const u = new URL(BASE_URL);
+  u.searchParams.set('path', 'tasks');
+  u.searchParams.set('q', q);
+
+  topLoad(true);
+  try {
+    const data = await fetchJSON(u.toString());
+    const list = Array.isArray(data.tasks) ? data.tasks : [];
+
+    els.resultsCount.textContent = `נמצאו ${list.length} תוצאות`;
+    els.resultsList.innerHTML = list.map(t => {
+      const ownerLabel = norm(t.owner) ? t.owner : 'לא משויך';
+      const linkOwner  = ownerLabel === 'לא משויך' ? 'unassigned' : encodeURIComponent(ownerLabel);
+      const focusId    = encodeURIComponent(String(t.caseId ?? ''));
+      return `
+        <div class="result-item">
+          <div>
+            <div><strong>${escapeHTML(t.subject ?? '(ללא כותרת)')}</strong></div>
+            <div class="result-meta">
+              #${escapeHTML(t.caseId)} • ${escapeHTML(t.fullName ?? '')} • ${escapeHTML(t.phone ?? '')} • ${escapeHTML(ownerLabel)}
+            </div>
+          </div>
+          <a class="btn" href="./owner.html?owner=${linkOwner}&focus=${focusId}">פתח</a>
+        </div>
+      `;
+    }).join('');
+
+    els.resultsBox.style.display = 'block';
+  } finally {
+    topLoad(false);
+  }
 }
 
-/* Events */
-els.btnSearch.addEventListener('click', loadTasks);
-els.search.addEventListener('keydown', e=>{ if(e.key==='Enter') loadTasks(); });
-els.btnClear.addEventListener('click', ()=>{ els.search.value=''; loadTasks(); });
-els.btnRefresh?.addEventListener('click', loadTasks);
-els.btnSave.addEventListener('click', saveTask);
-els.btnClose.addEventListener('click', ()=> els.dlg.close());
+/* ===== Events ===== */
+if (els.btnSearch)  els.btnSearch.addEventListener('click', runGlobalSearch);
+if (els.searchInput) els.searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') runGlobalSearch(); });
+if (els.btnClear)   els.btnClear.addEventListener('click', () => {
+  els.searchInput.value = '';
+  els.resultsBox.style.display = 'none';
+  els.resultsList.innerHTML = '';
+});
 
-/* Init */
-loadTasks();
+/* ===== Init + Refresh hook ===== */
+window.__loadStatsPromise = loadAllForStats().catch(err => console.error('stats load failed:', err));
+window.reloadTasksStats = async () => loadAllForStats();

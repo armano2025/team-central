@@ -31,34 +31,14 @@
     .meta { display:flex; gap:10px; flex-wrap: wrap; opacity:.8; font-size: .9rem; }
     .pill { background: rgba(0,0,0,.06); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
 
-    /* שדות עריכה */
     .edit-row { display:flex; gap:8px; flex-wrap: wrap; margin: 8px 0; }
-    .edit-row select {
-      appearance: none; -webkit-appearance: none;
+    .edit-row select, .notes-edit textarea {
       background: #fff; border: 1px solid rgba(0,0,0,.1);
       border-radius: 10px; padding: 8px 10px; font-size: .95rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      box-shadow: 0 1px 3px rgba(0,0,0,.06); outline: none;
     }
-
-    /* הערת מנהל - textarea */
-    .notes-edit {
-      margin-top: 8px;
-      display: grid;
-      gap: 6px;
-    }
+    .notes-edit { margin-top: 8px; display: grid; gap: 6px; }
     .notes-edit label { font-weight: 600; opacity: .8; }
-    .notes-edit textarea {
-      width: 100%;
-      min-height: 72px;
-      resize: vertical;
-      background: #fff;
-      border: 1px solid rgba(0,0,0,.1);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: .95rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06);
-      outline: none;
-    }
     .notes-hint { font-size:.85rem; opacity:.65; }
 
     .saving { opacity: .6; pointer-events: none; }
@@ -75,7 +55,6 @@
 
     .empty { opacity:.6; text-align:center; padding: 18px 10px; }
 
-    /* Toast */
     #toast {
       position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
       background: rgba(0,0,0,.85); color: #fff; padding: 8px 12px; border-radius: 10px;
@@ -86,7 +65,6 @@
 </head>
 <body>
 
-  <!-- ניווט עליון -->
   <nav class="top-buttons" aria-label="ניווט עליון">
     <a href="javascript:void(0)" onclick="history.back()" title="חזור"><i data-feather="arrow-right"></i> חזור</a>
     <a href="houston-dashboard.html" title="דאשבורד"><i data-feather="grid"></i> דאשבורד</a>
@@ -96,7 +74,6 @@
     <button id="dark-toggle" type="button" title="מצב כהה / בהיר"><i data-feather="moon"></i></button>
   </nav>
 
-  <!-- הירו -->
   <header class="hero">
     <div class="hero-content">
       <h2 id="flow-title">Flow</h2>
@@ -108,7 +85,6 @@
     </div>
   </header>
 
-  <!-- חיפוש -->
   <div class="toolbar">
     <input id="search" class="search-input" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
     <div class="btns">
@@ -116,7 +92,6 @@
     </div>
   </div>
 
-  <!-- שני טורים -->
   <main class="columns">
     <section class="col" aria-label="לטיפול">
       <h3>לטיפול</h3>
@@ -145,20 +120,19 @@
     // === CONFIG ===
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
     const flowKey = new URLSearchParams(location.search).get('flowKey') || '';
-    const OWNERS   = ['ריק','חן','בלה','תמרה','ליאור','נטע']; // תואם ברירת המחדל ב־API
-    const STATUSES = ['לטיפול','בעבודה','הסתיים'];            // תואם ברירת המחדל ב־API
+    const OWNERS   = ['ריק','חן','בלה','תמרה','ליאור','נטע'];
+    const STATUSES = ['לטיפול','בעבודה','הסתיים'];
 
-    // אירועים
     document.getElementById('refresh-btn').addEventListener('click', loadAll);
 
     // חיפוש עם debounce
     let q = '';
     const searchInput = document.getElementById('search');
-    let t = null;
+    let debounceHandle = null;
     searchInput.addEventListener('input', () => {
       q = searchInput.value.trim();
-      clearTimeout(t);
-      t = setTimeout(loadAll, 300);
+      clearTimeout(debounceHandle);
+      debounceHandle = setTimeout(loadAll, 300);
     });
     function clearSearch(){ searchInput.value=''; q=''; loadAll(); }
 
@@ -177,7 +151,6 @@
       finally { btn.removeAttribute('aria-busy'); btn.removeAttribute('disabled'); }
     }
 
-    // טעינה ראשונית
     setTitle(flowKey);
     setSheetLink();
     loadAll();
@@ -222,8 +195,8 @@
       const status = f.status || '';
       const adminNotes = f.adminNotes || f['admin notes'] || '';
 
-      const ownerSel = selectHtml(`owner-${rowId}`, OWNERS, owner);
-      const statusSel = selectHtml(`status-${rowId}`, STATUSES, status);
+      const ownerSel = selectHtml(`owner-${rowId}`, OWNERS, owner, 'owner-select', rowId);
+      const statusSel = selectHtml(`status-${rowId}`, STATUSES, status, 'status-select', rowId);
 
       const kvs = [
         fullName ? kv('שם', fullName) : '',
@@ -238,7 +211,7 @@
       }).join('');
 
       return `
-        <article class="task-card" id="card-${rowId}">
+        <article class="task-card" id="card-${rowId}" data-rowid="${rowId}">
           <div class="task-head">
             <div class="meta">
               ${createdAt ? `<span class="pill">נוצר: ${escapeHtml(createdAt)}</span>` : ''}
@@ -249,22 +222,16 @@
             </div>
           </div>
 
-          <!-- שדות עריכה: Owner + Status -->
           <div class="edit-row">
-            <label>מטפל:
-              ${ownerSel}
-            </label>
-            <label>סטטוס:
-              ${statusSel}
-            </label>
+            <label>מטפל: ${ownerSel}</label>
+            <label>סטטוס: ${statusSel}</label>
           </div>
 
           ${kvs ? `<div class="kvs">${kvs}</div>` : ''}
 
-          <!-- עריכת הערת מנהל -->
           <div class="notes-edit">
             <label for="notes-${rowId}">הערת מנהל</label>
-            <textarea id="notes-${rowId}" placeholder="כתוב הערה…">${escapeHtml(adminNotes)}</textarea>
+            <textarea id="notes-${rowId}" class="notes-textarea" data-rowid="${rowId}" placeholder="כתוב הערה…">${escapeHtml(adminNotes)}</textarea>
             <div class="notes-hint" id="notes-hint-${rowId}" aria-live="polite"></div>
           </div>
 
@@ -273,45 +240,53 @@
             <div class="full-grid">${allRows}</div>
           </details>
         </article>
-
-        <script>
-          (function(){
-            const ownerEl = document.getElementById('owner-${rowId}');
-            const statusEl = document.getElementById('status-${rowId}');
-            const notesEl  = document.getElementById('notes-${rowId}');
-            const hintEl   = document.getElementById('notes-hint-${rowId}');
-            let timer = null;
-
-            ownerEl.addEventListener('change', () => saveField(${rowId}, { owner: ownerEl.value }));
-            statusEl.addEventListener('change', () => saveField(${rowId}, { status: statusEl.value }));
-
-            // שמירה ב-debounce בעת הקלדה
-            notesEl.addEventListener('input', () => {
-              hintEl.textContent = 'שומר…';
-              clearTimeout(timer);
-              timer = setTimeout(async () => {
-                await saveField(${rowId}, { adminNotes: notesEl.value });
-                hintEl.textContent = 'נשמר ✓';
-                setTimeout(()=> hintEl.textContent='', 1200);
-              }, 600);
-            });
-
-            // שמירה גם ב-blur ליתר ביטחון
-            notesEl.addEventListener('blur', async () => {
-              clearTimeout(timer);
-              hintEl.textContent = 'שומר…';
-              await saveField(${rowId}, { adminNotes: notesEl.value });
-              hintEl.textContent = 'נשמר ✓';
-              setTimeout(()=> hintEl.textContent='', 1200);
-            });
-          })();
-        </script>
       `;
     }
 
-    function selectHtml(id, options, value) {
+    // === האזנות מרוכזות (אין סקריפטים בתוך הכרטיס) ===
+    document.addEventListener('change', async (e) => {
+      const sel = e.target;
+      if (sel.matches('.owner-select')) {
+        const rowId = Number(sel.dataset.rowid);
+        await saveField(rowId, { owner: sel.value });
+      }
+      if (sel.matches('.status-select')) {
+        const rowId = Number(sel.dataset.rowid);
+        await saveField(rowId, { status: sel.value });
+      }
+    });
+
+    // שמירת הערות עם debounce
+    const notesTimers = new Map();
+    document.addEventListener('input', (e) => {
+      if (!e.target.matches('.notes-textarea')) return;
+      const ta = e.target;
+      const rowId = Number(ta.dataset.rowid);
+      const hint = document.getElementById(`notes-hint-${rowId}`);
+      hint.textContent = 'שומר…';
+      clearTimeout(notesTimers.get(rowId));
+      const h = setTimeout(async () => {
+        await saveField(rowId, { adminNotes: ta.value });
+        hint.textContent = 'נשמר ✓';
+        setTimeout(()=> hint.textContent='', 1200);
+      }, 600);
+      notesTimers.set(rowId, h);
+    });
+    document.addEventListener('blur', async (e) => {
+      if (!e.target.matches('.notes-textarea')) return;
+      const ta = e.target;
+      const rowId = Number(ta.dataset.rowid);
+      const hint = document.getElementById(`notes-hint-${rowId}`);
+      clearTimeout(notesTimers.get(rowId));
+      hint.textContent = 'שומר…';
+      await saveField(rowId, { adminNotes: ta.value });
+      hint.textContent = 'נשמר ✓';
+      setTimeout(()=> hint.textContent='', 1200);
+    }, true);
+
+    function selectHtml(id, options, value, cls, rowId) {
       const opts = options.map(o => `<option value="${escapeHtml(o)}"${o===value?' selected':''}>${escapeHtml(o)}</option>`).join('');
-      return `<select id="${id}" name="${id}">${opts}</select>`;
+      return `<select id="${id}" name="${id}" class="${cls}" data-rowid="${rowId}">${opts}</select>`;
     }
 
     async function saveField(rowId, updates) {

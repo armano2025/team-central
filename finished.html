@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>יוסטון – הסתיימו</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <style>
+    .top-buttons { gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+    .top-buttons a, .top-buttons button { padding: 8px 12px; border-radius: 10px; font-size: .95rem; }
+
+    .hero .chips { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+    .chip {
+      background: rgba(255,255,255,.22); color: #fff; padding: 10px 12px;
+      border-radius: 999px; font-weight: 600; backdrop-filter: blur(2px);
+    }
+    .chip .num { font-size: 1.25rem; margin-inline-start: 6px; }
+
+    .toolbar { display: grid; grid-template-columns: 1fr auto; gap: 10px; max-width: 1000px; margin: 8px auto 14px; }
+    .search-input {
+      background: var(--color-surface); border: none; border-radius: var(--border-radius);
+      padding: 10px 12px; font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,.08); outline: none;
+    }
+
+    .list { max-width: 1100px; margin: 0 auto; }
+    .row {
+      display: grid; gap: 8px; grid-template-columns: 1.2fr 0.9fr 0.9fr 1fr 1fr auto;
+      align-items: center;
+      background: var(--color-surface); border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      padding: 10px 12px; margin-bottom: 10px; text-align: right;
+      font-size: .95rem;
+    }
+    .row .muted { opacity: .7; font-size: .9rem; }
+    .row .tag { background: rgba(0,0,0,.06); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+    .row details { grid-column: 1 / -1; background: rgba(0,0,0,.03); border-radius: 10px; padding: 8px 10px; }
+    .full-grid { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; margin-top: 8px; font-size: .9rem; }
+    .full-grid .cell { background: #fff; border-radius: 8px; padding: 6px 8px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+    .full-grid .cell b { display:inline-block; min-width:120px; opacity:.7; }
+
+    @media (max-width: 780px) {
+      .row { grid-template-columns: 1fr; gap: 6px; }
+      .row > * { margin-bottom: 2px; }
+    }
+
+    .empty { opacity:.6; text-align:center; padding: 18px 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- ניווט עליון -->
+  <nav class="top-buttons" aria-label="ניווט עליון">
+    <a href="javascript:void(0)" onclick="history.back()" title="חזור"><i data-feather="arrow-right"></i> חזור</a>
+    <a href="houston-dashboard.html" title="דאשבורד"><i data-feather="grid"></i> דאשבורד</a>
+    <a href="admin.html" title="עמוד אדמין"><i data-feather="settings"></i> אדמין</a>
+    <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
+    <button id="sheet-btn" type="button" title="לגליון הנתונים"><i data-feather="table"></i> לגליון</button>
+    <button id="export-btn" type="button" title="ייצוא ל־CSV"><i data-feather="download"></i> CSV</button>
+    <button id="dark-toggle" type="button" title="מצב כהה / בהיר"><i data-feather="moon"></i></button>
+  </nav>
+
+  <!-- הירו -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2 id="flow-title">הסתיימו</h2>
+      <p id="flow-subtitle">רשימה פשוטה של כל המשימות בסטטוס “הסתיים”.</p>
+      <div class="chips">
+        <div class="chip"><span class="num" id="total-finished">0</span>סה״כ הסתיימו</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- חיפוש -->
+  <div class="toolbar">
+    <input id="search" class="search-input" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
+    <div>
+      <button class="top-buttons" style="padding:8px 12px" onclick="clearSearch()"><i data-feather="x"></i> נקה</button>
+    </div>
+  </div>
+
+  <!-- רשימה -->
+  <main id="list" class="list" aria-label="רשימת הסתיימו"></main>
+
+  <script>
+    feather.replace();
+
+    if (localStorage.getItem('dark-mode') === '1') {
+      document.documentElement.classList.add('dark-mode');
+    }
+    document.getElementById('dark-toggle').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark-mode');
+      isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
+    });
+
+    const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
+    const flowKey = new URLSearchParams(location.search).get('flowKey') || '';
+
+    document.getElementById('refresh-btn').addEventListener('click', loadFinished);
+    document.getElementById('sheet-btn').addEventListener('click', openSheetTab);
+    document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+    let q = '';
+    const searchInput = document.getElementById('search');
+    let t = null;
+    searchInput.addEventListener('input', () => {
+      q = searchInput.value.trim();
+      clearTimeout(t);
+      t = setTimeout(loadFinished, 300);
+    });
+    function clearSearch() { searchInput.value = ''; q = ''; loadFinished(); }
+
+    setTitle(flowKey);
+
+    async function openSheetTab() {
+      try {
+        const r = await fetch(API_URL + `?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
+        const d = await r.json();
+        if (d?.url) window.open(d.url, '_blank');
+      } catch (e) { console.error(e); }
+    }
+
+    let lastItems = [];
+    async function loadFinished() {
+      if (!flowKey) { alert('חסר flowKey בכתובת'); return; }
+      const list = document.getElementById('list');
+      list.innerHTML = '<div class="empty">טוען…</div>';
+
+      try {
+        const res = await fetch(API_URL + `?action=finished&flowKey=${encodeURIComponent(flowKey)}&q=${encodeURIComponent(q)}&limit=500`);
+        const data = await res.json();
+        const items = data?.items || [];
+        lastItems = items;
+        document.getElementById('total-finished').textContent = data?.meta?.total ?? items.length;
+
+        if (!items.length) { list.innerHTML = '<div class="empty">אין משימות להצגה</div>'; return; }
+        list.innerHTML = items.map(renderRow).join('');
+      } catch (e) {
+        console.error(e);
+        list.innerHTML = '<div class="empty" style="color:#b00020">שגיאה בטעינה</div>';
+      }
+    }
+
+    function setTitle(key) {
+      const map = {
+        info: 'פניות רישום', onetime: 'שיעורים חד-פעמיים', billing: 'בקשות תשלום',
+        message: 'הודעות כלליות', boost: 'שיעורי תגבור', reschedule: 'שינוי מועד',
+        makeup: 'שיעור השלמה', cancel: 'ביטול שיעור'
+      };
+      const name = map[key] || key || 'Flow';
+      document.getElementById('flow-title').textContent = `${name} – הסתיימו`;
+      document.getElementById('flow-subtitle').textContent = 'רשימה פשוטה של כל המשימות בסטטוס “הסתיים”.';
+    }
+
+    function renderRow(item) {
+      const f = item.fields || {};
+      const fullName = [f.firstName, f.lastName].filter(Boolean).join(' ');
+      const phone = f.phone || '';
+      const subject = f.subject || '';
+      const role = f.role || '';
+      const createdAt = f.createdAt || '';
+      const adminNotes = f.adminNotes || f['admin notes'] || '';
+      const owner = f.owner || '—';
+
+      return `
+        <div class="row">
+          <div><b>${escapeHtml(fullName || '—')}</b><div class="muted">${escapeHtml(role || '')}</div></div>
+          <div>${escapeHtml(phone || '—')}</div>
+          <div>${escapeHtml(subject || '—')}</div>
+          <div class="muted">${escapeHtml(createdAt || '')}</div>
+          <div class="tag">מטפל: ${escapeHtml(owner)}</div>
+          <div class="muted">${adminNotes ? escapeHtml(adminNotes) : ''}</div>
+
+          <details>
+            <summary>פרטים נוספים</summary>
+            <div class="full-grid">
+              ${(f._keys || Object.keys(f)).map(k => {
+                if (k === '_keys') return '';
+                return `<div class="cell"><b>${escapeHtml(k)}:</b> ${escapeHtml(f[k])}</div>`;
+              }).join('')}
+            </div>
+          </details>
+        </div>
+      `;
+    }
+
+    function escapeHtml(v) {
+      return String(v ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function exportCSV() {
+      if (!lastItems.length) { alert("אין נתונים לייצוא"); return; }
+
+      // שליפת כל המפתחות האפשריים
+      const keys = Array.from(new Set(lastItems.flatMap(i => Object.keys(i.fields || {}))));
+      const rows = [keys.join(",")];
+      lastItems.forEach(it => {
+        const f = it.fields || {};
+        rows.push(keys.map(k => `"${String(f[k] ?? '').replace(/"/g,'""')}"`).join(","));
+      });
+
+      const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `finished-${flowKey}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    loadFinished();
+  </script>
+</body>
+</html>

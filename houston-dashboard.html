@@ -5,20 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>יוסטון דאשבורד</title>
 
-  <!-- הסגנון הקיים שלך -->
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    /* === התאמות עיצוביות לדשבורד (מעל styles.css) === */
+    /* חיזוק מובייל ויישור לעיצוב הקיים */
 
-    /* פס כפתורים עליון – קומפקטי ונושם במובייל */
+    /* פס כפתורים עליון – כמו באפליקציה (קומפקטי) */
     .top-buttons {
       gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .top-buttons a, .top-buttons button {
       padding: 8px 12px;
@@ -26,33 +25,27 @@
       font-size: .95rem;
     }
 
-    /* Hero עם סיכומי סטטוסים */
-    .hero-stats {
+    /* הירו – נשתמש במחלקות הקיימות שלך, רק תוספות קטנות */
+    .hero .chips {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      max-width: 620px;
-      margin: 0 auto 16px auto;
-      text-align: center;
+      gap: 10px;
+      margin-top: 12px;
     }
-    .stat-card {
-      background: var(--color-surface);
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
-      padding: 14px;
-    }
-    .stat-card h4 {
-      margin-bottom: 6px;
+    .chip {
+      background: rgba(255,255,255,.22);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 999px;
       font-weight: 600;
-      font-size: 1rem;
-      opacity: .85;
+      backdrop-filter: blur(2px);
     }
-    .stat-card .num {
-      font-size: 1.6rem;
-      font-weight: 700;
+    .chip .num {
+      font-size: 1.25rem;
+      margin-inline-start: 6px;
     }
 
-    /* כרטיסיות Flows – Mobile first */
+    /* גריד כרטיסיות – mobile-first */
     .cards-grid {
       grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
       gap: 14px;
@@ -60,8 +53,8 @@
     .cards-grid .card {
       text-align: right;
       align-items: stretch;
-      padding: 14px;
-      border-radius: 14px;
+      padding: 16px;
+      border-radius: var(--border-radius);
     }
     .flow-card-header {
       display:flex;
@@ -69,6 +62,7 @@
       justify-content: space-between;
       gap: 8px;
       margin-bottom: 8px;
+      width: 100%;
     }
     .flow-title {
       font-weight: 700;
@@ -78,8 +72,8 @@
     .counts {
       display:flex;
       gap:6px;
-      flex-wrap: wrap;        /* שלא יישברו ויעלו שורה נקייה במובייל */
-      justify-content: flex-end;
+      flex-wrap: wrap;
+      justify-content:flex-end;
     }
     .badge {
       display:inline-block;
@@ -89,29 +83,24 @@
       font-size: .85rem;
       white-space: nowrap;
     }
-    .card .hint {
+    .hint {
       opacity:.65;
       font-size:.9rem;
       margin-top: 6px;
     }
 
-    /* כותרת עמוד קומפקטית */
-    h1 {
-      margin: 8px 0 14px 0;
-      font-size: 1.8rem;
-    }
+    /* כותרת עמוד קומפקטית – לא צריך ענק כי יש הירו */
+    h1 { display:none; }
 
-    /* התאמות למסכים גדולים קצת */
     @media (min-width: 680px) {
       .cards-grid { gap: 16px; }
       .flow-title { font-size: 1.1rem; }
-      .stat-card .num { font-size: 1.8rem; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ניווט עליון -->
+  <!-- ניווט עליון תואם אתר -->
   <nav class="top-buttons" aria-label="ניווט עליון">
     <a href="javascript:void(0)" onclick="history.back()" title="חזור">
       <i data-feather="arrow-right"></i> חזור
@@ -127,29 +116,29 @@
     </button>
   </nav>
 
-  <h1>יוסטון דאשבורד</h1>
+  <!-- הירו זהה לסגנון האפליקציה -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>יוסטון<br/>דאשבורד</h2>
+      <p>סקירה מהירה של כל הזרימות והפניות—במקום אחד.</p>
 
-  <!-- HERO: סיכום כולל -->
-  <section class="hero-stats" aria-label="סיכום סטטוסים">
-    <div class="stat-card">
-      <h4>סה״כ לטיפול</h4>
-      <div id="total-in" class="num">0</div>
+      <!-- תיבות סיכום בתוך ההירו -->
+      <div class="chips">
+        <div class="chip"><span class="num" id="total-in">0</span>סה״כ לטיפול</div>
+        <div class="chip"><span class="num" id="total-work">0</span>סה״כ בעבודה</div>
+      </div>
     </div>
-    <div class="stat-card">
-      <h4>סה״כ בעבודה</h4>
-      <div id="total-work" class="num">0</div>
-    </div>
-  </section>
+  </header>
 
-  <!-- גריד כרטיסיות של ה־Flows -->
+  <!-- גריד כרטיסיות -->
   <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה">
-    <!-- מתמלא דינמית -->
+    <!-- נטען דינמית -->
   </section>
 
   <script>
     feather.replace();
 
-    // מצב כהה – כמו בשאר האתר
+    // מצב כהה – זהה לשאר האתר
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
@@ -158,6 +147,7 @@
       isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
     });
 
+    // API שלך
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
     async function loadDashboard() {
@@ -169,7 +159,7 @@
         const data = await res.json();
         if (!data.ok) throw new Error('שגיאה בנתונים');
 
-        // סכומים כוללים ל-Hero
+        // סכומים כוללים להירו
         const totals = data.flows.reduce((acc, f) => {
           acc.in += (f.counts?.in || 0);
           acc.work += (f.counts?.work || 0);

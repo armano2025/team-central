@@ -5,41 +5,107 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>יוסטון דאשבורד</title>
 
-  <!-- עיצוב קיים שלך -->
+  <!-- הסגנון הקיים שלך -->
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    /* תגיות מונה קטנות לכרטיסים */
+    /* === התאמות עיצוביות לדשבורד (מעל styles.css) === */
+
+    /* פס כפתורים עליון – קומפקטי ונושם במובייל */
+    .top-buttons {
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .top-buttons a, .top-buttons button {
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: .95rem;
+    }
+
+    /* Hero עם סיכומי סטטוסים */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 620px;
+      margin: 0 auto 16px auto;
+      text-align: center;
+    }
+    .stat-card {
+      background: var(--color-surface);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      padding: 14px;
+    }
+    .stat-card h4 {
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      opacity: .85;
+    }
+    .stat-card .num {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    /* כרטיסיות Flows – Mobile first */
+    .cards-grid {
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 14px;
+    }
+    .cards-grid .card {
+      text-align: right;
+      align-items: stretch;
+      padding: 14px;
+      border-radius: 14px;
+    }
+    .flow-card-header {
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .flow-title {
+      font-weight: 700;
+      line-height: 1.2;
+      font-size: 1.05rem;
+    }
+    .counts {
+      display:flex;
+      gap:6px;
+      flex-wrap: wrap;        /* שלא יישברו ויעלו שורה נקייה במובייל */
+      justify-content: flex-end;
+    }
     .badge {
       display:inline-block;
       background: rgba(0,0,0,0.06);
       padding: 4px 10px;
       border-radius: 999px;
-      font-size: .875rem;
-      margin-inline-start: 6px;
+      font-size: .85rem;
+      white-space: nowrap;
     }
-    .flow-card-header {
-      display:flex;
-      justify-content: space-between;
-      align-items:center;
-      margin-bottom: 10px;
-      width: 100%;
+    .card .hint {
+      opacity:.65;
+      font-size:.9rem;
+      margin-top: 6px;
     }
-    .flow-title {
-      font-weight: 600;
-      font-size: 1.05rem;
+
+    /* כותרת עמוד קומפקטית */
+    h1 {
+      margin: 8px 0 14px 0;
+      font-size: 1.8rem;
     }
-    .counts {
-      display:flex;
-      gap:8px;
-    }
-    /* ריספונסיביות קלה – שימוש ב־cards-grid הקיים שלך */
-    .cards-grid .card {
-      align-items: stretch;   /* שהכותרות והמנות יישרו ימין */
-      text-align: right;
-      cursor: pointer;
+
+    /* התאמות למסכים גדולים קצת */
+    @media (min-width: 680px) {
+      .cards-grid { gap: 16px; }
+      .flow-title { font-size: 1.1rem; }
+      .stat-card .num { font-size: 1.8rem; }
     }
   </style>
 </head>
@@ -47,28 +113,33 @@
 
   <!-- ניווט עליון -->
   <nav class="top-buttons" aria-label="ניווט עליון">
-    <!-- חזור אחורה -->
     <a href="javascript:void(0)" onclick="history.back()" title="חזור">
       <i data-feather="arrow-right"></i> חזור
     </a>
-
-    <!-- מעבר ל־ADMIN -->
     <a href="admin.html" title="עמוד אדמין">
       <i data-feather="settings"></i> אדמין
     </a>
-
-    <!-- ריענון נתונים -->
     <button id="refresh-btn" type="button" title="ריענון">
       <i data-feather="rotate-cw"></i> ריענון
     </button>
-
-    <!-- מצב כהה -->
     <button id="dark-toggle" type="button" title="מצב כהה / בהיר">
       <i data-feather="moon"></i>
     </button>
   </nav>
 
   <h1>יוסטון דאשבורד</h1>
+
+  <!-- HERO: סיכום כולל -->
+  <section class="hero-stats" aria-label="סיכום סטטוסים">
+    <div class="stat-card">
+      <h4>סה״כ לטיפול</h4>
+      <div id="total-in" class="num">0</div>
+    </div>
+    <div class="stat-card">
+      <h4>סה״כ בעבודה</h4>
+      <div id="total-work" class="num">0</div>
+    </div>
+  </section>
 
   <!-- גריד כרטיסיות של ה־Flows -->
   <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה">
@@ -78,7 +149,7 @@
   <script>
     feather.replace();
 
-    /* מצב כהה – שימוש באותו מנגנון שיש לך */
+    // מצב כהה – כמו בשאר האתר
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
@@ -87,7 +158,6 @@
       isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
     });
 
-    // API שלך
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
     async function loadDashboard() {
@@ -99,32 +169,39 @@
         const data = await res.json();
         if (!data.ok) throw new Error('שגיאה בנתונים');
 
-        const html = data.flows.map(flow => {
-          return `
-            <a class="card" href="flow.html?flowKey=${encodeURIComponent(flow.flowKey)}" title="${flow.friendlyName}">
-              <div class="flow-card-header">
-                <div class="flow-title">${flow.friendlyName}</div>
-                <div class="counts">
-                  <span class="badge">לטיפול: ${flow.counts.in}</span>
-                  <span class="badge">בעבודה: ${flow.counts.work}</span>
-                </div>
+        // סכומים כוללים ל-Hero
+        const totals = data.flows.reduce((acc, f) => {
+          acc.in += (f.counts?.in || 0);
+          acc.work += (f.counts?.work || 0);
+          return acc;
+        }, {in:0, work:0});
+        document.getElementById('total-in').textContent = totals.in;
+        document.getElementById('total-work').textContent = totals.work;
+
+        // כרטיסיות Flows
+        const html = data.flows.map(flow => `
+          <a class="card" href="flow.html?flowKey=${encodeURIComponent(flow.flowKey)}" title="${flow.friendlyName}">
+            <div class="flow-card-header">
+              <div class="flow-title">${flow.friendlyName}</div>
+              <div class="counts">
+                <span class="badge">לטיפול: ${flow.counts.in}</span>
+                <span class="badge">בעבודה: ${flow.counts.work}</span>
               </div>
-              <div style="opacity:.6;font-size:.9rem">כניסה לניהול ה־Flow →</div>
-            </a>
-          `;
-        }).join('');
+            </div>
+            <div class="hint">כניסה לניהול ה־Flow →</div>
+          </a>
+        `).join('');
 
         container.innerHTML = html || '<div class="card" style="opacity:.6">אין נתונים להצגה</div>';
       } catch (e) {
         console.error(e);
-        container.innerHTML = '<div class="card" style="opacity:.8;color:#b00020">שגיאה בטעינה</div>';
+        container.innerHTML = '<div class="card" style="opacity:.9;color:#b00020">שגיאה בטעינה</div>';
+        document.getElementById('total-in').textContent = '—';
+        document.getElementById('total-work').textContent = '—';
       }
     }
 
-    // ריענון בלחיצה
     document.getElementById('refresh-btn').addEventListener('click', loadDashboard);
-
-    // טעינה ראשונית
     loadDashboard();
   </script>
 </body>

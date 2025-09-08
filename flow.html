@@ -13,54 +13,50 @@
     .top-buttons { gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
     .top-buttons a, .top-buttons button { padding: 8px 12px; border-radius: 10px; font-size: .95rem; }
 
-    .hero .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-    .chip { background: rgba(255,255,255,.22); color: #fff; padding: 10px 12px; border-radius: 999px; font-weight: 600; backdrop-filter: blur(2px); }
-    .chip .num { font-size: 1.25rem; margin-inline-start: 6px; }
+    .hero .chips { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
+    .chip { background:rgba(255,255,255,.22); color:#fff; padding:10px 12px; border-radius:999px; font-weight:600; backdrop-filter:blur(2px); }
+    .chip .num { font-size:1.25rem; margin-inline-start:6px; }
 
-    .toolbar { display: grid; grid-template-columns: 1fr auto; gap: 10px; max-width: 900px; margin: 8px auto 14px; }
-    .search-input { background: var(--color-surface); border: none; border-radius: var(--border-radius); padding: 10px 12px; font-size: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,.08); outline: none; }
-    .toolbar .btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .toolbar { display:grid; grid-template-columns:1fr auto; gap:10px; max-width:900px; margin:8px auto 14px; }
+    .search-input { background:var(--color-surface); border:none; border-radius:var(--border-radius); padding:10px 12px; font-size:1rem; box-shadow:0 2px 8px rgba(0,0,0,.08); outline:none; }
+    .toolbar .btns { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 
-    .columns { display: grid; gap: 14px; grid-template-columns: 1fr; max-width: 1100px; margin: 0 auto; }
-    @media (min-width: 900px) { .columns { grid-template-columns: 1fr 1fr; gap: 18px; } }
-    .col h3 { text-align: right; margin: 6px 4px 10px; font-size: 1.1rem; opacity: .85; }
+    .columns { display:grid; gap:14px; grid-template-columns:1fr; max-width:1100px; margin:0 auto; }
+    @media (min-width: 900px) { .columns { grid-template-columns:1fr 1fr; gap:18px; } }
+    .col h3 { text-align:right; margin:6px 4px 10px; font-size:1.1rem; opacity:.85; }
 
-    .task-list { display: grid; gap: 12px; }
-    .task-card { background: var(--color-surface); border-radius: var(--border-radius); box-shadow: 0 2px 10px rgba(0,0,0,.08); padding: 12px 14px; text-align: right; }
-    .task-head { display:flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .meta { display:flex; gap:10px; flex-wrap: wrap; opacity:.8; font-size: .9rem; }
-    .pill { background: rgba(0,0,0,.06); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+    .task-list { display:grid; gap:12px; }
+    .task-card { background:var(--color-surface); border-radius:var(--border-radius); box-shadow:0 2px 10px rgba(0,0,0,.08); padding:12px 14px; text-align:right; }
+    .task-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+    .meta { display:flex; gap:10px; flex-wrap:wrap; opacity:.8; font-size:.9rem; }
+    .pill { background:rgba(0,0,0,.06); padding:4px 10px; border-radius:999px; white-space:nowrap; }
 
-    .edit-row { display:flex; gap:8px; flex-wrap: wrap; margin: 8px 0; }
+    .edit-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
     .edit-row select, .notes-edit textarea {
-      background: #fff; border: 1px solid rgba(0,0,0,.1);
-      border-radius: 10px; padding: 8px 10px; font-size: .95rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06); outline: none;
+      background:#fff; border:1px solid rgba(0,0,0,.1);
+      border-radius:10px; padding:8px 10px; font-size:.95rem;
+      box-shadow:0 1px 3px rgba(0,0,0,.06); outline:none;
     }
-    .notes-edit { margin-top: 8px; display: grid; gap: 6px; }
-    .notes-edit label { font-weight: 600; opacity: .8; }
+
+    .notes-edit { margin-top:8px; display:grid; gap:6px; }
+    .notes-edit label { font-weight:600; opacity:.8; }
     .notes-hint { font-size:.85rem; opacity:.65; }
 
-    .saving { opacity: .6; pointer-events: none; }
-
-    .kvs { display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: .95rem; margin-top: 6px; }
-    .kv { background: rgba(0,0,0,.04); border-radius: 10px; padding: 8px; }
+    .kvs { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:.95rem; margin-top:6px; }
+    .kv { background:rgba(0,0,0,.04); border-radius:10px; padding:8px; }
     .kv b { display:block; font-weight:600; opacity:.75; margin-bottom:3px; }
 
-    details { margin-top: 8px; background: rgba(0,0,0,.03); border-radius: 10px; padding: 8px 10px; }
-    details summary { cursor: pointer; font-weight: 600; }
-    .full-grid { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; margin-top: 8px; font-size: .9rem; }
-    .full-grid .row { background: #fff; border-radius: 8px; padding: 6px 8px; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
-    .full-grid .row b { display: inline-block; min-width: 110px; opacity: .7; }
+    details { margin-top:8px; background:rgba(0,0,0,.03); border-radius:10px; padding:8px 10px; }
+    details summary { cursor:pointer; font-weight:600; }
+    .full-grid { display:grid; gap:6px; grid-template-columns:1fr 1fr; margin-top:8px; font-size:.9rem; }
+    .full-grid .row { background:#fff; border-radius:8px; padding:6px 8px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+    .full-grid .row b { display:inline-block; min-width:110px; opacity:.7; }
 
-    .empty { opacity:.6; text-align:center; padding: 18px 10px; }
+    .empty { opacity:.6; text-align:center; padding:18px 10px; }
 
-    #toast {
-      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-      background: rgba(0,0,0,.85); color: #fff; padding: 8px 12px; border-radius: 10px;
-      font-size: .9rem; display: none; z-index: 9999;
-    }
+    #toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.85); color:#fff; padding:8px 12px; border-radius:10px; font-size:.9rem; display:none; z-index:9999; }
     #sheet-btn[disabled] { opacity:.6; pointer-events:none; }
+    .saving { opacity:.6; pointer-events:none; }
   </style>
 </head>
 <body>
@@ -117,11 +113,10 @@
       isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
     });
 
-    // === CONFIG ===
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
     const flowKey = new URLSearchParams(location.search).get('flowKey') || '';
-    const OWNERS   = ['ריק','חן','בלה','תמרה','ליאור','נטע'];
-    const STATUSES = ['לטיפול','בעבודה','הסתיים'];
+    let OWNERS   = ['ריק','חן','בלה','תמרה','ליאור','נטע']; // fallback
+    let STATUSES = ['לטיפול','בעבודה','הסתיים'];           // fallback
 
     document.getElementById('refresh-btn').addEventListener('click', loadAll);
 
@@ -136,11 +131,24 @@
     });
     function clearSearch(){ searchInput.value=''; q=''; loadAll(); }
 
+    // מטא (רשימת מטפלים/סטטוסים)
+    async function loadMeta() {
+      try {
+        const r = await fetch(API_URL + '?action=meta');
+        const d = await r.json();
+        if (d.ok) {
+          if (Array.isArray(d.owners) && d.owners.length) OWNERS = d.owners;
+          if (Array.isArray(d.statuses) && d.statuses.length) STATUSES = d.statuses;
+          const m = {}; (d.flows||[]).forEach(f => m[f.flowKey]=f.friendlyName);
+          document.getElementById('flow-title').textContent = m[flowKey] || flowKey || 'Flow';
+        }
+      } catch(_) {}
+    }
+
     // קישור "לגליון"
     async function setSheetLink() {
       const btn = document.getElementById('sheet-btn');
       btn.setAttribute('href', '#');
-      btn.setAttribute('aria-busy','true');
       btn.setAttribute('disabled','disabled');
       try {
         const r = await fetch(API_URL + `?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
@@ -148,33 +156,29 @@
         const url = d?.url || `https://docs.google.com/spreadsheets/d/1bqfwDNtTM8AG8zdJwqm3Y835EWU2veakeuuruYDe_g4/edit`;
         btn.setAttribute('href', url);
       } catch(e) { console.error(e); }
-      finally { btn.removeAttribute('aria-busy'); btn.removeAttribute('disabled'); }
+      finally { btn.removeAttribute('disabled'); }
     }
 
-    setTitle(flowKey);
     setSheetLink();
-    loadAll();
+    loadMeta().finally(loadAll);
 
     async function loadAll() {
       if (!flowKey) { alert('חסר flowKey בכתובת'); return; }
 
       const [inRes, workRes] = await Promise.all([
-        fetch(API_URL + `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=in&q=${encodeURIComponent(q)}&limit=200`),
-        fetch(API_URL + `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=work&q=${encodeURIComponent(q)}&limit=200`)
+        fetch(API_URL + `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=in&q=${encodeURIComponent(q)}&limit=400`),
+        fetch(API_URL + `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=work&q=${encodeURIComponent(q)}&limit=400`)
       ]);
       const [inData, workData] = await Promise.all([inRes.json(), workRes.json()]);
 
-      document.getElementById('count-in').textContent = inData?.meta?.total ?? 0;
-      document.getElementById('count-work').textContent = workData?.meta?.total ?? 0;
+      const inItems = inData?.items || [];
+      const workItems = workData?.items || [];
 
-      renderList('list-in', inData?.items || []);
-      renderList('list-work', workData?.items || []);
-    }
+      document.getElementById('count-in').textContent = inData?.meta?.total ?? inItems.length;
+      document.getElementById('count-work').textContent = workData?.meta?.total ?? workItems.length;
 
-    function setTitle(key) {
-      const map = { info:'פניות רישום', onetime:'שיעורים חד-פעמיים', billing:'בקשות תשלום', message:'הודעות כלליות', boost:'שיעורי תגבור', reschedule:'שינוי מועד', makeup:'שיעור השלמה', cancel:'ביטול שיעור' };
-      document.getElementById('flow-title').textContent = map[key] || key;
-      document.getElementById('flow-subtitle').textContent = 'תצוגת עבודה – טור "לטיפול" וטור "בעבודה".';
+      renderList('list-in', inItems);
+      renderList('list-work', workItems);
     }
 
     function renderList(elId, items) {
@@ -186,16 +190,18 @@
     function renderCard(item) {
       const rowId = item.rowId;
       const f = item.fields || {};
-      const fullName = [f.firstName, f.lastName].filter(Boolean).join(' ');
-      const role = f.role || '';
-      const phone = f.phone || '';
-      const subject = f.subject || '';
-      const createdAt = f.createdAt || '';
-      const owner = f.owner || 'ריק';
-      const status = f.status || '';
-      const adminNotes = f.adminNotes || f['admin notes'] || '';
 
-      const ownerSel = selectHtml(`owner-${rowId}`, OWNERS, owner, 'owner-select', rowId);
+      const createdAt  = f.createdAt  || f['תאריך יצירה'] || f['נוצר'] || '';
+      const owner      = f.owner      || f['שם המטפל']    || f['מטפל'] || 'ריק';
+      const status     = f.status     || f['סטטוס']        || '';
+      const adminNotes = f.adminNotes || f['admin notes']  || f['הערת מנהל'] || '';
+
+      const fullName = [f.firstName || f['שם פרטי'] || f['שם'], f.lastName || f['שם משפחה']].filter(Boolean).join(' ');
+      const role     = f.role || f['תפקיד'] || f['הורה/תלמיד'] || '';
+      const phone    = f.phone || f['טלפון'] || f['נייד'] || '';
+      const subject  = f.subject || f['מקצוע'] || '';
+
+      const ownerSel  = selectHtml(`owner-${rowId}`,  OWNERS,   owner,  'owner-select',  rowId);
       const statusSel = selectHtml(`status-${rowId}`, STATUSES, status, 'status-select', rowId);
 
       const kvs = [
@@ -217,8 +223,8 @@
               ${createdAt ? `<span class="pill">נוצר: ${escapeHtml(createdAt)}</span>` : ''}
             </div>
             <div class="meta">
-              <span class="pill">סטטוס נוכחי: ${escapeHtml(status || '—')}</span>
-              <span class="pill">מטפל: ${escapeHtml(owner)}</span>
+              <span class="pill pill-status">סטטוס נוכחי: ${escapeHtml(status || '—')}</span>
+              <span class="pill pill-owner">מטפל: ${escapeHtml(owner || '—')}</span>
             </div>
           </div>
 
@@ -243,16 +249,25 @@
       `;
     }
 
-    // === האזנות מרוכזות (אין סקריפטים בתוך הכרטיס) ===
+    // האזנות מרוכזות
     document.addEventListener('change', async (e) => {
       const sel = e.target;
       if (sel.matches('.owner-select')) {
         const rowId = Number(sel.dataset.rowid);
-        await saveField(rowId, { owner: sel.value });
+        const value = sel.value;
+        const ok = await saveField(rowId, { owner: value });
+        if (ok) {
+          document.querySelector(`#card-${rowId} .pill-owner`).textContent = 'מטפל: ' + value;
+        }
       }
       if (sel.matches('.status-select')) {
         const rowId = Number(sel.dataset.rowid);
-        await saveField(rowId, { status: sel.value });
+        const value = sel.value;
+        const ok = await saveField(rowId, { status: value });
+        if (ok) {
+          document.querySelector(`#card-${rowId} .pill-status`).textContent = 'סטטוס נוכחי: ' + value;
+          moveCardByStatus(rowId, value);
+        }
       }
     });
 
@@ -266,8 +281,8 @@
       hint.textContent = 'שומר…';
       clearTimeout(notesTimers.get(rowId));
       const h = setTimeout(async () => {
-        await saveField(rowId, { adminNotes: ta.value });
-        hint.textContent = 'נשמר ✓';
+        const ok = await saveField(rowId, { adminNotes: ta.value });
+        hint.textContent = ok ? 'נשמר ✓' : 'שגיאה בשמירה';
         setTimeout(()=> hint.textContent='', 1200);
       }, 600);
       notesTimers.set(rowId, h);
@@ -279,8 +294,8 @@
       const hint = document.getElementById(`notes-hint-${rowId}`);
       clearTimeout(notesTimers.get(rowId));
       hint.textContent = 'שומר…';
-      await saveField(rowId, { adminNotes: ta.value });
-      hint.textContent = 'נשמר ✓';
+      const ok = await saveField(rowId, { adminNotes: ta.value });
+      hint.textContent = ok ? 'נשמר ✓' : 'שגיאה בשמירה';
       setTimeout(()=> hint.textContent='', 1200);
     }, true);
 
@@ -293,32 +308,48 @@
       const card = document.getElementById(`card-${rowId}`);
       card?.classList.add('saving');
       try {
+        // text/plain כדי להימנע מ-preflight
         const res = await fetch(API_URL, {
           method:'POST',
-          headers:{'Content-Type':'application/json'},
+          headers:{ 'Content-Type':'text/plain;charset=utf-8' },
           body: JSON.stringify({ action:'updateRow', flowKey, rowId, updates, actor:'Panel' })
         });
-        const data = await res.json();
-        if (!data.ok) throw new Error(data.error || 'update_failed');
+        const text = await res.text();
+        let data; try { data = JSON.parse(text); } catch { data = { ok:false, error:text || 'bad_response' }; }
+        if (!data.ok) { showToast('שגיאה בשמירה: ' + (data.error || '')); return false; }
         showToast('נשמר ✓');
+        return true;
       } catch(e) {
         console.error(e);
-        showToast('שגיאה בשמירה');
+        showToast('שגיאה בשמירה: ' + (e.message || 'network'));
+        return false;
       } finally {
         card?.classList.remove('saving');
       }
     }
 
+    function moveCardByStatus(rowId, status) {
+      const card = document.getElementById(`card-${rowId}`);
+      if (!card) return;
+      if (status === 'לטיפול') {
+        document.getElementById('list-in').prepend(card);
+      } else if (status === 'בעבודה') {
+        document.getElementById('list-work').prepend(card);
+      } else if (status === 'הסתיים') {
+        card.style.opacity = .4;
+        card.style.transition = 'opacity .3s';
+        setTimeout(()=> card.remove(), 350);
+      }
+      // עדכון מונה בהירו
+      const cntIn = document.querySelectorAll('#list-in .task-card').length;
+      const cntWork = document.querySelectorAll('#list-work .task-card').length;
+      document.getElementById('count-in').textContent = cntIn;
+      document.getElementById('count-work').textContent = cntWork;
+    }
+
     function kv(label, value) { return `<div class="kv"><b>${escapeHtml(label)}</b><div>${escapeHtml(value)}</div></div>`; }
     function escapeHtml(v){ return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
-    function showToast(msg){
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.style.display = 'block';
-      clearTimeout(showToast._h);
-      showToast._h = setTimeout(()=> t.style.display='none', 1500);
-    }
+    function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(showToast._h); showToast._h=setTimeout(()=>t.style.display='none',1500); }
   </script>
 </body>
 </html>

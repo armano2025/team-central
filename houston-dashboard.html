@@ -10,119 +10,35 @@
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    /* חיזוק מובייל ויישור לעיצוב הקיים */
+    .top-buttons { gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+    .top-buttons a, .top-buttons button { padding: 8px 12px; border-radius: 10px; font-size: .95rem; }
 
-    /* פס כפתורים עליון – כמו באפליקציה (קומפקטי) */
-    .top-buttons {
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .top-buttons a, .top-buttons button {
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: .95rem;
-    }
+    .hero .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .chip { background: rgba(255,255,255,.22); color: #fff; padding: 10px 12px; border-radius: 999px; font-weight: 600; backdrop-filter: blur(2px); }
+    .chip .num { font-size: 1.25rem; margin-inline-start: 6px; }
 
-    /* הירו – נשתמש במחלקות הקיימות שלך, רק תוספות קטנות */
-    .hero .chips {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .chip {
-      background: rgba(255,255,255,.22);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-weight: 600;
-      backdrop-filter: blur(2px);
-    }
-    .chip .num {
-      font-size: 1.25rem;
-      margin-inline-start: 6px;
-    }
-
-    /* גריד כרטיסיות – mobile-first */
-    .cards-grid {
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 14px;
-    }
-    .cards-grid .card {
-      text-align: right;
-      align-items: stretch;
-      padding: 16px;
-      border-radius: var(--border-radius);
-    }
-    .flow-card-header {
-      display:flex;
-      align-items:flex-start;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-      width: 100%;
-    }
-    .flow-title {
-      font-weight: 700;
-      line-height: 1.2;
-      font-size: 1.05rem;
-    }
-    .counts {
-      display:flex;
-      gap:6px;
-      flex-wrap: wrap;
-      justify-content:flex-end;
-    }
-    .badge {
-      display:inline-block;
-      background: rgba(0,0,0,0.06);
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: .85rem;
-      white-space: nowrap;
-    }
-    .hint {
-      opacity:.65;
-      font-size:.9rem;
-      margin-top: 6px;
-    }
-
-    /* כותרת עמוד קומפקטית – לא צריך ענק כי יש הירו */
-    h1 { display:none; }
-
-    @media (min-width: 680px) {
-      .cards-grid { gap: 16px; }
-      .flow-title { font-size: 1.1rem; }
-    }
+    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+    .card { align-items: stretch; text-align:right; }
+    .flow-card-header { display:flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .counts { display:flex; gap:6px; flex-wrap:wrap; }
+    .badge { background: rgba(0,0,0,.08); padding: 4px 10px; border-radius: 999px; font-size: .85rem; }
+    .hint { opacity:.65; font-size:.9rem; }
+    .error { color:#b00020; text-align:center; opacity:.9; }
   </style>
 </head>
 <body>
 
-  <!-- ניווט עליון תואם אתר -->
   <nav class="top-buttons" aria-label="ניווט עליון">
-    <a href="javascript:void(0)" onclick="history.back()" title="חזור">
-      <i data-feather="arrow-right"></i> חזור
-    </a>
-    <a href="admin.html" title="עמוד אדמין">
-      <i data-feather="settings"></i> אדמין
-    </a>
-    <button id="refresh-btn" type="button" title="ריענון">
-      <i data-feather="rotate-cw"></i> ריענון
-    </button>
-    <button id="dark-toggle" type="button" title="מצב כהה / בהיר">
-      <i data-feather="moon"></i>
-    </button>
+    <a href="javascript:void(0)" onclick="history.back()" title="חזור"><i data-feather="arrow-right"></i> חזור</a>
+    <a href="admin.html" title="עמוד אדמין"><i data-feather="settings"></i> אדמין</a>
+    <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
+    <button id="dark-toggle" type="button" title="מצב כהה / בהיר"><i data-feather="moon"></i></button>
   </nav>
 
-  <!-- הירו זהה לסגנון האפליקציה -->
   <header class="hero">
     <div class="hero-content">
       <h2>יוסטון<br/>דאשבורד</h2>
       <p>סקירה מהירה של כל הזרימות והפניות—במקום אחד.</p>
-
-      <!-- תיבות סיכום בתוך ההירו -->
       <div class="chips">
         <div class="chip"><span class="num" id="total-in">0</span>סה״כ לטיפול</div>
         <div class="chip"><span class="num" id="total-work">0</span>סה״כ בעבודה</div>
@@ -130,15 +46,12 @@
     </div>
   </header>
 
-  <!-- גריד כרטיסיות -->
-  <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה">
-    <!-- נטען דינמית -->
-  </section>
+  <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה"></section>
+  <div id="toast" style="display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:8px 12px;border-radius:10px;font-size:.9rem;z-index:9999"></div>
 
   <script>
     feather.replace();
 
-    // מצב כהה – זהה לשאר האתר
     if (localStorage.getItem('dark-mode') === '1') {
       document.documentElement.classList.add('dark-mode');
     }
@@ -147,32 +60,36 @@
       isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
     });
 
-    // API שלך
-    const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
+    const API = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
-    async function loadDashboard() {
-      const container = document.getElementById('flows');
-      container.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
+    document.getElementById('refresh-btn').addEventListener('click', load);
 
+    async function load() {
+      const flowsEl = document.getElementById('flows');
+      flowsEl.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
       try {
-        const res = await fetch(API_URL + "?action=dashboard");
-        const data = await res.json();
-        if (!data.ok) throw new Error('שגיאה בנתונים');
+        const [dashRes, metaRes] = await Promise.all([
+          fetch(API + "?action=dashboard").then(r=>r.json()),
+          fetch(API + "?action=meta").then(r=>r.json()).catch(()=>({}))
+        ]);
 
-        // סכומים כוללים להירו
-        const totals = data.flows.reduce((acc, f) => {
-          acc.in += (f.counts?.in || 0);
-          acc.work += (f.counts?.work || 0);
-          return acc;
-        }, {in:0, work:0});
+        if (!dashRes.ok) throw new Error(dashRes.error || 'dashboard_failed');
+
+        // סה"כ
+        const totals = dashRes.flows.reduce((acc,f)=>({in: acc.in+(f.counts?.in||0), work: acc.work+(f.counts?.work||0)}), {in:0,work:0});
         document.getElementById('total-in').textContent = totals.in;
         document.getElementById('total-work').textContent = totals.work;
 
-        // כרטיסיות Flows
-        const html = data.flows.map(flow => `
-          <a class="card" href="flow.html?flowKey=${encodeURIComponent(flow.flowKey)}" title="${flow.friendlyName}">
+        // שם ידידותי (אם קיים במטה)
+        const names = {};
+        if (metaRes.ok && Array.isArray(metaRes.flows)) {
+          metaRes.flows.forEach(f => names[f.flowKey] = f.friendlyName);
+        }
+
+        flowsEl.innerHTML = dashRes.flows.map(flow => `
+          <a class="card" href="flow.html?flowKey=${encodeURIComponent(flow.flowKey)}" title="${names[flow.flowKey] || flow.friendlyName}">
             <div class="flow-card-header">
-              <div class="flow-title">${flow.friendlyName}</div>
+              <div style="font-weight:700">${names[flow.flowKey] || flow.friendlyName}</div>
               <div class="counts">
                 <span class="badge">לטיפול: ${flow.counts.in}</span>
                 <span class="badge">בעבודה: ${flow.counts.work}</span>
@@ -181,18 +98,20 @@
             <div class="hint">כניסה לניהול ה־Flow →</div>
           </a>
         `).join('');
-
-        container.innerHTML = html || '<div class="card" style="opacity:.6">אין נתונים להצגה</div>';
       } catch (e) {
         console.error(e);
-        container.innerHTML = '<div class="card" style="opacity:.9;color:#b00020">שגיאה בטעינה</div>';
-        document.getElementById('total-in').textContent = '—';
-        document.getElementById('total-work').textContent = '—';
+        document.getElementById('flows').innerHTML = '<div class="error">שגיאה בטעינה</div>';
+        showToast('שגיאה בטעינה');
       }
     }
 
-    document.getElementById('refresh-btn').addEventListener('click', loadDashboard);
-    loadDashboard();
+    function showToast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg; t.style.display='block';
+      clearTimeout(showToast._h); showToast._h=setTimeout(()=>t.style.display='none',1500);
+    }
+
+    load();
   </script>
 </body>
 </html>

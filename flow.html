@@ -10,7 +10,7 @@
   <style>
     .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:.9rem}
     .hero .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-    .hero .stat{flex:1 1 180px; text-align:center;background:rgba(255,255,255,.18);padding:12px;border-radius:999px}
+    .hero .stat{flex:1 1 180px;text-align:center;background:rgba(255,255,255,.18);padding:12px;border-radius:999px}
     .search-wrap{display:flex;gap:8px;align-items:center;margin:12px 0}
     .search-wrap input{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ddd}
     .cols{display:grid;grid-template-columns:1fr;gap:16px}
@@ -22,7 +22,8 @@
     .muted{opacity:.65}
     .actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
     .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(0,0,0,.85);color:#fff;padding:10px 14px;border-radius:12px}
-    details summary{cursor:pointer; list-style:none}
+    .error{color:#b00020;margin-top:10px}
+    details summary{cursor:pointer;list-style:none}
     details summary::-webkit-details-marker{display:none}
   </style>
 </head>
@@ -63,10 +64,12 @@
   </div>
 
   <div id="toast" class="toast" style="display:none"></div>
-  <p id="err" class="error" style="color:#b00020;margin-top:10px" hidden></p>
+  <p id="err" class="error" hidden></p>
 
   <script>
     feather.replace();
+
+    // מצב כהה
     (function(){
       const root = document.documentElement;
       if (localStorage.getItem('dark-mode') === '1') root.classList.add('dark-mode');
@@ -76,15 +79,10 @@
       });
     })();
 
-    // ====== Panel API URL (כבר מולא) ======
+    // ====== Panel API URL שלך ======
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
-    const qs = new URLSearchParams(location.search);
-    const flowKey = qs.get('flowKey') || '';
-    document.getElementById('flowKeyPill').textContent = flowKey || '—';
-
-    function toast(msg, ms=1800){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', ms); }
-
+    // שירות עזר לפניות API עם Retry + Timeout
     async function api(path, {method='GET', body, tries=2, timeout=12000}={}){
       const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), timeout);
       try{
@@ -97,8 +95,16 @@
       finally{ clearTimeout(to); }
     }
 
-    // Owners/Statuses/Names
-    let META = {owners: [], statuses: [], flows: []};
+    // קריאת פרמטרים
+    const qs = new URLSearchParams(location.search);
+    const flowKey = qs.get('flowKey') || '';
+    document.getElementById('flowKeyPill').textContent = flowKey || '—';
+
+    // טוסט
+    function toast(msg, ms=1800){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', ms); }
+
+    // מטא (סטטוסים/מטפלים/שמות ה־Flow)
+    let META = {owners:[], statuses:[], flows:[]};
     async function loadMeta() {
       const m = await api("?action=meta");
       META = m;
@@ -111,36 +117,30 @@
       const a = document.getElementById('sheetBtn'); a.href = r.url; a.target = "_blank";
     }
 
-    function selectHtml(id, options, value){
-      const opts = options.map(o => `<option${o===value?' selected':''}>${o}</option>`).join('');
-      return `<select id="${id}" class="pill" style="background:#eef;border:0;cursor:pointer">${opts}</select>`;
-    }
-
-    async function updateField(rowId, updates){
-      const body = { action:'updateRow', flowKey, rowId, updates, actor:'WebPanel' };
-      await api("", {method:'POST', body});
-      toast('נשמר ✔︎');
-    }
-
+    // רינדור כרטיס
     function renderItem(item){
       const f = item.fields;
       const owners = META.owners && META.owners.length ? META.owners : ['ריק','חן','בלה','תמרה','ליאור','נטע'];
       const statuses = META.statuses && META.statuses.length ? META.statuses : ['לטיפול','בעבודה','הסתיים'];
 
-      const ownerId = `owner_${item.rowId}`;
-      const statusId = `status_${item.rowId}`;
-      const notesId  = `notes_${item.rowId}`;
+      const ownerSel = `<select class="pill owner" data-rowid="${item.rowId}">
+        ${owners.map(o=>`<option${(f.owner||'ריק')===o?' selected':''}>${o}</option>`).join('')}
+      </select>`;
+
+      const statusSel = `<select class="pill status" data-rowid="${item.rowId}">
+        ${statuses.map(s=>`<option${(f.status||'לטיפול')===s?' selected':''}>${s}</option>`).join('')}
+      </select>`;
 
       return `
-        <article class="card" id="row_${item.rowId}">
+        <article class="card" data-rowid="${item.rowId}">
           <div class="actions" style="justify-content:space-between;margin-bottom:6px">
             <span class="pill muted">נוצר: ${f.createdAt || ''}</span>
             <span class="pill muted">מס׳ תיק: ${f.caseId || ''}</span>
           </div>
 
           <div class="actions" style="margin-bottom:8px">
-            <span class="pill">מטפל: ${selectHtml(ownerId, owners, f.owner || 'ריק')}</span>
-            <span class="pill">סטטוס: ${selectHtml(statusId, statuses, f.status || 'לטיפול')}</span>
+            <span class="pill">מטפל: ${ownerSel}</span>
+            <span class="pill">סטטוס: ${statusSel}</span>
           </div>
 
           <div class="kv">
@@ -152,59 +152,84 @@
 
           <div style="margin-top:10px">
             <div class="muted" style="margin-bottom:6px">הערת מנהל</div>
-            <textarea id="${notesId}" rows="2" placeholder="כתוב הערה…" style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd">${f.adminNotes||''}</textarea>
+            <textarea class="admin-notes" data-rowid="${item.rowId}" rows="2" placeholder="כתוב הערה…" style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd">${f.adminNotes||''}</textarea>
           </div>
 
           <details style="margin-top:10px">
             <summary class="pill">פרטים נוספים ▾</summary>
             <div style="margin-top:10px">
-              ${
-                (f._keys||[]).map(k=>{
-                  if (k==='adminNotes') return '';
-                  const v = f[k];
-                  return `<div class="box" style="margin:6px 0"><div class="muted">${k}</div><div>${v==null?'':v}</div></div>`;
-                }).join('')
-              }
+              ${(f._keys||[]).map(k=>{
+                if (k==='adminNotes') return '';
+                const v = f[k];
+                return `<div class="box" style="margin:6px 0"><div class="muted">${k}</div><div>${v==null?'':v}</div></div>`;
+              }).join('')}
             </div>
           </details>
 
           <div class="actions" style="justify-content:flex-end;margin-top:10px">
-            <button class="pill" onclick="window.open(document.getElementById('sheetBtn').href,'_blank')"><i data-feather="book-open"></i>לשורה בגליון</button>
+            <button class="pill open-sheet"><i data-feather="book-open"></i> לשורה בגליון</button>
           </div>
         </article>
-
-        <script>
-          (function(){
-            const ownerSel = document.getElementById('${ownerId}');
-            ownerSel && ownerSel.addEventListener('change', async (e)=>{
-              try { await updateField(${item.rowId}, {owner: e.target.value}); } catch(err){ alert('שגיאה בשמירה: '+err.message); }
-            });
-            const statusSel = document.getElementById('${statusId}');
-            statusSel && statusSel.addEventListener('change', async (e)=>{
-              try { await updateField(${item.rowId}, {status: e.target.value}); } catch(err){ alert('שגיאה בשמירה: '+err.message); }
-            });
-            const notes = document.getElementById('${notesId}');
-            let h;
-            notes && notes.addEventListener('input', ()=>{
-              clearTimeout(h);
-              h = setTimeout(async ()=>{
-                try { await updateField(${item.rowId}, {adminNotes: notes.value}); }
-                catch(err){ alert('שגיאה בשמירה: '+err.message); }
-              }, 500);
-            });
-          })();
-        </script>
       `;
     }
 
+    // כתיבה ל-API
+    async function updateField(rowId, updates){
+      const body = { action:'updateRow', flowKey, rowId, updates, actor:'WebPanel' };
+      await api("", {method:'POST', body});
+      toast('נשמר ✔︎');
+    }
+
+    // טעינת טור
     async function loadColumn(which, q=''){
       const list = document.getElementById('list-'+which);
       list.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
       const data = await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
       list.innerHTML = (data.items||[]).map(renderItem).join('') || '<div class="card" style="opacity:.6">אין משימות להצגה</div>';
+      feather.replace(list); // לרענן איקונים בכרטיסים
       return data.meta ? data.meta.total : 0;
     }
 
+    // Delegation – מאזינים פעם אחת לכל קונטיינר
+    function wireList(containerId){
+      const el = document.getElementById(containerId);
+      // שינוי מטפל/סטטוס
+      el.addEventListener('change', async (e)=>{
+        try{
+          const t = e.target;
+          const rowId = parseInt(t.getAttribute('data-rowid'),10);
+          if (!rowId) return;
+          if (t.classList.contains('owner')) {
+            await updateField(rowId, {owner: t.value});
+          } else if (t.classList.contains('status')) {
+            await updateField(rowId, {status: t.value});
+          }
+        }catch(err){ alert('שגיאה בשמירה: '+err.message); }
+      });
+      // הערות – debounce
+      let timers = new Map();
+      el.addEventListener('input', (e)=>{
+        const t = e.target;
+        if (!t.classList.contains('admin-notes')) return;
+        const rowId = parseInt(t.getAttribute('data-rowid'),10);
+        clearTimeout(timers.get(rowId));
+        timers.set(rowId, setTimeout(async ()=>{
+          try{ await updateField(rowId, {adminNotes: t.value}); }
+          catch(err){ alert('שגיאה בשמירה: '+err.message); }
+        }, 500));
+      });
+      // פתיחה לשורה בגליון (פותח את הטאב; מיקום לשורה – ידני אחרי קליק)
+      el.addEventListener('click', (e)=>{
+        const btn = e.target.closest('.open-sheet');
+        if (!btn) return;
+        const href = document.getElementById('sheetBtn').href;
+        if (href) window.open(href, '_blank');
+      });
+    }
+    wireList('list-in');
+    wireList('list-work');
+
+    // טעינה כוללת
     async function loadAll(){
       const err = document.getElementById('err'); err.hidden=true; err.textContent='';
       try{
@@ -218,9 +243,11 @@
       }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
 
+    // ריענון / חיפוש
     document.getElementById('refresh-btn').addEventListener('click', loadAll);
     document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll, 250); });
 
+    // הפעלת הדף
     loadAll();
   </script>
 </body>

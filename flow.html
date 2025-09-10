@@ -3,353 +3,225 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>יוסטון – Flow</title>
-
+  <title>Flow</title>
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
-
   <style>
-    .top-buttons { gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
-    .top-buttons a, .top-buttons button { padding: 8px 12px; border-radius: 10px; font-size: .95rem; }
-
-    .hero .chips { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; }
-    .chip { background:rgba(255,255,255,.22); color:#fff; padding:10px 12px; border-radius:999px; font-weight:600; backdrop-filter:blur(2px); }
-    .chip .num { font-size:1.25rem; margin-inline-start:6px; }
-
-    .toolbar { display:grid; grid-template-columns:1fr auto; gap:10px; max-width:900px; margin:8px auto 14px; }
-    .search-input { background:var(--color-surface); border:none; border-radius:var(--border-radius); padding:10px 12px; font-size:1rem; box-shadow:0 2px 8px rgba(0,0,0,.08); outline:none; }
-    .toolbar .btns { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-
-    .columns { display:grid; gap:14px; grid-template-columns:1fr; max-width:1100px; margin:0 auto; }
-    @media (min-width: 900px) { .columns { grid-template-columns:1fr 1fr; gap:18px; } }
-    .col h3 { text-align:right; margin:6px 4px 10px; font-size:1.1rem; opacity:.85; }
-
-    .task-list { display:grid; gap:12px; }
-    .task-card { background:var(--color-surface); border-radius:var(--border-radius); box-shadow:0 2px 10px rgba(0,0,0,.08); padding:12px 14px; text-align:right; }
-    .task-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
-    .meta { display:flex; gap:10px; flex-wrap:wrap; opacity:.8; font-size:.9rem; }
-    .pill { background:rgba(0,0,0,.06); padding:4px 10px; border-radius:999px; white-space:nowrap; }
-
-    .edit-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
-    .edit-row select, .notes-edit textarea {
-      background:#fff; border:1px solid rgba(0,0,0,.1);
-      border-radius:10px; padding:8px 10px; font-size:.95rem;
-      box-shadow:0 1px 3px rgba(0,0,0,.06); outline:none;
-    }
-
-    .notes-edit { margin-top:8px; display:grid; gap:6px; }
-    .notes-edit label { font-weight:600; opacity:.8; }
-    .notes-hint { font-size:.85rem; opacity:.65; }
-
-    .kvs { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:.95rem; margin-top:6px; }
-    .kv { background:rgba(0,0,0,.04); border-radius:10px; padding:8px; }
-    .kv b { display:block; font-weight:600; opacity:.75; margin-bottom:3px; }
-
-    details { margin-top:8px; background:rgba(0,0,0,.03); border-radius:10px; padding:8px 10px; }
-    details summary { cursor:pointer; font-weight:600; }
-    .full-grid { display:grid; gap:6px; grid-template-columns:1fr 1fr; margin-top:8px; font-size:.9rem; }
-    .full-grid .row { background:#fff; border-radius:8px; padding:6px 8px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
-    .full-grid .row b { display:inline-block; min-width:110px; opacity:.7; }
-
-    .empty { opacity:.6; text-align:center; padding:18px 10px; }
-
-    #toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.85); color:#fff; padding:8px 12px; border-radius:10px; font-size:.9rem; display:none; z-index:9999; }
-    #sheet-btn[disabled] { opacity:.6; pointer-events:none; }
-    .saving { opacity:.6; pointer-events:none; }
+    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:.9rem}
+    .hero .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .hero .stat{flex:1 1 180px; text-align:center;background:rgba(255,255,255,.18);padding:12px;border-radius:999px}
+    .search-wrap{display:flex;gap:8px;align-items:center;margin:12px 0}
+    .search-wrap input{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ddd}
+    .cols{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width: 920px){ .cols{grid-template-columns:1fr 1fr} }
+    .group-head{font-weight:700;margin:14px 6px}
+    .card{align-items:stretch;text-align:right}
+    .kv{display:grid;grid-template-columns:1fr 1fr; gap:10px}
+    .kv .box{background:var(--color-bg);border-radius:12px;padding:12px}
+    .muted{opacity:.65}
+    .actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(0,0,0,.85);color:#fff;padding:10px 14px;border-radius:12px}
+    details summary{cursor:pointer; list-style:none}
+    details summary::-webkit-details-marker{display:none}
   </style>
 </head>
 <body>
-
   <nav class="top-buttons" aria-label="ניווט עליון">
     <a href="javascript:void(0)" onclick="history.back()" title="חזור"><i data-feather="arrow-right"></i> חזור</a>
-    <a href="houston-dashboard.html" title="דאשבורד"><i data-feather="grid"></i> דאשבורד</a>
-    <a href="admin.html" title="עמוד אדמין"><i data-feather="settings"></i> אדמין</a>
+    <a href="admin.html" title="אדמין"><i data-feather="settings"></i> אדמין</a>
+    <a id="sheetBtn" href="#" target="_blank" rel="noopener" title="לגליון"><i data-feather="book-open"></i> גליון</a>
     <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
-    <a id="sheet-btn" class="top-buttons" href="#" target="_blank" rel="noopener" title="לגליון הנתונים"><i data-feather="table"></i> לגליון</a>
-    <button id="dark-toggle" type="button" title="מצב כהה / בהיר"><i data-feather="moon"></i></button>
+    <button id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
   </nav>
 
   <header class="hero">
     <div class="hero-content">
-      <h2 id="flow-title">Flow</h2>
-      <p id="flow-subtitle">תצוגת עבודה – טור "לטיפול" וטור "בעבודה".</p>
-      <div class="chips">
-        <div class="chip"><span class="num" id="count-in">0</span>לטיפול</div>
-        <div class="chip"><span class="num" id="count-work">0</span>בעבודה</div>
+      <h2 id="title">Flow</h2>
+      <p class="muted">תצוגת עבודה – טור "לטיפול" וטור "בעבודה".</p>
+      <div class="row">
+        <div class="stat">בעבודה <strong id="cnt-work">0</strong></div>
+        <div class="stat">לטיפול <strong id="cnt-in">0</strong></div>
       </div>
     </div>
   </header>
 
-  <div class="toolbar">
-    <input id="search" class="search-input" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
-    <div class="btns">
-      <button class="top-buttons" style="padding:8px 12px" onclick="clearSearch()"><i data-feather="x"></i> נקה</button>
-    </div>
+  <div class="search-wrap">
+    <span class="pill muted" id="flowKeyPill">—</span>
+    <input id="q" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
   </div>
 
-  <main class="columns">
-    <section class="col" aria-label="לטיפול">
-      <h3>לטיפול</h3>
-      <div id="list-in" class="task-list"></div>
+  <div class="cols">
+    <section>
+      <div class="group-head">לטיפול</div>
+      <div id="list-in"></div>
     </section>
-
-    <section class="col" aria-label="בעבודה">
-      <h3>בעבודה</h3>
-      <div id="list-work" class="task-list"></div>
+    <section>
+      <div class="group-head">בעבודה</div>
+      <div id="list-work"></div>
     </section>
-  </main>
+  </div>
 
-  <div id="toast"></div>
+  <div id="toast" class="toast" style="display:none"></div>
+  <p id="err" class="error" style="color:#b00020;margin-top:10px" hidden></p>
 
   <script>
     feather.replace();
+    (function(){
+      const root = document.documentElement;
+      if (localStorage.getItem('dark-mode') === '1') root.classList.add('dark-mode');
+      document.getElementById('dark-toggle').addEventListener('click', ()=>{
+        const on = root.classList.toggle('dark-mode');
+        on ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
+      });
+    })();
 
-    if (localStorage.getItem('dark-mode') === '1') {
-      document.documentElement.classList.add('dark-mode');
-    }
-    document.getElementById('dark-toggle').addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
-    });
-
+    // ====== Panel API URL (כבר מולא) ======
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
-    const flowKey = new URLSearchParams(location.search).get('flowKey') || '';
-    let OWNERS   = ['ריק','חן','בלה','תמרה','ליאור','נטע']; // fallback
-    let STATUSES = ['לטיפול','בעבודה','הסתיים'];           // fallback
 
-    document.getElementById('refresh-btn').addEventListener('click', loadAll);
+    const qs = new URLSearchParams(location.search);
+    const flowKey = qs.get('flowKey') || '';
+    document.getElementById('flowKeyPill').textContent = flowKey || '—';
 
-    // חיפוש עם debounce
-    let q = '';
-    const searchInput = document.getElementById('search');
-    let debounceHandle = null;
-    searchInput.addEventListener('input', () => {
-      q = searchInput.value.trim();
-      clearTimeout(debounceHandle);
-      debounceHandle = setTimeout(loadAll, 300);
-    });
-    function clearSearch(){ searchInput.value=''; q=''; loadAll(); }
+    function toast(msg, ms=1800){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', ms); }
 
-    // מטא (רשימת מטפלים/סטטוסים)
+    async function api(path, {method='GET', body, tries=2, timeout=12000}={}){
+      const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), timeout);
+      try{
+        const res = await fetch(API_URL + path, { method, headers: body?{'Content-Type':'application/json'}:undefined, body: body?JSON.stringify(body):undefined, signal: ctrl.signal });
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const data = await res.json().catch(()=>{ throw new Error('Bad JSON'); });
+        if(!data || data.ok === false) throw new Error(data && data.error || 'API error');
+        return data;
+      }catch(e){ if(tries>0) return api(path,{method,body,tries:tries-1,timeout}); throw e; }
+      finally{ clearTimeout(to); }
+    }
+
+    // Owners/Statuses/Names
+    let META = {owners: [], statuses: [], flows: []};
     async function loadMeta() {
-      try {
-        const r = await fetch(API_URL + '?action=meta');
-        const d = await r.json();
-        if (d.ok) {
-          if (Array.isArray(d.owners) && d.owners.length) OWNERS = d.owners;
-          if (Array.isArray(d.statuses) && d.statuses.length) STATUSES = d.statuses;
-          const m = {}; (d.flows||[]).forEach(f => m[f.flowKey]=f.friendlyName);
-          document.getElementById('flow-title').textContent = m[flowKey] || flowKey || 'Flow';
-        }
-      } catch(_) {}
+      const m = await api("?action=meta");
+      META = m;
+      const flow = META.flows.find(f => f.flowKey === flowKey);
+      if (flow) document.getElementById('title').textContent = flow.friendlyName;
     }
 
-    // קישור "לגליון"
-    async function setSheetLink() {
-      const btn = document.getElementById('sheet-btn');
-      btn.setAttribute('href', '#');
-      btn.setAttribute('disabled','disabled');
-      try {
-        const r = await fetch(API_URL + `?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
-        const d = await r.json();
-        const url = d?.url || `https://docs.google.com/spreadsheets/d/1bqfwDNtTM8AG8zdJwqm3Y835EWU2veakeuuruYDe_g4/edit`;
-        btn.setAttribute('href', url);
-      } catch(e) { console.error(e); }
-      finally { btn.removeAttribute('disabled'); }
+    async function loadSheetLink(){
+      const r = await api(`?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
+      const a = document.getElementById('sheetBtn'); a.href = r.url; a.target = "_blank";
     }
 
-    setSheetLink();
-    loadMeta().finally(loadAll);
-
-    async function loadAll() {
-      if (!flowKey) { alert('חסר flowKey בכתובת'); return; }
-
-      const [inRes, workRes] = await Promise.all([
-        fetch(API_URL + `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=in&q=${encodeURIComponent(q)}&limit=400`),
-        fetch(API_URL + `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=work&q=${encodeURIComponent(q)}&limit=400`)
-      ]);
-      const [inData, workData] = await Promise.all([inRes.json(), workRes.json()]);
-
-      const inItems = inData?.items || [];
-      const workItems = workData?.items || [];
-
-      document.getElementById('count-in').textContent = inData?.meta?.total ?? inItems.length;
-      document.getElementById('count-work').textContent = workData?.meta?.total ?? workItems.length;
-
-      renderList('list-in', inItems);
-      renderList('list-work', workItems);
+    function selectHtml(id, options, value){
+      const opts = options.map(o => `<option${o===value?' selected':''}>${o}</option>`).join('');
+      return `<select id="${id}" class="pill" style="background:#eef;border:0;cursor:pointer">${opts}</select>`;
     }
 
-    function renderList(elId, items) {
-      const el = document.getElementById(elId);
-      if (!items.length) { el.innerHTML = `<div class="empty">אין משימות להצגה</div>`; return; }
-      el.innerHTML = items.map(renderCard).join('');
+    async function updateField(rowId, updates){
+      const body = { action:'updateRow', flowKey, rowId, updates, actor:'WebPanel' };
+      await api("", {method:'POST', body});
+      toast('נשמר ✔︎');
     }
 
-    function renderCard(item) {
-      const rowId = item.rowId;
-      const f = item.fields || {};
+    function renderItem(item){
+      const f = item.fields;
+      const owners = META.owners && META.owners.length ? META.owners : ['ריק','חן','בלה','תמרה','ליאור','נטע'];
+      const statuses = META.statuses && META.statuses.length ? META.statuses : ['לטיפול','בעבודה','הסתיים'];
 
-      const createdAt  = f.createdAt  || f['תאריך יצירה'] || f['נוצר'] || '';
-      const owner      = f.owner      || f['שם המטפל']    || f['מטפל'] || 'ריק';
-      const status     = f.status     || f['סטטוס']        || '';
-      const adminNotes = f.adminNotes || f['admin notes']  || f['הערת מנהל'] || '';
-
-      const fullName = [f.firstName || f['שם פרטי'] || f['שם'], f.lastName || f['שם משפחה']].filter(Boolean).join(' ');
-      const role     = f.role || f['תפקיד'] || f['הורה/תלמיד'] || '';
-      const phone    = f.phone || f['טלפון'] || f['נייד'] || '';
-      const subject  = f.subject || f['מקצוע'] || '';
-
-      const ownerSel  = selectHtml(`owner-${rowId}`,  OWNERS,   owner,  'owner-select',  rowId);
-      const statusSel = selectHtml(`status-${rowId}`, STATUSES, status, 'status-select', rowId);
-
-      const kvs = [
-        fullName ? kv('שם', fullName) : '',
-        phone ? kv('טלפון', phone) : '',
-        subject ? kv('מקצוע', subject) : '',
-        role ? kv('תפקיד', role) : '',
-      ].join('');
-
-      const allRows = (f._keys || Object.keys(f)).map(k => {
-        if (k === '_keys') return '';
-        return `<div class="row"><b>${escapeHtml(k)}:</b> ${escapeHtml(f[k])}</div>`;
-      }).join('');
+      const ownerId = `owner_${item.rowId}`;
+      const statusId = `status_${item.rowId}`;
+      const notesId  = `notes_${item.rowId}`;
 
       return `
-        <article class="task-card" id="card-${rowId}" data-rowid="${rowId}">
-          <div class="task-head">
-            <div class="meta">
-              ${createdAt ? `<span class="pill">נוצר: ${escapeHtml(createdAt)}</span>` : ''}
+        <article class="card" id="row_${item.rowId}">
+          <div class="actions" style="justify-content:space-between;margin-bottom:6px">
+            <span class="pill muted">נוצר: ${f.createdAt || ''}</span>
+            <span class="pill muted">מס׳ תיק: ${f.caseId || ''}</span>
+          </div>
+
+          <div class="actions" style="margin-bottom:8px">
+            <span class="pill">מטפל: ${selectHtml(ownerId, owners, f.owner || 'ריק')}</span>
+            <span class="pill">סטטוס: ${selectHtml(statusId, statuses, f.status || 'לטיפול')}</span>
+          </div>
+
+          <div class="kv">
+            <div class="box"><div class="muted">שם</div><div>${(f.firstName||'') + ' ' + (f.lastName||'')}</div></div>
+            <div class="box"><div class="muted">טלפון</div><div dir="ltr">${f.phone||''}</div></div>
+            <div class="box"><div class="muted">תפקיד</div><div>${f.role||''}</div></div>
+            <div class="box"><div class="muted">מקצוע</div><div>${f.subject||''}</div></div>
+          </div>
+
+          <div style="margin-top:10px">
+            <div class="muted" style="margin-bottom:6px">הערת מנהל</div>
+            <textarea id="${notesId}" rows="2" placeholder="כתוב הערה…" style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd">${f.adminNotes||''}</textarea>
+          </div>
+
+          <details style="margin-top:10px">
+            <summary class="pill">פרטים נוספים ▾</summary>
+            <div style="margin-top:10px">
+              ${
+                (f._keys||[]).map(k=>{
+                  if (k==='adminNotes') return '';
+                  const v = f[k];
+                  return `<div class="box" style="margin:6px 0"><div class="muted">${k}</div><div>${v==null?'':v}</div></div>`;
+                }).join('')
+              }
             </div>
-            <div class="meta">
-              <span class="pill pill-status">סטטוס נוכחי: ${escapeHtml(status || '—')}</span>
-              <span class="pill pill-owner">מטפל: ${escapeHtml(owner || '—')}</span>
-            </div>
-          </div>
-
-          <div class="edit-row">
-            <label>מטפל: ${ownerSel}</label>
-            <label>סטטוס: ${statusSel}</label>
-          </div>
-
-          ${kvs ? `<div class="kvs">${kvs}</div>` : ''}
-
-          <div class="notes-edit">
-            <label for="notes-${rowId}">הערת מנהל</label>
-            <textarea id="notes-${rowId}" class="notes-textarea" data-rowid="${rowId}" placeholder="כתוב הערה…">${escapeHtml(adminNotes)}</textarea>
-            <div class="notes-hint" id="notes-hint-${rowId}" aria-live="polite"></div>
-          </div>
-
-          <details>
-            <summary>פרטים נוספים</summary>
-            <div class="full-grid">${allRows}</div>
           </details>
+
+          <div class="actions" style="justify-content:flex-end;margin-top:10px">
+            <button class="pill" onclick="window.open(document.getElementById('sheetBtn').href,'_blank')"><i data-feather="book-open"></i>לשורה בגליון</button>
+          </div>
         </article>
+
+        <script>
+          (function(){
+            const ownerSel = document.getElementById('${ownerId}');
+            ownerSel && ownerSel.addEventListener('change', async (e)=>{
+              try { await updateField(${item.rowId}, {owner: e.target.value}); } catch(err){ alert('שגיאה בשמירה: '+err.message); }
+            });
+            const statusSel = document.getElementById('${statusId}');
+            statusSel && statusSel.addEventListener('change', async (e)=>{
+              try { await updateField(${item.rowId}, {status: e.target.value}); } catch(err){ alert('שגיאה בשמירה: '+err.message); }
+            });
+            const notes = document.getElementById('${notesId}');
+            let h;
+            notes && notes.addEventListener('input', ()=>{
+              clearTimeout(h);
+              h = setTimeout(async ()=>{
+                try { await updateField(${item.rowId}, {adminNotes: notes.value}); }
+                catch(err){ alert('שגיאה בשמירה: '+err.message); }
+              }, 500);
+            });
+          })();
+        </script>
       `;
     }
 
-    // האזנות מרוכזות
-    document.addEventListener('change', async (e) => {
-      const sel = e.target;
-      if (sel.matches('.owner-select')) {
-        const rowId = Number(sel.dataset.rowid);
-        const value = sel.value;
-        const ok = await saveField(rowId, { owner: value });
-        if (ok) {
-          document.querySelector(`#card-${rowId} .pill-owner`).textContent = 'מטפל: ' + value;
-        }
-      }
-      if (sel.matches('.status-select')) {
-        const rowId = Number(sel.dataset.rowid);
-        const value = sel.value;
-        const ok = await saveField(rowId, { status: value });
-        if (ok) {
-          document.querySelector(`#card-${rowId} .pill-status`).textContent = 'סטטוס נוכחי: ' + value;
-          moveCardByStatus(rowId, value);
-        }
-      }
-    });
-
-    // שמירת הערות עם debounce
-    const notesTimers = new Map();
-    document.addEventListener('input', (e) => {
-      if (!e.target.matches('.notes-textarea')) return;
-      const ta = e.target;
-      const rowId = Number(ta.dataset.rowid);
-      const hint = document.getElementById(`notes-hint-${rowId}`);
-      hint.textContent = 'שומר…';
-      clearTimeout(notesTimers.get(rowId));
-      const h = setTimeout(async () => {
-        const ok = await saveField(rowId, { adminNotes: ta.value });
-        hint.textContent = ok ? 'נשמר ✓' : 'שגיאה בשמירה';
-        setTimeout(()=> hint.textContent='', 1200);
-      }, 600);
-      notesTimers.set(rowId, h);
-    });
-    document.addEventListener('blur', async (e) => {
-      if (!e.target.matches('.notes-textarea')) return;
-      const ta = e.target;
-      const rowId = Number(ta.dataset.rowid);
-      const hint = document.getElementById(`notes-hint-${rowId}`);
-      clearTimeout(notesTimers.get(rowId));
-      hint.textContent = 'שומר…';
-      const ok = await saveField(rowId, { adminNotes: ta.value });
-      hint.textContent = ok ? 'נשמר ✓' : 'שגיאה בשמירה';
-      setTimeout(()=> hint.textContent='', 1200);
-    }, true);
-
-    function selectHtml(id, options, value, cls, rowId) {
-      const opts = options.map(o => `<option value="${escapeHtml(o)}"${o===value?' selected':''}>${escapeHtml(o)}</option>`).join('');
-      return `<select id="${id}" name="${id}" class="${cls}" data-rowid="${rowId}">${opts}</select>`;
+    async function loadColumn(which, q=''){
+      const list = document.getElementById('list-'+which);
+      list.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
+      const data = await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
+      list.innerHTML = (data.items||[]).map(renderItem).join('') || '<div class="card" style="opacity:.6">אין משימות להצגה</div>';
+      return data.meta ? data.meta.total : 0;
     }
 
-    async function saveField(rowId, updates) {
-      const card = document.getElementById(`card-${rowId}`);
-      card?.classList.add('saving');
-      try {
-        // text/plain כדי להימנע מ-preflight
-        const res = await fetch(API_URL, {
-          method:'POST',
-          headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action:'updateRow', flowKey, rowId, updates, actor:'Panel' })
-        });
-        const text = await res.text();
-        let data; try { data = JSON.parse(text); } catch { data = { ok:false, error:text || 'bad_response' }; }
-        if (!data.ok) { showToast('שגיאה בשמירה: ' + (data.error || '')); return false; }
-        showToast('נשמר ✓');
-        return true;
-      } catch(e) {
-        console.error(e);
-        showToast('שגיאה בשמירה: ' + (e.message || 'network'));
-        return false;
-      } finally {
-        card?.classList.remove('saving');
-      }
+    async function loadAll(){
+      const err = document.getElementById('err'); err.hidden=true; err.textContent='';
+      try{
+        if(!flowKey){ err.hidden=false; err.textContent='חסר flowKey ב־URL'; return; }
+        await loadMeta();
+        await loadSheetLink();
+        const q = document.getElementById('q').value.trim();
+        const [inCnt, workCnt] = await Promise.all([ loadColumn('in', q), loadColumn('work', q) ]);
+        document.getElementById('cnt-in').textContent = inCnt;
+        document.getElementById('cnt-work').textContent = workCnt;
+      }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
 
-    function moveCardByStatus(rowId, status) {
-      const card = document.getElementById(`card-${rowId}`);
-      if (!card) return;
-      if (status === 'לטיפול') {
-        document.getElementById('list-in').prepend(card);
-      } else if (status === 'בעבודה') {
-        document.getElementById('list-work').prepend(card);
-      } else if (status === 'הסתיים') {
-        card.style.opacity = .4;
-        card.style.transition = 'opacity .3s';
-        setTimeout(()=> card.remove(), 350);
-      }
-      // עדכון מונה בהירו
-      const cntIn = document.querySelectorAll('#list-in .task-card').length;
-      const cntWork = document.querySelectorAll('#list-work .task-card').length;
-      document.getElementById('count-in').textContent = cntIn;
-      document.getElementById('count-work').textContent = cntWork;
-    }
+    document.getElementById('refresh-btn').addEventListener('click', loadAll);
+    document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll, 250); });
 
-    function kv(label, value) { return `<div class="kv"><b>${escapeHtml(label)}</b><div>${escapeHtml(value)}</div></div>`; }
-    function escapeHtml(v){ return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-    function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(showToast._h); showToast._h=setTimeout(()=>t.style.display='none',1500); }
+    loadAll();
   </script>
 </body>
 </html>

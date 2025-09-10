@@ -4,35 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>יוסטון דאשבורד</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
-
   <style>
-    .top-buttons { gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
-    .top-buttons a, .top-buttons button { padding: 8px 12px; border-radius: 10px; font-size: .95rem; }
-
-    .hero .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-    .chip { background: rgba(255,255,255,.22); color: #fff; padding: 10px 12px; border-radius: 999px; font-weight: 600; backdrop-filter: blur(2px); }
-    .chip .num { font-size: 1.25rem; margin-inline-start: 6px; }
-
-    .cards-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
-    .card { align-items: stretch; text-align:right; }
-    .flow-card-header { display:flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-    .counts { display:flex; gap:6px; flex-wrap:wrap; }
-    .badge { background: rgba(0,0,0,.08); padding: 4px 10px; border-radius: 999px; font-size: .85rem; }
-    .hint { opacity:.65; font-size:.9rem; }
-    .error { color:#b00020; text-align:center; opacity:.9; }
+    h1{display:none}
+    .hero .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    .chip{background:rgba(255,255,255,.22);color:#fff;padding:10px 12px;border-radius:999px;font-weight:600;backdrop-filter:blur(2px)}
+    .chip .num{font-size:1.25rem;margin-inline-start:6px}
+    .cards-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+    .card{align-items:stretch;text-align:right}
+    .flow-card-header{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px}
+    .counts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+    .badge{background:rgba(0,0,0,.06);padding:4px 10px;border-radius:999px;font-size:.85rem;white-space:nowrap}
+    .error{color:#b00020;margin-top:10px}
   </style>
 </head>
 <body>
-
   <nav class="top-buttons" aria-label="ניווט עליון">
     <a href="javascript:void(0)" onclick="history.back()" title="חזור"><i data-feather="arrow-right"></i> חזור</a>
-    <a href="admin.html" title="עמוד אדמין"><i data-feather="settings"></i> אדמין</a>
+    <a href="admin.html" title="אדמין"><i data-feather="settings"></i> אדמין</a>
     <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
-    <button id="dark-toggle" type="button" title="מצב כהה / בהיר"><i data-feather="moon"></i></button>
+    <button id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
   </nav>
 
   <header class="hero">
@@ -47,71 +40,66 @@
   </header>
 
   <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה"></section>
-  <div id="toast" style="display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:8px 12px;border-radius:10px;font-size:.9rem;z-index:9999"></div>
+  <p id="err" class="error" hidden></p>
 
   <script>
     feather.replace();
 
-    if (localStorage.getItem('dark-mode') === '1') {
-      document.documentElement.classList.add('dark-mode');
-    }
-    document.getElementById('dark-toggle').addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark-mode');
-      isDark ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
-    });
+    // Dark mode
+    (function(){
+      const root = document.documentElement;
+      if (localStorage.getItem('dark-mode') === '1') root.classList.add('dark-mode');
+      document.getElementById('dark-toggle').addEventListener('click', ()=>{
+        const on = root.classList.toggle('dark-mode');
+        on ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
+      });
+    })();
 
+    // ====== Panel API URL (כבר מולא) ======
     const API = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
-    document.getElementById('refresh-btn').addEventListener('click', load);
+    async function api(path, {method='GET', body, tries=2, timeout=12000}={}){
+      const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), timeout);
+      try{
+        const res = await fetch(API + path, { method, headers: body?{'Content-Type':'application/json'}:undefined, body: body?JSON.stringify(body):undefined, signal: ctrl.signal });
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const data = await res.json().catch(()=>{ throw new Error('Bad JSON'); });
+        if(!data || data.ok === false) throw new Error(data && data.error || 'API error');
+        return data;
+      }catch(e){ if(tries>0) return api(path,{method,body,tries:tries-1,timeout}); throw e; }
+      finally{ clearTimeout(t); }
+    }
 
-    async function load() {
-      const flowsEl = document.getElementById('flows');
-      flowsEl.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
-      try {
-        const [dashRes, metaRes] = await Promise.all([
-          fetch(API + "?action=dashboard").then(r=>r.json()),
-          fetch(API + "?action=meta").then(r=>r.json()).catch(()=>({}))
-        ]);
+    async function loadDashboard(){
+      const wrap = document.getElementById('flows');
+      const err = document.getElementById('err');
+      wrap.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>'; err.hidden=true; err.textContent='';
 
-        if (!dashRes.ok) throw new Error(dashRes.error || 'dashboard_failed');
-
-        // סה"כ
-        const totals = dashRes.flows.reduce((acc,f)=>({in: acc.in+(f.counts?.in||0), work: acc.work+(f.counts?.work||0)}), {in:0,work:0});
+      try{
+        const data = await api("?action=dashboard");
+        const totals = data.flows.reduce((a,f)=>({in:a.in+(f.counts?.in||0), work:a.work+(f.counts?.work||0)}), {in:0,work:0});
         document.getElementById('total-in').textContent = totals.in;
         document.getElementById('total-work').textContent = totals.work;
 
-        // שם ידידותי (אם קיים במטה)
-        const names = {};
-        if (metaRes.ok && Array.isArray(metaRes.flows)) {
-          metaRes.flows.forEach(f => names[f.flowKey] = f.friendlyName);
-        }
-
-        flowsEl.innerHTML = dashRes.flows.map(flow => `
-          <a class="card" href="flow.html?flowKey=${encodeURIComponent(flow.flowKey)}" title="${names[flow.flowKey] || flow.friendlyName}">
+        wrap.innerHTML = data.flows.map(f=>`
+          <a class="card" href="flow.html?flowKey=${encodeURIComponent(f.flowKey)}" title="${f.friendlyName}">
             <div class="flow-card-header">
-              <div style="font-weight:700">${names[flow.flowKey] || flow.friendlyName}</div>
+              <div class="flow-title" style="font-weight:700">${f.friendlyName}</div>
               <div class="counts">
-                <span class="badge">לטיפול: ${flow.counts.in}</span>
-                <span class="badge">בעבודה: ${flow.counts.work}</span>
+                <span class="badge">לטיפול: ${f.counts.in}</span>
+                <span class="badge">בעבודה: ${f.counts.work}</span>
               </div>
             </div>
-            <div class="hint">כניסה לניהול ה־Flow →</div>
+            <div class="hint" style="opacity:.65">כניסה לניהול ה־Flow →</div>
           </a>
-        `).join('');
-      } catch (e) {
-        console.error(e);
-        document.getElementById('flows').innerHTML = '<div class="error">שגיאה בטעינה</div>';
-        showToast('שגיאה בטעינה');
+        `).join('') || '<div class="card" style="opacity:.6">אין נתונים</div>';
+      }catch(e){
+        wrap.innerHTML=''; err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message;
       }
     }
 
-    function showToast(msg){
-      const t=document.getElementById('toast');
-      t.textContent=msg; t.style.display='block';
-      clearTimeout(showToast._h); showToast._h=setTimeout(()=>t.style.display='none',1500);
-    }
-
-    load();
+    document.getElementById('refresh-btn').addEventListener('click', loadDashboard);
+    loadDashboard();
   </script>
 </body>
 </html>

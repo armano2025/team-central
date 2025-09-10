@@ -28,10 +28,10 @@
   </style>
 </head>
 <body>
-  <nav class="top-buttons" aria-label="ניווט עליון">
-    <a href="javascript:void(0)" onclick="history.back()" title="חזור"><i data-feather="arrow-right"></i> חזור</a>
-    <a href="admin.html" title="אדמין"><i data-feather="settings"></i> אדמין</a>
-    <a id="sheetBtn" href="#" target="_blank" rel="noopener" title="לגליון"><i data-feather="book-open"></i> גליון</a>
+  <nav class="top-buttons">
+    <a href="javascript:void(0)" onclick="history.back()"><i data-feather="arrow-right"></i> חזור</a>
+    <a href="admin.html"><i data-feather="settings"></i> אדמין</a>
+    <a id="sheetBtn" href="#" target="_blank" rel="noopener"><i data-feather="book-open"></i> גליון</a>
     <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
     <button id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
   </nav>
@@ -82,8 +82,7 @@
     // ====== Panel API URL שלך ======
     const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
-    // שירות עזר לפניות API עם Retry + Timeout
-    async function api(path, {method='GET', body, tries=2, timeout=12000}={}){
+    async function api(path, {method='GET', body, tries=1, timeout=12000}={}){
       const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), timeout);
       try{
         const res = await fetch(API_URL + path, { method, headers: body?{'Content-Type':'application/json'}:undefined, body: body?JSON.stringify(body):undefined, signal: ctrl.signal });
@@ -91,19 +90,15 @@
         const data = await res.json().catch(()=>{ throw new Error('Bad JSON'); });
         if(!data || data.ok === false) throw new Error(data && data.error || 'API error');
         return data;
-      }catch(e){ if(tries>0) return api(path,{method,body,tries:tries-1,timeout}); throw e; }
-      finally{ clearTimeout(to); }
+      }finally{ clearTimeout(to); }
     }
 
-    // קריאת פרמטרים
     const qs = new URLSearchParams(location.search);
     const flowKey = qs.get('flowKey') || '';
     document.getElementById('flowKeyPill').textContent = flowKey || '—';
 
-    // טוסט
-    function toast(msg, ms=1800){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', ms); }
+    function toast(msg, ms=1600){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none', ms); }
 
-    // מטא (סטטוסים/מטפלים/שמות ה־Flow)
     let META = {owners:[], statuses:[], flows:[]};
     async function loadMeta() {
       const m = await api("?action=meta");
@@ -117,7 +112,6 @@
       const a = document.getElementById('sheetBtn'); a.href = r.url; a.target = "_blank";
     }
 
-    // רינדור כרטיס
     function renderItem(item){
       const f = item.fields;
       const owners = META.owners && META.owners.length ? META.owners : ['ריק','חן','בלה','תמרה','ליאור','נטע'];
@@ -126,7 +120,6 @@
       const ownerSel = `<select class="pill owner" data-rowid="${item.rowId}">
         ${owners.map(o=>`<option${(f.owner||'ריק')===o?' selected':''}>${o}</option>`).join('')}
       </select>`;
-
       const statusSel = `<select class="pill status" data-rowid="${item.rowId}">
         ${statuses.map(s=>`<option${(f.status||'לטיפול')===s?' selected':''}>${s}</option>`).join('')}
       </select>`;
@@ -137,7 +130,6 @@
             <span class="pill muted">נוצר: ${f.createdAt || ''}</span>
             <span class="pill muted">מס׳ תיק: ${f.caseId || ''}</span>
           </div>
-
           <div class="actions" style="margin-bottom:8px">
             <span class="pill">מטפל: ${ownerSel}</span>
             <span class="pill">סטטוס: ${statusSel}</span>
@@ -173,81 +165,62 @@
       `;
     }
 
-    // כתיבה ל-API
     async function updateField(rowId, updates){
-      const body = { action:'updateRow', flowKey, rowId, updates, actor:'WebPanel' };
-      await api("", {method:'POST', body});
-      toast('נשמר ✔︎');
+      try{
+        const body = { action:'updateRow', flowKey, rowId, updates, actor:'WebPanel' };
+        const r = await api("", {method:'POST', body});
+        if (!r.ok) throw new Error(r.error||'update failed');
+        toast('נשמר ✔︎');
+      }catch(e){
+        alert('שגיאה בשמירה: '+ e.message);
+      }
     }
 
-    // טעינת טור
     async function loadColumn(which, q=''){
       const list = document.getElementById('list-'+which);
       list.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
       const data = await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
       list.innerHTML = (data.items||[]).map(renderItem).join('') || '<div class="card" style="opacity:.6">אין משימות להצגה</div>';
-      feather.replace(list); // לרענן איקונים בכרטיסים
+      feather.replace(list);
       return data.meta ? data.meta.total : 0;
     }
 
-    // Delegation – מאזינים פעם אחת לכל קונטיינר
     function wireList(containerId){
       const el = document.getElementById(containerId);
-      // שינוי מטפל/סטטוס
       el.addEventListener('change', async (e)=>{
-        try{
-          const t = e.target;
-          const rowId = parseInt(t.getAttribute('data-rowid'),10);
-          if (!rowId) return;
-          if (t.classList.contains('owner')) {
-            await updateField(rowId, {owner: t.value});
-          } else if (t.classList.contains('status')) {
-            await updateField(rowId, {status: t.value});
-          }
-        }catch(err){ alert('שגיאה בשמירה: '+err.message); }
+        const t=e.target; const rowId=parseInt(t.getAttribute('data-rowid'),10); if(!rowId) return;
+        if (t.classList.contains('owner')) await updateField(rowId, {owner: t.value});
+        if (t.classList.contains('status')) await updateField(rowId, {status: t.value});
       });
-      // הערות – debounce
-      let timers = new Map();
-      el.addEventListener('input', (e)=>{
-        const t = e.target;
-        if (!t.classList.contains('admin-notes')) return;
-        const rowId = parseInt(t.getAttribute('data-rowid'),10);
+      let timers=new Map();
+      el.addEventListener('input',(e)=>{
+        const t=e.target; if(!t.classList.contains('admin-notes')) return;
+        const rowId=parseInt(t.getAttribute('data-rowid'),10);
         clearTimeout(timers.get(rowId));
-        timers.set(rowId, setTimeout(async ()=>{
-          try{ await updateField(rowId, {adminNotes: t.value}); }
-          catch(err){ alert('שגיאה בשמירה: '+err.message); }
-        }, 500));
+        timers.set(rowId, setTimeout(()=>updateField(rowId, {adminNotes: t.value}), 500));
       });
-      // פתיחה לשורה בגליון (פותח את הטאב; מיקום לשורה – ידני אחרי קליק)
-      el.addEventListener('click', (e)=>{
-        const btn = e.target.closest('.open-sheet');
-        if (!btn) return;
-        const href = document.getElementById('sheetBtn').href;
-        if (href) window.open(href, '_blank');
+      el.addEventListener('click',(e)=>{
+        const btn=e.target.closest('.open-sheet'); if(!btn) return;
+        const href=document.getElementById('sheetBtn').href; if(href) window.open(href,'_blank');
       });
     }
-    wireList('list-in');
-    wireList('list-work');
+    wireList('list-in'); wireList('list-work');
 
-    // טעינה כוללת
     async function loadAll(){
-      const err = document.getElementById('err'); err.hidden=true; err.textContent='';
+      const err=document.getElementById('err'); err.hidden=true; err.textContent='';
       try{
         if(!flowKey){ err.hidden=false; err.textContent='חסר flowKey ב־URL'; return; }
-        await loadMeta();
-        await loadSheetLink();
-        const q = document.getElementById('q').value.trim();
-        const [inCnt, workCnt] = await Promise.all([ loadColumn('in', q), loadColumn('work', q) ]);
-        document.getElementById('cnt-in').textContent = inCnt;
-        document.getElementById('cnt-work').textContent = workCnt;
+        await loadMeta(); await loadSheetLink();
+        const q=document.getElementById('q').value.trim();
+        const [inCnt, workCnt]=await Promise.all([loadColumn('in',q), loadColumn('work',q)]);
+        document.getElementById('cnt-in').textContent=inCnt;
+        document.getElementById('cnt-work').textContent=workCnt;
       }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
 
-    // ריענון / חיפוש
     document.getElementById('refresh-btn').addEventListener('click', loadAll);
-    document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll, 250); });
+    document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll,250); });
 
-    // הפעלת הדף
     loadAll();
   </script>
 </body>

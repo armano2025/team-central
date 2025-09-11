@@ -79,16 +79,24 @@
       });
     })();
 
+    // === API URL שלך ===
     const API_URL="https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
+    // fetch JSON (מתמודד עם טקסט/שגיאות ומוסיף cache-buster)
     async function api(path,{method='GET',body,timeout=12000}={}){
+      const url = API_URL + path + (path.includes('?') ? '&' : '?') + '_=' + Date.now();
       const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),timeout);
       try{
-        const res=await fetch(API_URL+path,{method,headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:ctrl.signal});
-        const txt=await res.text(); // תמיד קוראים טקסט, אח"כ נפרסר
-        if(!res.ok) throw new Error('HTTP '+res.status+' '+txt);
-        let data; try{ data=JSON.parse(txt);}catch(_){ throw new Error('Bad JSON: '+txt); }
-        if(!data || data.ok===false) throw new Error(data && data.error || 'API error');
+        const init = { method, signal: ctrl.signal, cache:'no-store' };
+        if (body!=null){
+          init.headers = { 'Content-Type':'text/plain;charset=UTF-8' }; // ללא preflight
+          init.body    = JSON.stringify(body);
+        }
+        const res  = await fetch(url, init);
+        const text = await res.text();
+        if(!res.ok) throw new Error(text || ('HTTP '+res.status));
+        let data; try{ data=JSON.parse(text); }catch(_){ throw new Error('Bad JSON'); }
+        if(data.ok===false) throw new Error(data.error||'API error');
         return data;
       }finally{ clearTimeout(to); }
     }
@@ -166,13 +174,11 @@
 
     async function updateField(rowId, updates){
       try{
-        const body={action:'updateRow', flowKey, rowId, updates, actor:'WebPanel'};
+        const body={action:'updateRow',flowKey,rowId,updates,actor:'WebPanel'};
         const r=await api("",{method:'POST',body});
-        if(!r.ok) throw new Error(r.error||'update failed');
+        if(!r.ok && r.error) throw new Error(r.error);
         toast('נשמר ✔︎');
-      }catch(e){
-        alert('שגיאה בשמירה: '+e.message);
-      }
+      }catch(e){ alert('שגיאה בשמירה: '+e.message); }
     }
 
     async function loadColumn(which,q=''){
@@ -184,8 +190,8 @@
       return data.meta?data.meta.total:0;
     }
 
-    function wireList(containerId){
-      const el=document.getElementById(containerId);
+    function wireList(id){
+      const el=document.getElementById(id);
       el.addEventListener('change',async(e)=>{
         const t=e.target; const rowId=parseInt(t.getAttribute('data-rowid'),10); if(!rowId) return;
         if(t.classList.contains('owner'))  await updateField(rowId,{owner:t.value});
@@ -201,7 +207,12 @@
       el.addEventListener('click',(e)=>{
         const btn=e.target.closest('.open-sheet'); if(!btn) return;
         const base=document.getElementById('sheetBtn').href; const row=btn.getAttribute('data-row');
-        if(base){ const url=new URL(base); url.searchParams.set('range','A'+row); window.open(url.toString(),'_blank'); }
+        if(base){
+          // Google Sheets: .../edit#gid=XXXX -> מוסיפים ?range=A{row} לפני ה-hash
+          const u=new URL(base);
+          u.searchParams.set('range','A'+row);
+          window.open(u.toString(),'_blank');
+        }
       });
     }
     wireList('list-in'); wireList('list-work');
@@ -217,6 +228,7 @@
         document.getElementById('cnt-work').textContent=workCnt;
       }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
+
     document.getElementById('refresh-btn').addEventListener('click',loadAll);
     document.getElementById('q').addEventListener('input',()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll,250); });
 

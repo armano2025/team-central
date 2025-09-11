@@ -1,33 +1,112 @@
+<!-- /flow.html — Flow (List View Compact for iPhone) -->
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Flow</title>
+
+  <!-- עיצוב בסיסי חיצוני שלך -->
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
+
   <style>
-    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:.9rem}
+    /* =========================================================
+       ״List View Compact״ – מותאם לאייפון (שורות דקיקות + פירוט בהרחבה)
+       ========================================================= */
+
+    :root{
+      --radius: 12px;
+      --gap: 10px;
+      --muted: 0.65;
+      --row-h: 56px;                /* גובה שורה קומפקטי */
+      --pad: 12px;                  /* ריווח כללי קטן יותר למובייל */
+      --border: 1px solid #e8e8ee;
+      --bg-soft: rgba(0,0,0,.04);
+    }
+
+    /* גיבור + סטטיסטיקות – נשאר, רק קומפקטי יותר במובייל */
     .hero .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-    .hero .stat{flex:1 1 180px;text-align:center;background:rgba(255,255,255,.18);padding:12px;border-radius:999px}
-    .search-wrap{display:flex;gap:8px;align-items:center;margin:12px 0}
-    .search-wrap input{width:100%;padding:10px 14px;border-radius:12px;border:1px solid #ddd}
-    .cols{display:grid;grid-template-columns:1fr;gap:16px}
-    @media (min-width: 920px){ .cols{grid-template-columns:1fr 1fr} }
-    .group-head{font-weight:700;margin:14px 6px}
-    .card{align-items:stretch;text-align:right}
-    .kv{display:grid;grid-template-columns:1fr 1fr; gap:10px}
-    .kv .box{background:var(--color-bg);border-radius:12px;padding:12px}
+    .hero .stat{flex:1 1 160px;text-align:center;background:rgba(255,255,255,.18);padding:10px;border-radius:999px}
+
+    /* חיפוש */
+    .search-wrap{display:flex;gap:8px;align-items:center;margin:10px 0;padding:0 var(--pad)}
+    .search-wrap input{
+      width:100%;padding:10px 12px;border-radius:12px;border:1px solid #ddd; font-size:15px;
+      -webkit-appearance:none; appearance:none;
+    }
+    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:.9rem}
     .muted{opacity:.65}
-    .actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+    /* שתי עמודות בדסקטופ, עמודה יחידה במובייל */
+    .cols{display:grid;grid-template-columns:1fr;gap:16px;padding:0 var(--pad) var(--pad)}
+    @media (min-width: 920px){ .cols{grid-template-columns:1fr 1fr} }
+    .group-head{font-weight:700;margin:4px 2px 8px}
+
+    /* ========= LIST VIEW ========= */
+
+    /* מכולת רשימה */
+    .list{display:block;border-radius:14px}
+
+    /* כל משימה היא details עם summary קצר (שורה), ותוכן מתחת */
+    .row{background:#fff;border:var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+    .row[open]{box-shadow:0 8px 24px rgba(15,23,42,0.08)}
+
+    /* שורת הסיכום – דקה, תופסת מעט גובה */
+    .row > summary{
+      list-style:none; cursor:pointer; -webkit-tap-highlight-color: transparent;
+      display:grid; grid-template-columns:auto 1fr auto auto; gap:12px;
+      align-items:center; min-height:var(--row-h); padding:8px 12px;
+    }
+    .row > summary::-webkit-details-marker{display:none}
+
+    /* אלמנטים בשורה */
+    .status-dot{width:10px;height:10px;border-radius:50%;background:var(--c,#9aa0a6);box-shadow:0 0 0 2px rgba(0,0,0,.06) inset}
+    .primary .name{font-weight:600;line-height:1.1}
+    .primary .sub{font-size:13px;opacity:var(--muted)}
+    .meta{font-size:12px;opacity:var(--muted);white-space:nowrap}
+    .chev{opacity:.6}
+
+    /* גוף ההרחבה – טפסים + פרטים */
+    .row-body{padding:12px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+    .controls select{
+      padding:6px 10px;border-radius:999px;border:1px solid #ddd;background:#fff;font-size:14px
+    }
+
+    /* סידור פרטים חשובים בקומפקטיות */
+    .kv{display:grid;grid-template-columns:1fr 1fr; gap:8px; margin-top:6px}
+    @media (min-width:680px){ .kv{grid-template-columns:1fr 1fr 1fr 1fr} }
+    .kv .box{background:var(--bg-soft);border-radius:10px;padding:10px}
+    .kv .box .lbl{font-size:12px;opacity:.7;margin-bottom:4px}
+
+    textarea.admin-notes{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #ddd; resize:vertical; min-height:64px
+    }
+
+    .more{margin-top:8px;padding-top:8px;border-top:1px dashed #e5e7eb}
+    .more .item{background:#fff;border:1px solid #eee;border-radius:10px;padding:8px 10px;margin:6px 0}
+
+    .line-actions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px}
+    .open-sheet{border:1px solid #e5e7eb;background:#fff;padding:6px 10px;border-radius:999px}
+
+    /* טוסט קטן לתגובת שמירה */
     .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(0,0,0,.85);color:#fff;padding:10px 14px;border-radius:12px}
-    .error{color:#b00020;margin-top:10px}
-    details summary{cursor:pointer;list-style:none}
-    details summary::-webkit-details-marker{display:none}
+    .error{color:#b00020;margin:10px var(--pad) 0}
+
+    /* כפתורים עליונים – נשארים */
+    .top-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px var(--pad)}
+    .top-buttons a,.top-buttons button{padding:8px 12px;border-radius:10px;font-size:.95rem}
+
+    /* נגישות תנועה באייפון */
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto;animation:none!important;transition:none!important}
+    }
   </style>
 </head>
 <body>
+  <!-- פס ניווט עליון -->
   <nav class="top-buttons">
     <a href="javascript:void(0)" onclick="history.back()"><i data-feather="arrow-right"></i> חזור</a>
     <a href="admin.html"><i data-feather="settings"></i> אדמין</a>
@@ -36,10 +115,11 @@
     <button id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
   </nav>
 
+  <!-- כותרת + סטטוסים -->
   <header class="hero">
-    <div class="hero-content">
-      <h2 id="title">Flow</h2>
-      <p class="muted">תצוגת עבודה – טור "לטיפול" וטור "בעבודה".</p>
+    <div class="hero-content" style="text-align:center;padding:6px var(--pad) 0">
+      <h2 id="title" style="margin:0 0 4px">Flow</h2>
+      <p class="muted" style="margin:0 0 8px">תצוגה קומפקטית – טור "לטיפול" וטור "בעבודה".</p>
       <div class="row">
         <div class="stat">בעבודה <strong id="cnt-work">0</strong></div>
         <div class="stat">לטיפול <strong id="cnt-in">0</strong></div>
@@ -47,19 +127,21 @@
     </div>
   </header>
 
+  <!-- חיפוש -->
   <div class="search-wrap">
     <span class="pill muted" id="flowKeyPill">—</span>
     <input id="q" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
   </div>
 
+  <!-- שתי רשימות -->
   <div class="cols">
     <section>
       <div class="group-head">לטיפול</div>
-      <div id="list-in"></div>
+      <div id="list-in" class="list"></div>
     </section>
     <section>
       <div class="group-head">בעבודה</div>
-      <div id="list-work"></div>
+      <div id="list-work" class="list"></div>
     </section>
   </div>
 
@@ -67,9 +149,13 @@
   <p id="err" class="error" hidden></p>
 
   <script>
+    /* =========================================================
+       JS – זרימה קומפקטית (שורות + פירוט בהרחבה)
+       ========================================================= */
+
     feather.replace();
 
-    // Dark mode toggle
+    // מצב כהה/בהיר (שומר ב-localStorage)
     (function(){
       const root=document.documentElement;
       if(localStorage.getItem('dark-mode')==='1') root.classList.add('dark-mode');
@@ -79,10 +165,10 @@
       });
     })();
 
-    // === API URL שלך ===
+    /* נתיב API – החלף לפי הצורך אצלך */
     const API_URL="https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
-    // fetch JSON (מתמודד עם טקסט/שגיאות ומוסיף cache-buster)
+    // fetch JSON (עם cache-buster ו-handling לטעויות)
     async function api(path,{method='GET',body,timeout=12000}={}){
       const url = API_URL + path + (path.includes('?') ? '&' : '?') + '_=' + Date.now();
       const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),timeout);
@@ -101,16 +187,22 @@
       }finally{ clearTimeout(to); }
     }
 
+    // פרמטר flowKey מה-URL
     const qs=new URLSearchParams(location.search);
     const flowKey=qs.get('flowKey')||'';
     document.getElementById('flowKeyPill').textContent=flowKey||'—';
 
-    function toast(msg,ms=1500){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',ms); }
+    function toast(msg,ms=1500){
+      const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block';
+      setTimeout(()=>t.style.display='none',ms);
+    }
 
+    // === מטה (בעלי תיקים/סטטוסים/פלואים) ===
     let META={owners:[],statuses:[],flows:[]};
+
     async function loadMeta(){
       const m=await api("?action=meta"); META=m;
-      const flow=META.flows.find(f=>f.flowKey===flowKey);
+      const flow=META.flows?.find?.(f=>f.flowKey===flowKey);
       if(flow) document.getElementById('title').textContent=flow.friendlyName;
     }
 
@@ -119,59 +211,108 @@
       const a=document.getElementById('sheetBtn'); a.href=r.url; a.target="_blank";
     }
 
+    // === עזרי תצוגה קומפקטית ===
+    function fmtDate(s){
+      if(!s) return '';
+      const d=new Date(s);
+      if(isNaN(d)) return s;
+      const dd=String(d.getDate()).padStart(2,'0');
+      const mm=String(d.getMonth()+1).padStart(2,'0');
+      const yy=String(d.getFullYear()).slice(-2);
+      return `${dd}/${mm}/${yy}`;
+    }
+
+    function statusColor(st){
+      const s=(st||'').trim();
+      // מיפוי צבעים נעים לעין במובייל
+      if(/לטיפול/.test(s)) return '#f59e0b';   // כתום
+      if(/בעבודה/.test(s)) return '#3b82f6';   // כחול
+      if(/הסתיים|סגור/.test(s)) return '#10b981'; // ירוק
+      if(/תקוע|בעיה|נכשל/.test(s)) return '#ef4444'; // אדום
+      return '#9aa0a6'; // ברירת מחדל
+    }
+
+    // === שורה קומפקטית: summary קצר + תוכן בהרחבה ===
     function renderItem(item){
-      const f=item.fields;
+      const f=item.fields||{};
       const owners=META.owners?.length?META.owners:['ריק','חן','בלה','תמרה','ליאור','נטע'];
       const statuses=META.statuses?.length?META.statuses:['לטיפול','בעבודה','הסתיים'];
 
-      const ownerSel=`<select class="pill owner" data-rowid="${item.rowId}">
+      const createdShort=fmtDate(f.createdAt);
+      const statusClr=statusColor(f.status);
+
+      const ownerSel=`<select class="owner" data-rowid="${item.rowId}">
         ${owners.map(o=>`<option${(f.owner||'ריק')===o?' selected':''}>${o}</option>`).join('')}
       </select>`;
-      const statusSel=`<select class="pill status" data-rowid="${item.rowId}">
+      const statusSel=`<select class="status" data-rowid="${item.rowId}">
         ${statuses.map(s=>`<option${(f.status||'לטיפול')===s?' selected':''}>${s}</option>`).join('')}
       </select>`;
 
+      // שורת הסיכום: נקודת סטטוס, שם + טלפון, מטה קצר, וחץ
       return `
-        <article class="card" data-rowid="${item.rowId}">
-          <div class="actions" style="justify-content:space-between;margin-bottom:6px">
-            <span class="pill muted">נוצר: ${f.createdAt||''}</span>
-            <span class="pill muted">מס׳ תיק: ${f.caseId||''}</span>
+      <details class="row" data-rowid="${item.rowId}">
+        <summary>
+          <span class="status-dot" style="--c:${statusClr}"></span>
+          <div class="primary">
+            <div class="name">${(f.firstName||'')+' '+(f.lastName||'')}</div>
+            <div class="sub" dir="ltr">${f.phone||''}</div>
           </div>
-          <div class="actions" style="margin-bottom:8px">
-            <span class="pill">מטפל: ${ownerSel}</span>
-            <span class="pill">סטטוס: ${statusSel}</span>
+          <div class="meta">
+            ${createdShort}${f.caseId?` • ${f.caseId}`:''}
+          </div>
+          <i data-feather="chevron-down" class="chev"></i>
+        </summary>
+
+        <div class="row-body">
+          <div class="controls">
+            <label class="pill">מטפל: ${ownerSel}</label>
+            <label class="pill">סטטוס: ${statusSel}</label>
           </div>
 
           <div class="kv">
-            <div class="box"><div class="muted">שם</div><div>${(f.firstName||'')+' '+(f.lastName||'')}</div></div>
-            <div class="box"><div class="muted">טלפון</div><div dir="ltr">${f.phone||''}</div></div>
-            <div class="box"><div class="muted">תפקיד</div><div>${f.role||''}</div></div>
-            <div class="box"><div class="muted">מקצוע</div><div>${f.subject||''}</div></div>
+            <div class="box">
+              <div class="lbl">שם</div>
+              <div>${(f.firstName||'')+' '+(f.lastName||'')}</div>
+            </div>
+            <div class="box">
+              <div class="lbl">טלפון</div>
+              <div dir="ltr">${f.phone||''}</div>
+            </div>
+            <div class="box">
+              <div class="lbl">תפקיד</div>
+              <div>${f.role||''}</div>
+            </div>
+            <div class="box">
+              <div class="lbl">מקצוע</div>
+              <div>${f.subject||''}</div>
+            </div>
           </div>
 
           <div style="margin-top:10px">
-            <div class="muted" style="margin-bottom:6px">הערת מנהל</div>
-            <textarea class="admin-notes" data-rowid="${item.rowId}" rows="2" placeholder="כתוב הערה…" style="width:100%;padding:12px;border-radius:12px;border:1px solid #ddd">${f.adminNotes||''}</textarea>
+            <div class="lbl" style="opacity:.75;margin-bottom:6px">הערת מנהל</div>
+            <textarea class="admin-notes" data-rowid="${item.rowId}" placeholder="כתוב הערה…">${f.adminNotes||''}</textarea>
           </div>
 
-          <details style="margin-top:10px">
-            <summary class="pill">פרטים נוספים ▾</summary>
-            <div style="margin-top:10px">
-              ${(f._keys||[]).map(k=>{
-                if(k==='adminNotes') return '';
-                const v=f[k];
-                return `<div class="box" style="margin:6px 0"><div class="muted">${k}</div><div>${v==null?'':v}</div></div>`;
-              }).join('')}
-            </div>
-          </details>
-
-          <div class="actions" style="justify-content:flex-end;margin-top:10px">
-            <button class="pill open-sheet" data-row="${item.rowId}"><i data-feather="book-open"></i> לשורה בגליון</button>
+          <div class="more">
+            ${(f._keys||[]).map(k=>{
+              if(k==='adminNotes') return '';
+              const v=f[k];
+              return `<div class="item"><div class="lbl" style="opacity:.75">${k}</div><div>${v==null?'':v}</div></div>`;
+            }).join('')}
           </div>
-        </article>
+
+          <div class="line-actions">
+            <span class="muted" style="font-size:12px">נוצר: ${f.createdAt||''}</span>
+            <button class="open-sheet" data-row="${item.rowId}">
+              <i data-feather="book-open"></i> לשורה בגליון
+            </button>
+          </div>
+        </div>
+      </details>
       `;
     }
 
+    // שמירה
     async function updateField(rowId, updates){
       try{
         const body={action:'updateRow',flowKey,rowId,updates,actor:'WebPanel'};
@@ -181,22 +322,33 @@
       }catch(e){ alert('שגיאה בשמירה: '+e.message); }
     }
 
+    // טעינת עמודת סטטוס (in/work) עם חיפוש
     async function loadColumn(which,q=''){
       const list=document.getElementById('list-'+which);
-      list.innerHTML='<div class="card" style="opacity:.6">טוען…</div>';
+      list.innerHTML='<div class="row" style="opacity:.6"><summary>טוען…</summary></div>';
+
       const data=await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
-      list.innerHTML=(data.items||[]).map(renderItem).join('')||'<div class="card" style="opacity:.6">אין משימות להצגה</div>';
+      const html=(data.items||[]).map(renderItem).join('') || '<div class="muted" style="padding:8px">אין משימות להצגה</div>';
+      list.innerHTML=html;
+
+      // להחליף איקונים לאחר הזרקה
       feather.replace(list);
+
       return data.meta?data.meta.total:0;
     }
 
+    // האזנה לרשימה – שומרת עריכות באופן ממוזער
     function wireList(id){
       const el=document.getElementById(id);
+
+      // שינוי בעלים/סטטוס
       el.addEventListener('change',async(e)=>{
         const t=e.target; const rowId=parseInt(t.getAttribute('data-rowid'),10); if(!rowId) return;
         if(t.classList.contains('owner'))  await updateField(rowId,{owner:t.value});
         if(t.classList.contains('status')) await updateField(rowId,{status:t.value});
       });
+
+      // דיבאונס להערות
       const timers=new Map();
       el.addEventListener('input',(e)=>{
         const t=e.target; if(!t.classList.contains('admin-notes')) return;
@@ -204,11 +356,12 @@
         clearTimeout(timers.get(rowId));
         timers.set(rowId,setTimeout(()=>updateField(rowId,{adminNotes:t.value}),500));
       });
+
+      // קפיצה לשורה בגליון
       el.addEventListener('click',(e)=>{
         const btn=e.target.closest('.open-sheet'); if(!btn) return;
         const base=document.getElementById('sheetBtn').href; const row=btn.getAttribute('data-row');
         if(base){
-          // Google Sheets: .../edit#gid=XXXX -> מוסיפים ?range=A{row} לפני ה-hash
           const u=new URL(base);
           u.searchParams.set('range','A'+row);
           window.open(u.toString(),'_blank');
@@ -217,6 +370,7 @@
     }
     wireList('list-in'); wireList('list-work');
 
+    // טעינת הכל
     async function loadAll(){
       const err=document.getElementById('err'); err.hidden=true; err.textContent='';
       try{
@@ -229,9 +383,13 @@
       }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
 
+    // שליטה
     document.getElementById('refresh-btn').addEventListener('click',loadAll);
-    document.getElementById('q').addEventListener('input',()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll,250); });
+    document.getElementById('q').addEventListener('input',()=>{
+      clearTimeout(window.__q); window.__q=setTimeout(loadAll,250);
+    });
 
+    // פתיחה ראשונית
     loadAll();
   </script>
 </body>

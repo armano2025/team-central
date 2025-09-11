@@ -69,66 +69,65 @@
   <script>
     feather.replace();
 
-    // מצב כהה
+    // Dark mode toggle
     (function(){
-      const root = document.documentElement;
-      if (localStorage.getItem('dark-mode') === '1') root.classList.add('dark-mode');
-      document.getElementById('dark-toggle').addEventListener('click', ()=>{
-        const on = root.classList.toggle('dark-mode');
-        on ? localStorage.setItem('dark-mode','1') : localStorage.removeItem('dark-mode');
+      const root=document.documentElement;
+      if(localStorage.getItem('dark-mode')==='1') root.classList.add('dark-mode');
+      document.getElementById('dark-toggle').addEventListener('click',()=>{
+        const on=root.classList.toggle('dark-mode');
+        on?localStorage.setItem('dark-mode','1'):localStorage.removeItem('dark-mode');
       });
     })();
 
-    // ====== Panel API URL שלך ======
-    const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
+    const API_URL="https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
-    async function api(path, {method='GET', body, tries=1, timeout=12000}={}){
-      const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), timeout);
+    async function api(path,{method='GET',body,timeout=12000}={}){
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),timeout);
       try{
-        const res = await fetch(API_URL + path, { method, headers: body?{'Content-Type':'application/json'}:undefined, body: body?JSON.stringify(body):undefined, signal: ctrl.signal });
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const data = await res.json().catch(()=>{ throw new Error('Bad JSON'); });
-        if(!data || data.ok === false) throw new Error(data && data.error || 'API error');
+        const res=await fetch(API_URL+path,{method,headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,signal:ctrl.signal});
+        const txt=await res.text(); // תמיד קוראים טקסט, אח"כ נפרסר
+        if(!res.ok) throw new Error('HTTP '+res.status+' '+txt);
+        let data; try{ data=JSON.parse(txt);}catch(_){ throw new Error('Bad JSON: '+txt); }
+        if(!data || data.ok===false) throw new Error(data && data.error || 'API error');
         return data;
       }finally{ clearTimeout(to); }
     }
 
-    const qs = new URLSearchParams(location.search);
-    const flowKey = qs.get('flowKey') || '';
-    document.getElementById('flowKeyPill').textContent = flowKey || '—';
+    const qs=new URLSearchParams(location.search);
+    const flowKey=qs.get('flowKey')||'';
+    document.getElementById('flowKeyPill').textContent=flowKey||'—';
 
-    function toast(msg, ms=1600){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none', ms); }
+    function toast(msg,ms=1500){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',ms); }
 
-    let META = {owners:[], statuses:[], flows:[]};
-    async function loadMeta() {
-      const m = await api("?action=meta");
-      META = m;
-      const flow = META.flows.find(f => f.flowKey === flowKey);
-      if (flow) document.getElementById('title').textContent = flow.friendlyName;
+    let META={owners:[],statuses:[],flows:[]};
+    async function loadMeta(){
+      const m=await api("?action=meta"); META=m;
+      const flow=META.flows.find(f=>f.flowKey===flowKey);
+      if(flow) document.getElementById('title').textContent=flow.friendlyName;
     }
 
     async function loadSheetLink(){
-      const r = await api(`?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
-      const a = document.getElementById('sheetBtn'); a.href = r.url; a.target = "_blank";
+      const r=await api(`?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
+      const a=document.getElementById('sheetBtn'); a.href=r.url; a.target="_blank";
     }
 
     function renderItem(item){
-      const f = item.fields;
-      const owners = META.owners && META.owners.length ? META.owners : ['ריק','חן','בלה','תמרה','ליאור','נטע'];
-      const statuses = META.statuses && META.statuses.length ? META.statuses : ['לטיפול','בעבודה','הסתיים'];
+      const f=item.fields;
+      const owners=META.owners?.length?META.owners:['ריק','חן','בלה','תמרה','ליאור','נטע'];
+      const statuses=META.statuses?.length?META.statuses:['לטיפול','בעבודה','הסתיים'];
 
-      const ownerSel = `<select class="pill owner" data-rowid="${item.rowId}">
+      const ownerSel=`<select class="pill owner" data-rowid="${item.rowId}">
         ${owners.map(o=>`<option${(f.owner||'ריק')===o?' selected':''}>${o}</option>`).join('')}
       </select>`;
-      const statusSel = `<select class="pill status" data-rowid="${item.rowId}">
+      const statusSel=`<select class="pill status" data-rowid="${item.rowId}">
         ${statuses.map(s=>`<option${(f.status||'לטיפול')===s?' selected':''}>${s}</option>`).join('')}
       </select>`;
 
       return `
         <article class="card" data-rowid="${item.rowId}">
           <div class="actions" style="justify-content:space-between;margin-bottom:6px">
-            <span class="pill muted">נוצר: ${f.createdAt || ''}</span>
-            <span class="pill muted">מס׳ תיק: ${f.caseId || ''}</span>
+            <span class="pill muted">נוצר: ${f.createdAt||''}</span>
+            <span class="pill muted">מס׳ תיק: ${f.caseId||''}</span>
           </div>
           <div class="actions" style="margin-bottom:8px">
             <span class="pill">מטפל: ${ownerSel}</span>
@@ -136,7 +135,7 @@
           </div>
 
           <div class="kv">
-            <div class="box"><div class="muted">שם</div><div>${(f.firstName||'') + ' ' + (f.lastName||'')}</div></div>
+            <div class="box"><div class="muted">שם</div><div>${(f.firstName||'')+' '+(f.lastName||'')}</div></div>
             <div class="box"><div class="muted">טלפון</div><div dir="ltr">${f.phone||''}</div></div>
             <div class="box"><div class="muted">תפקיד</div><div>${f.role||''}</div></div>
             <div class="box"><div class="muted">מקצוע</div><div>${f.subject||''}</div></div>
@@ -151,15 +150,15 @@
             <summary class="pill">פרטים נוספים ▾</summary>
             <div style="margin-top:10px">
               ${(f._keys||[]).map(k=>{
-                if (k==='adminNotes') return '';
-                const v = f[k];
+                if(k==='adminNotes') return '';
+                const v=f[k];
                 return `<div class="box" style="margin:6px 0"><div class="muted">${k}</div><div>${v==null?'':v}</div></div>`;
               }).join('')}
             </div>
           </details>
 
           <div class="actions" style="justify-content:flex-end;margin-top:10px">
-            <button class="pill open-sheet"><i data-feather="book-open"></i> לשורה בגליון</button>
+            <button class="pill open-sheet" data-row="${item.rowId}"><i data-feather="book-open"></i> לשורה בגליון</button>
           </div>
         </article>
       `;
@@ -167,41 +166,42 @@
 
     async function updateField(rowId, updates){
       try{
-        const body = { action:'updateRow', flowKey, rowId, updates, actor:'WebPanel' };
-        const r = await api("", {method:'POST', body});
-        if (!r.ok) throw new Error(r.error||'update failed');
+        const body={action:'updateRow', flowKey, rowId, updates, actor:'WebPanel'};
+        const r=await api("",{method:'POST',body});
+        if(!r.ok) throw new Error(r.error||'update failed');
         toast('נשמר ✔︎');
       }catch(e){
-        alert('שגיאה בשמירה: '+ e.message);
+        alert('שגיאה בשמירה: '+e.message);
       }
     }
 
-    async function loadColumn(which, q=''){
-      const list = document.getElementById('list-'+which);
-      list.innerHTML = '<div class="card" style="opacity:.6">טוען…</div>';
-      const data = await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
-      list.innerHTML = (data.items||[]).map(renderItem).join('') || '<div class="card" style="opacity:.6">אין משימות להצגה</div>';
+    async function loadColumn(which,q=''){
+      const list=document.getElementById('list-'+which);
+      list.innerHTML='<div class="card" style="opacity:.6">טוען…</div>';
+      const data=await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
+      list.innerHTML=(data.items||[]).map(renderItem).join('')||'<div class="card" style="opacity:.6">אין משימות להצגה</div>';
       feather.replace(list);
-      return data.meta ? data.meta.total : 0;
+      return data.meta?data.meta.total:0;
     }
 
     function wireList(containerId){
-      const el = document.getElementById(containerId);
-      el.addEventListener('change', async (e)=>{
+      const el=document.getElementById(containerId);
+      el.addEventListener('change',async(e)=>{
         const t=e.target; const rowId=parseInt(t.getAttribute('data-rowid'),10); if(!rowId) return;
-        if (t.classList.contains('owner')) await updateField(rowId, {owner: t.value});
-        if (t.classList.contains('status')) await updateField(rowId, {status: t.value});
+        if(t.classList.contains('owner'))  await updateField(rowId,{owner:t.value});
+        if(t.classList.contains('status')) await updateField(rowId,{status:t.value});
       });
-      let timers=new Map();
+      const timers=new Map();
       el.addEventListener('input',(e)=>{
         const t=e.target; if(!t.classList.contains('admin-notes')) return;
         const rowId=parseInt(t.getAttribute('data-rowid'),10);
         clearTimeout(timers.get(rowId));
-        timers.set(rowId, setTimeout(()=>updateField(rowId, {adminNotes: t.value}), 500));
+        timers.set(rowId,setTimeout(()=>updateField(rowId,{adminNotes:t.value}),500));
       });
       el.addEventListener('click',(e)=>{
         const btn=e.target.closest('.open-sheet'); if(!btn) return;
-        const href=document.getElementById('sheetBtn').href; if(href) window.open(href,'_blank');
+        const base=document.getElementById('sheetBtn').href; const row=btn.getAttribute('data-row');
+        if(base){ const url=new URL(base); url.searchParams.set('range','A'+row); window.open(url.toString(),'_blank'); }
       });
     }
     wireList('list-in'); wireList('list-work');
@@ -212,14 +212,13 @@
         if(!flowKey){ err.hidden=false; err.textContent='חסר flowKey ב־URL'; return; }
         await loadMeta(); await loadSheetLink();
         const q=document.getElementById('q').value.trim();
-        const [inCnt, workCnt]=await Promise.all([loadColumn('in',q), loadColumn('work',q)]);
+        const [inCnt,workCnt]=await Promise.all([loadColumn('in',q),loadColumn('work',q)]);
         document.getElementById('cnt-in').textContent=inCnt;
         document.getElementById('cnt-work').textContent=workCnt;
       }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
-
-    document.getElementById('refresh-btn').addEventListener('click', loadAll);
-    document.getElementById('q').addEventListener('input', ()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll,250); });
+    document.getElementById('refresh-btn').addEventListener('click',loadAll);
+    document.getElementById('q').addEventListener('input',()=>{ clearTimeout(window.__q); window.__q=setTimeout(loadAll,250); });
 
     loadAll();
   </script>

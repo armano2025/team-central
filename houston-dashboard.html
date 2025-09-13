@@ -2,81 +2,245 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>יוסטון דאשבורד</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>יוסטון 👨‍🚀 – דאשבורד</title>
+
+  <!-- פונט -->
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/feather-icons"></script>
+
   <style>
-    .hero .chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    .chip{background:rgba(255,255,255,.22);color:#fff;padding:10px 12px;border-radius:999px;font-weight:600}
-    .chip .num{font-size:1.25rem;margin-inline-start:6px}
-    .cards-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
-    .flow-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;width:100%}
-    .flow-title{font-weight:700;line-height:1.2;font-size:1.05rem}
-    .badge{display:inline-block;background:rgba(0,0,0,0.06);padding:4px 10px;border-radius:999px;font-size:.85rem;white-space:nowrap}
+    /* ============ TOKENS ============ */
+    :root{
+      --bg:#f6f8fb;
+      --glass-bg:rgba(255,255,255,.88);
+      --glass-brd:#e8eef7;
+      --text:#0f172a;
+      --muted:#64748b;
+      --brand:#2563eb;
+      --brand-2:#22c55e;
+      --chip:#eef2f7;
+      --chip-brd:#dbe3ef;
+      --shadow:0 14px 40px rgba(15,23,42,.10);
+      --radius:18px;
+      --fs-base:clamp(16px,.98rem + .2vw,18px);
+    }
+    .dark-mode{
+      --bg:#0b1220;
+      --glass-bg:rgba(17,24,39,.78);
+      --glass-brd:#1f2937;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --chip:#111827;
+      --chip-brd:#1f2937;
+      --shadow:0 16px 46px rgba(0,0,0,.5);
+    }
+
+    /* ============ BASE ============ */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:"Rubik",system-ui,Segoe UI,Arial,sans-serif;
+      font-size:var(--fs-base); line-height:1.55; color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 110% -10%, rgba(37,99,235,.22), transparent 60%),
+        radial-gradient(900px 600px at -20% 120%, rgba(34,197,94,.18), transparent 60%),
+        var(--bg);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+
+    /* ============ TOP BAR ============ */
+    .top-buttons{
+      position:sticky; top:0; z-index:20;
+      display:flex; gap:8px; align-items:center; justify-content:flex-start;
+      padding:10px; background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,.35));
+      -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--glass-brd);
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      height:44px; padding:0 14px; border-radius:999px; cursor:pointer;
+      border:1px solid var(--glass-brd); background:#fff; color:var(--text); font-weight:700;
+      transition:transform .05s ease, box-shadow .15s ease, background .2s ease, border-color .2s;
+    }
+    .dark-mode .btn{ background:rgba(255,255,255,.08) }
+    .btn:active{ transform:translateY(1px) }
+    .btn.ghost{ background:transparent }
+    .top-buttons .btn i{ width:18px; height:18px }
+
+    /* ============ HERO ============ */
+    .hero{
+      max-width:980px; margin:14px auto 0; padding:0 14px;
+    }
+    .hero-card{
+      background:var(--glass-bg); border:1px solid var(--glass-brd);
+      border-radius:24px; box-shadow:var(--shadow);
+      padding:18px 16px 14px;
+      background-image:linear-gradient(135deg, rgba(37,99,235,.35), rgba(34,197,94,.28));
+    }
+    .hero-title{
+      margin:0 0 6px; font-size:clamp(1.6rem,1.1rem + 2vw,2.2rem); font-weight:800; letter-spacing:-.02em; color:#fff;
+      display:flex; align-items:center; gap:.5ch;
+    }
+    .hero-sub{ margin:0; color:#eef6ff; opacity:.95 }
+    .hero .chips{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;
+    }
+    .chip{
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      background:rgba(255,255,255,.18); color:#fff; padding:10px 12px; border-radius:999px; font-weight:800;
+      border:1px solid rgba(255,255,255,.32)
+    }
+    .chip .num{ font-size:1.25rem; }
+
+    /* ============ GRID ============ */
+    .wrap{ max-width:980px; margin:14px auto 22px; padding:0 14px }
+    .cards-grid{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px;
+    }
+    .card{
+      background:#fff; border:1px solid var(--glass-brd); border-radius:16px; padding:14px; box-shadow:var(--shadow);
+      transition:transform .15s ease, box-shadow .15s ease, border-color .2s ease;
+      min-height:110px; display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .dark-mode .card{ background:rgba(255,255,255,.06) }
+    .card:hover{ transform:translateY(-2px); box-shadow:0 22px 50px rgba(15,23,42,.14); border-color:#cbd5e1 }
+    .flow-card-header{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:8px; width:100%;
+    }
+    .flow-title{ font-weight:800; line-height:1.2; font-size:1.05rem }
+    .badges{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--chip); border:1px solid var(--chip-brd);
+      padding:4px 10px; border-radius:999px; font-size:.85rem; white-space:nowrap; font-weight:700; color:var(--text);
+    }
+    .badge .dot{ width:8px; height:8px; border-radius:50%; background:var(--brand) }
+    .badge.work .dot{ background:var(--brand-2) }
+
+    .hint{ color:var(--muted); font-size:.92rem }
+    .error{ color:#c62828; font-weight:700 }
+
+    /* Skeleton */
+    .skeleton{
+      position:relative; overflow:hidden; background:linear-gradient(90deg,#eaeef6 25%,#f4f7fb 37%,#eaeef6 63%); background-size:400% 100%;
+      animation:shimmer 1.25s infinite;
+      border-radius:14px; height:110px; border:1px solid var(--glass-brd);
+    }
+    @keyframes shimmer{ 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+    /* נגישות: פוקוס */
+    .card:focus-visible{ outline:3px solid rgba(59,130,246,.35) }
   </style>
 </head>
 <body>
-  <nav class="top-buttons">
-    <a href="javascript:void(0)" onclick="history.back()"><i data-feather="arrow-right"></i> חזור</a>
-    <a href="admin.html"><i data-feather="settings"></i> אדמין</a>
-    <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
-    <button id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
+  <!-- TOP BAR -->
+  <nav class="top-buttons" aria-label="ניווט עליון">
+    <a class="btn ghost" href="javascript:void(0)" onclick="history.back()"><i data-feather="arrow-right"></i> חזור</a>
+    <a class="btn ghost" href="admin.html"><i data-feather="settings"></i> אדמין</a>
+    <button class="btn" id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
+    <button class="btn ghost" id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
   </nav>
 
+  <!-- HERO -->
   <header class="hero">
-    <div class="hero-content">
-      <h2>יוסטון<br/>דאשבורד</h2>
-      <p>סקירה מהירה של כל הזרימות והפניות—במקום אחד.</p>
-      <div class="chips">
+    <div class="hero-card">
+      <h1 class="hero-title"><span aria-hidden="true">👨‍🚀</span> יוסטון – דאשבורד</h1>
+      <p class="hero-sub" id="heroSub">סקירה מהירה של כל הזרימות והפניות במקום אחד.</p>
+      <div class="chips" role="status" aria-live="polite">
         <div class="chip"><span class="num" id="total-in">0</span>סה״כ לטיפול</div>
         <div class="chip"><span class="num" id="total-work">0</span>סה״כ בעבודה</div>
       </div>
     </div>
   </header>
 
-  <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה"></section>
+  <!-- GRID -->
+  <main class="wrap">
+    <section id="flows" class="cards-grid" aria-label="כרטיסיות זרימה">
+      <!-- Skeletons בעת טעינה -->
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </section>
+  </main>
 
   <script>
     feather.replace();
-    const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
 
     // מצב כהה
     (function(){
       const r=document.documentElement;
-      if(localStorage.getItem('dark-mode')==='1') r.classList.add('dark-mode');
-      document.getElementById('dark-toggle').addEventListener('click', ()=>{ const on=r.classList.toggle('dark-mode'); on?localStorage.setItem('dark-mode','1'):localStorage.removeItem('dark-mode'); });
+      const btn=document.getElementById('dark-toggle');
+      const set=(on)=>on?r.classList.add('dark-mode'):r.classList.remove('dark-mode');
+      set(localStorage.getItem('dark-mode')==='1');
+      btn.addEventListener('click',()=>{
+        const on=!r.classList.contains('dark-mode');
+        set(on); on?localStorage.setItem('dark-mode','1'):localStorage.removeItem('dark-mode');
+      });
     })();
 
-    async function api(path){ const res=await fetch(API_URL+path); if(!res.ok) throw new Error('HTTP '+res.status); const j=await res.json(); if(j.ok===false) throw new Error(j.error||'API'); return j; }
+    const API_URL = "https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
+    const flowsEl = document.getElementById('flows');
+    const totalInEl = document.getElementById('total-in');
+    const totalWorkEl = document.getElementById('total-work');
+    const heroSub = document.getElementById('heroSub');
 
-    async function loadDashboard(){
-      const container=document.getElementById('flows');
-      container.innerHTML='<div class="card" style="opacity:.6">טוען…</div>';
-      try{
-        const data=await api("?action=dashboard");
-        const totals=data.flows.reduce((a,f)=>({in:a.in+(f.counts?.in||0), work:a.work+(f.counts?.work||0)}),{in:0,work:0});
-        document.getElementById('total-in').textContent=totals.in;
-        document.getElementById('total-work').textContent=totals.work;
+    async function api(path){
+      const res = await fetch(API_URL + path, { cache:'no-store' });
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const j = await res.json();
+      if(j?.ok===false) throw new Error(j.error || 'API error');
+      return j;
+    }
 
-        container.innerHTML = data.flows.map(f=>`
-          <a class="card" href="flow.html?flowKey=${encodeURIComponent(f.flowKey)}" title="${f.friendlyName}">
+    function renderFlows(flows){
+      flowsEl.innerHTML = flows.map(f=>{
+        const inNum = f.counts?.in ?? 0;
+        const workNum = f.counts?.work ?? 0;
+        const href = `flow.html?flowKey=${encodeURIComponent(f.flowKey)}`;
+        return `
+          <a class="card" href="${href}" title="${f.friendlyName}" data-flow="${f.flowKey}">
             <div class="flow-card-header">
               <div class="flow-title">${f.friendlyName}</div>
-              <div>
-                <span class="badge">לטיפול: ${f.counts.in}</span>
-                <span class="badge">בעבודה: ${f.counts.work}</span>
+              <div class="badges">
+                <span class="badge"><span class="dot" aria-hidden="true"></span> לטיפול: ${inNum}</span>
+                <span class="badge work"><span class="dot" aria-hidden="true"></span> בעבודה: ${workNum}</span>
               </div>
             </div>
             <div class="hint">כניסה לניהול ה־Flow →</div>
-          </a>
-        `).join('');
-      }catch(e){
-        container.innerHTML='<div class="card" style="opacity:.9;color:#b00020">שגיאה בטעינה</div>';
+          </a>`;
+      }).join('');
+    }
+
+    function renderTotals(flows){
+      const totals = flows.reduce((a,f)=>({
+        in: a.in + (f.counts?.in||0),
+        work: a.work + (f.counts?.work||0)
+      }), {in:0, work:0});
+      totalInEl.textContent = totals.in;
+      totalWorkEl.textContent = totals.work;
+
+      // כותרת משנה דינמית קצרה
+      if(totals.in>0 || totals.work>0){
+        heroSub.textContent = `היום ממתינים ${totals.in} פריטים לטיפול ו-${totals.work} בעבודה.`;
+      }else{
+        heroSub.textContent = 'אין פריטים חדשים כרגע — קח/י רגע לנשום 👏';
       }
     }
-    document.getElementById('refresh-btn').addEventListener('click',loadDashboard);
+
+    async function loadDashboard(){
+      try{
+        const data = await api("?action=dashboard");
+        const flows = Array.isArray(data.flows) ? data.flows : [];
+        renderTotals(flows);
+        renderFlows(flows);
+      }catch(err){
+        flowsEl.innerHTML = `<div class="card error">שגיאה בטעינה • נסה/י לרענן</div>`;
+        console.error(err);
+      }
+    }
+
+    document.getElementById('refresh-btn').addEventListener('click', loadDashboard, { passive:true });
     loadDashboard();
   </script>
 </body>

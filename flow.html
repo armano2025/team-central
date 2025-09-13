@@ -1,4 +1,4 @@
-<!-- /flow.html — Flow (List View Compact for iPhone) -->
+<!-- /flow.html — List + Kanban, sticky search/filters, drag & drop, mobile-first -->
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -6,156 +6,207 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Flow</title>
 
-  <!-- עיצוב בסיסי חיצוני שלך -->
+  <!-- בסיס (טיפוגרפיה + עיצוב גלובלי שלך) -->
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/feather-icons"></script>
 
   <style>
-    /* =========================================================
-       ״List View Compact״ – מותאם לאייפון (שורות דקיקות + פירוט בהרחבה)
-       ========================================================= */
-
     :root{
-      --radius: 12px;
-      --gap: 10px;
-      --muted: 0.65;
-      --row-h: 56px;                /* גובה שורה קומפקטי */
-      --pad: 12px;                  /* ריווח כללי קטן יותר למובייל */
-      --border: 1px solid #e8e8ee;
-      --bg-soft: rgba(0,0,0,.04);
+      --pad:12px; --radius:14px; --muted:.65; --chip:#eef2f7; --chip-brd:#e5e9f2;
+      --row-h:56px; --glass:rgba(255,255,255,.18); --brd:#e8e8ee; --soft:rgba(0,0,0,.05);
+      --in:#f59e0b; --work:#3b82f6; --done:#10b981; --bad:#ef4444;
     }
 
-    /* גיבור + סטטיסטיקות – נשאר, רק קומפקטי יותר במובייל */
-    .hero .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-    .hero .stat{flex:1 1 160px;text-align:center;background:rgba(255,255,255,.18);padding:10px;border-radius:999px}
-
-    /* חיפוש */
-    .search-wrap{display:flex;gap:8px;align-items:center;margin:10px 0;padding:0 var(--pad)}
-    .search-wrap input{
-      width:100%;padding:10px 12px;border-radius:12px;border:1px solid #ddd; font-size:15px;
-      -webkit-appearance:none; appearance:none;
+    /* ===== Top bar (גובה אחיד) ===== */
+    .top-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px var(--pad)}
+    .top-buttons a,.top-buttons button{
+      display:inline-flex;align-items:center;gap:8px; height:40px; line-height:40px;
+      padding:0 12px;border-radius:10px;background:#e3efff;border:1px solid #cfe3ff;
+      font-weight:700; font-size:.95rem; color:#0f172a; cursor:pointer; text-decoration:none;
     }
-    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:.9rem}
-    .muted{opacity:.65}
+    .top-buttons .ghost{background:transparent;border-color:#dfe5ef}
+    .top-buttons i{width:18px;height:18px}
 
-    /* שתי עמודות בדסקטופ, עמודה יחידה במובייל */
-    .cols{display:grid;grid-template-columns:1fr;gap:16px;padding:0 var(--pad) var(--pad)}
-    @media (min-width: 920px){ .cols{grid-template-columns:1fr 1fr} }
-    .group-head{font-weight:700;margin:4px 2px 8px}
+    /* ===== Hero ===== */
+    .hero{padding:0 var(--pad)}
+    .hero-card{
+      max-width:980px;margin:0 auto;background:linear-gradient(135deg,#60a5fa,#22c55e);
+      border-radius:18px;color:#fff;padding:18px; box-shadow:0 14px 40px rgba(15,23,42,.16);
+    }
+    .hero-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .hero h2{margin:0;font-size:clamp(1.4rem,1.1rem + 2vw,2.2rem);letter-spacing:-.02em}
+    .badges{display:flex;gap:8px;flex-wrap:wrap}
+    .badge-soft{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.35);padding:6px 10px;border-radius:999px;font-weight:700}
+    .segmented{display:inline-flex;background:rgba(255,255,255,.22);border-radius:12px;padding:4px}
+    .segmented button{
+      border:0;background:transparent;color:#fff;opacity:.85;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer
+    }
+    .segmented button[aria-pressed="true"]{background:#fff;color:#0f172a;opacity:1}
 
-    /* ========= LIST VIEW ========= */
+    /* ===== Sticky search + filters ===== */
+    .toolbar{position:sticky;top:0;z-index:5; background:linear-gradient(180deg,#fff,rgba(255,255,255,.94));
+      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border-bottom:1px solid #eef2f7}
+    .toolbar-inner{max-width:980px;margin:0 auto;padding:10px var(--pad)}
+    .searchline{display:flex;gap:8px;align-items:center}
+    .searchline input{flex:1 1 auto;padding:10px 12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+    .pill{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border:1px solid var(--chip-brd);
+      padding:6px 10px;border-radius:999px;font-size:.9rem}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid var(--chip-brd);
+      border-radius:999px;cursor:pointer;user-select:none}
+    .chip[aria-pressed="true"]{outline:2px solid #60a5fa; background:#edf5ff}
 
-    /* מכולת רשימה */
-    .list{display:block;border-radius:14px}
-
-    /* כל משימה היא details עם summary קצר (שורה), ותוכן מתחת */
-    .row{background:#fff;border:var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+    /* ===== List view (details rows) ===== */
+    .cols{max-width:980px;margin:12px auto;display:grid;grid-template-columns:1fr;gap:16px;padding:0 var(--pad)}
+    @media (min-width: 950px){ .cols{grid-template-columns:1fr 1fr} }
+    .group-head{display:flex;align-items:center;gap:8px;font-weight:800;margin:6px 2px 8px}
+    .group-head .dot{width:8px;height:8px;border-radius:50%}
+    .list .row{background:#fff;border:1px solid var(--brd);border-radius:14px;margin-bottom:10px;overflow:hidden}
     .row[open]{box-shadow:0 8px 24px rgba(15,23,42,0.08)}
-
-    /* שורת הסיכום – דקה, תופסת מעט גובה */
     .row > summary{
-      list-style:none; cursor:pointer; -webkit-tap-highlight-color: transparent;
-      display:grid; grid-template-columns:auto 1fr auto auto; gap:12px;
-      align-items:center; min-height:var(--row-h); padding:8px 12px;
-    }
+      list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;
+      align-items:center;min-height:var(--row-h);padding:8px 12px}
     .row > summary::-webkit-details-marker{display:none}
-
-    /* אלמנטים בשורה */
     .status-dot{width:10px;height:10px;border-radius:50%;background:var(--c,#9aa0a6);box-shadow:0 0 0 2px rgba(0,0,0,.06) inset}
-    .primary .name{font-weight:600;line-height:1.1}
+    .primary .name{font-weight:700;line-height:1.1}
     .primary .sub{font-size:13px;opacity:var(--muted)}
     .meta{font-size:12px;opacity:var(--muted);white-space:nowrap}
-    .chev{opacity:.6}
-
-    /* גוף ההרחבה – טפסים + פרטים */
     .row-body{padding:12px}
     .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-    .controls select{
-      padding:6px 10px;border-radius:999px;border:1px solid #ddd;background:#fff;font-size:14px
-    }
-
-    /* סידור פרטים חשובים בקומפקטיות */
+    .controls select{padding:6px 10px;border:1px solid #ddd;border-radius:999px;background:#fff;font-size:14px}
     .kv{display:grid;grid-template-columns:1fr 1fr; gap:8px; margin-top:6px}
-    @media (min-width:680px){ .kv{grid-template-columns:1fr 1fr 1fr 1fr} }
-    .kv .box{background:var(--bg-soft);border-radius:10px;padding:10px}
+    @media (min-width:680px){ .kv{grid-template-columns:repeat(4,1fr)} }
+    .kv .box{background:var(--soft);border-radius:10px;padding:10px}
     .kv .box .lbl{font-size:12px;opacity:.7;margin-bottom:4px}
-
-    textarea.admin-notes{
-      width:100%;padding:10px;border-radius:10px;border:1px solid #ddd; resize:vertical; min-height:64px
-    }
-
+    textarea.admin-notes{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;resize:vertical;min-height:64px}
     .more{margin-top:8px;padding-top:8px;border-top:1px dashed #e5e7eb}
     .more .item{background:#fff;border:1px solid #eee;border-radius:10px;padding:8px 10px;margin:6px 0}
-
     .line-actions{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px}
     .open-sheet{border:1px solid #e5e7eb;background:#fff;padding:6px 10px;border-radius:999px}
 
-    /* טוסט קטן לתגובת שמירה */
+    /* ===== Kanban ===== */
+    .kanban{max-width:980px;margin:14px auto;padding:0 var(--pad);display:grid;gap:10px;grid-template-columns:1fr}
+    @media (min-width:900px){ .kanban{grid-template-columns:1fr 1fr 1fr} }
+    .col{background:#f8fafc;border:1px solid #eef2f7;border-radius:14px;display:flex;flex-direction:column;min-height:260px}
+    .col-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px}
+    .col-head .title{display:flex;align-items:center;gap:8px;font-weight:800}
+    .col-head .count{background:#fff;border:1px solid #e5e9f2;border-radius:999px;padding:4px 10px;font-weight:700}
+    .col-drop{padding:10px;display:flex;flex-direction:column;gap:10px;min-height:200px}
+    .card{background:#fff;border:1px solid #eaeef5;border-radius:12px;padding:10px;box-shadow:0 6px 16px rgba(15,23,42,.06)}
+    .card.drag{opacity:.65;transform:scale(.98)}
+    .owner-dot{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font-size:12px;font-weight:800;color:#0f172a;background:#e8f0ff;border:1px solid #cfe3ff}
+    .mini{display:flex;align-items:center;gap:8px;justify-content:space-between}
+    .mini .name{font-weight:700}
+    .mini .sub{font-size:12px;opacity:.65}
+    .mini .right{display:flex;align-items:center;gap:8px}
+
+    /* ===== Utilities ===== */
+    .hint{opacity:.65}
     .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(0,0,0,.85);color:#fff;padding:10px 14px;border-radius:12px}
     .error{color:#b00020;margin:10px var(--pad) 0}
-
-    /* כפתורים עליונים – נשארים */
-    .top-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:10px var(--pad)}
-    .top-buttons a,.top-buttons button{padding:8px 12px;border-radius:10px;font-size:.95rem}
-
-    /* נגישות תנועה באייפון */
-    @media (prefers-reduced-motion: reduce){
-      *{scroll-behavior:auto;animation:none!important;transition:none!important}
-    }
+    .skeleton{background:linear-gradient(90deg,#f2f4f8,#e9edf4,#f2f4f8);background-size:200% 100%;animation:sk 1.1s infinite}
+    @keyframes sk{0%{background-position:0 0}100%{background-position:-200% 0}}
+    .empty{opacity:.65;padding:8px;text-align:center}
+    [hidden]{display:none!important}
   </style>
 </head>
 <body>
-  <!-- פס ניווט עליון -->
+  <!-- פס ניווט עליון (גובה אחיד) -->
   <nav class="top-buttons">
-    <a href="javascript:void(0)" onclick="history.back()"><i data-feather="arrow-right"></i> חזור</a>
-    <a href="admin.html"><i data-feather="settings"></i> אדמין</a>
-    <a id="sheetBtn" href="#" target="_blank" rel="noopener"><i data-feather="book-open"></i> גליון</a>
+    <a class="ghost" href="javascript:void(0)" onclick="history.back()"><i data-feather="arrow-right"></i> חזור</a>
+    <a class="ghost" href="admin.html"><i data-feather="settings"></i> אדמין</a>
+    <a id="sheetBtn" class="ghost" href="#" target="_blank" rel="noopener"><i data-feather="book-open"></i> גליון</a>
     <button id="refresh-btn" type="button" title="ריענון"><i data-feather="rotate-cw"></i> ריענון</button>
     <button id="dark-toggle" type="button" title="מצב כהה/בהיר"><i data-feather="moon"></i></button>
   </nav>
 
-  <!-- כותרת + סטטוסים -->
+  <!-- כותרת + מונים + מצב תצוגה -->
   <header class="hero">
-    <div class="hero-content" style="text-align:center;padding:6px var(--pad) 0">
-      <h2 id="title" style="margin:0 0 4px">Flow</h2>
-      <p class="muted" style="margin:0 0 8px">תצוגה קומפקטית – טור "לטיפול" וטור "בעבודה".</p>
-      <div class="row">
-        <div class="stat">בעבודה <strong id="cnt-work">0</strong></div>
-        <div class="stat">לטיפול <strong id="cnt-in">0</strong></div>
+    <div class="hero-card">
+      <div class="hero-head">
+        <h2 id="title">Flow</h2>
+        <div class="badges">
+          <span class="badge-soft">לטיפול <strong id="cnt-in">0</strong></span>
+          <span class="badge-soft">בעבודה <strong id="cnt-work">0</strong></span>
+          <div class="segmented" role="tablist" aria-label="בחירת תצוגה">
+            <button id="btn-list"  role="tab" aria-selected="true"  aria-pressed="true">רשימה</button>
+            <button id="btn-kanban" role="tab" aria-selected="false" aria-pressed="false">קאנבן</button>
+          </div>
+        </div>
       </div>
+      <p class="hint" style="margin:6px 0 0">תצוגה קומפקטית ונוחה לניהול פניות. גררו כרטיס בין עמודות כדי לשנות סטטוס.</p>
     </div>
   </header>
 
-  <!-- חיפוש -->
-  <div class="search-wrap">
-    <span class="pill muted" id="flowKeyPill">—</span>
-    <input id="q" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
+  <!-- חיפוש + פילטרים (Sticky) -->
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <div class="searchline">
+        <span class="pill" id="flowKeyPill">—</span>
+        <input id="q" type="search" placeholder="חיפוש: שם, משפחה, טלפון, מקצוע, הערות…" />
+        <button id="clearFilters" class="pill" type="button">נקה</button>
+      </div>
+      <div id="filters" class="chips" aria-label="מסננים">
+        <!-- נבנה דינמית: סטטוס/מטפל/יש-הערה -->
+      </div>
+    </div>
   </div>
 
-  <!-- שתי רשימות -->
-  <div class="cols">
-    <section>
-      <div class="group-head">לטיפול</div>
-      <div id="list-in" class="list"></div>
+  <!-- ===== תצוגה: רשימה ===== -->
+  <main id="view-list">
+    <div class="cols">
+      <section>
+        <div class="group-head"><span class="dot" style="background:var(--in)"></span>לטיפול</div>
+        <div id="list-in" class="list"></div>
+      </section>
+      <section>
+        <div class="group-head"><span class="dot" style="background:var(--work)"></span>בעבודה</div>
+        <div id="list-work" class="list"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ===== תצוגה: קאנבן ===== -->
+  <main id="view-kanban" hidden>
+    <section class="kanban">
+      <div class="col" data-col="in">
+        <div class="col-head">
+          <div class="title"><span class="dot" style="background:var(--in)"></span> לטיפול</div>
+          <div class="count" id="kb-in-count">0</div>
+        </div>
+        <div class="col-drop" id="kb-in"></div>
+      </div>
+
+      <div class="col" data-col="work">
+        <div class="col-head">
+          <div class="title"><span class="dot" style="background:var(--work)"></span> בעבודה</div>
+          <div class="count" id="kb-work-count">0</div>
+        </div>
+        <div class="col-drop" id="kb-work"></div>
+      </div>
+
+      <div class="col" data-col="done" hidden id="kb-done-col">
+        <div class="col-head">
+          <div class="title"><span class="dot" style="background:var(--done)"></span> הסתיים</div>
+          <div class="count" id="kb-done-count">0</div>
+        </div>
+        <div class="col-drop" id="kb-done"></div>
+      </div>
     </section>
-    <section>
-      <div class="group-head">בעבודה</div>
-      <div id="list-work" class="list"></div>
-    </section>
-  </div>
+  </main>
 
   <div id="toast" class="toast" style="display:none"></div>
   <p id="err" class="error" hidden></p>
 
   <script>
     /* =========================================================
-       JS – זרימה קומפקטית (שורות + פירוט בהרחבה)
+       JS – List + Kanban with sticky filters, drag & drop, autosave
        ========================================================= */
-
     feather.replace();
 
-    // מצב כהה/בהיר (שומר ב-localStorage)
+    // Dark mode
     (function(){
       const root=document.documentElement;
       if(localStorage.getItem('dark-mode')==='1') root.classList.add('dark-mode');
@@ -165,79 +216,144 @@
       });
     })();
 
-    /* נתיב API – החלף לפי הצורך אצלך */
+    // API helper
     const API_URL="https://script.google.com/macros/s/AKfycbxagWMbWh-tmxa03Z_6Z7AQK1Hgp3G8AkcBPgvj6eYLQxBm5aNMrPB7FfEEzHp0BT0H/exec";
-
-    // fetch JSON (עם cache-buster ו-handling לטעויות)
     async function api(path,{method='GET',body,timeout=12000}={}){
       const url = API_URL + path + (path.includes('?') ? '&' : '?') + '_=' + Date.now();
       const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),timeout);
       try{
         const init = { method, signal: ctrl.signal, cache:'no-store' };
         if (body!=null){
-          init.headers = { 'Content-Type':'text/plain;charset=UTF-8' }; // ללא preflight
+          init.headers = { 'Content-Type':'text/plain;charset=UTF-8' };
           init.body    = JSON.stringify(body);
         }
         const res  = await fetch(url, init);
-        const text = await res.text();
-        if(!res.ok) throw new Error(text || ('HTTP '+res.status));
-        let data; try{ data=JSON.parse(text); }catch(_){ throw new Error('Bad JSON'); }
+        const txt  = await res.text();
+        if(!res.ok) throw new Error(txt || ('HTTP '+res.status));
+        let data; try{ data=JSON.parse(txt); }catch(_){ throw new Error('Bad JSON'); }
         if(data.ok===false) throw new Error(data.error||'API error');
         return data;
       }finally{ clearTimeout(to); }
     }
 
-    // פרמטר flowKey מה-URL
+    // Query
     const qs=new URLSearchParams(location.search);
     const flowKey=qs.get('flowKey')||'';
     document.getElementById('flowKeyPill').textContent=flowKey||'—';
 
-    function toast(msg,ms=1500){
+    // State
+    let META={owners:[],statuses:[],flows:[]};
+    let CACHE={in:[], work:[], done:[]};
+    let FILTERS={owner:null, hasNote:null}; // {owner:'חן' | null, hasNote:true|false|null}
+
+    const VIEW = {
+      get(){ return localStorage.getItem('flow-view') || 'list'; },
+      set(v){ localStorage.setItem('flow-view', v); }
+    };
+
+    function toast(msg,ms=1400){
       const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block';
       setTimeout(()=>t.style.display='none',ms);
     }
 
-    // === מטה (בעלי תיקים/סטטוסים/פלואים) ===
-    let META={owners:[],statuses:[],flows:[]};
+    function fmtDate(s){
+      if(!s) return '';
+      const d=new Date(s); if (isNaN(d)) return s;
+      return String(d.getDate()).padStart(2,'0') + '/' +
+             String(d.getMonth()+1).padStart(2,'0') + '/' +
+             String(d.getFullYear()).slice(-2);
+    }
+    function statusColor(st){
+      const s=(st||'').trim();
+      if(/לטיפול/.test(s)) return getComputedStyle(document.documentElement).getPropertyValue('--in') || '#f59e0b';
+      if(/בעבודה/.test(s)) return getComputedStyle(document.documentElement).getPropertyValue('--work') || '#3b82f6';
+      if(/הסתיים|סגור/.test(s)) return getComputedStyle(document.documentElement).getPropertyValue('--done') || '#10b981';
+      if(/תקוע|בעיה|נכשל/.test(s)) return getComputedStyle(document.documentElement).getPropertyValue('--bad') || '#ef4444';
+      return '#9aa0a6';
+    }
 
+    // Meta + titles
     async function loadMeta(){
       const m=await api("?action=meta"); META=m;
       const flow=META.flows?.find?.(f=>f.flowKey===flowKey);
-      if(flow) document.getElementById('title').textContent=flow.friendlyName;
+      if(flow) document.getElementById('title').textContent = flow.friendlyName;
     }
-
     async function loadSheetLink(){
       const r=await api(`?action=sheetLink&flowKey=${encodeURIComponent(flowKey)}`);
       const a=document.getElementById('sheetBtn'); a.href=r.url; a.target="_blank";
     }
 
-    // === עזרי תצוגה קומפקטית ===
-    function fmtDate(s){
-      if(!s) return '';
-      const d=new Date(s);
-      if(isNaN(d)) return s;
-      const dd=String(d.getDate()).padStart(2,'0');
-      const mm=String(d.getMonth()+1).padStart(2,'0');
-      const yy=String(d.getFullYear()).slice(-2);
-      return `${dd}/${mm}/${yy}`;
+    // Filters UI
+    function buildFilters(){
+      const box=document.getElementById('filters');
+      const owners=META.owners?.length?META.owners:[];
+      const chip = (id,label,pressed=false)=>`<button class="chip" id="${id}" aria-pressed="${pressed?'true':'false'}">${label}</button>`;
+
+      box.innerHTML = [
+        chip('f-hasnote','יש הערת מנהל', FILTERS.hasNote===true),
+        chip('f-nonote','ללא הערת מנהל', FILTERS.hasNote===false),
+        ...owners.map(o=>chip('own-'+btoa(unescape(encodeURIComponent(o))).replace(/=+/g,''), 'מטפל: '+o, FILTERS.owner===o)),
+      ].join('');
+
+      // wiring
+      box.onclick = (ev)=>{
+        const b=ev.target.closest('.chip'); if(!b) return;
+        const id=b.id;
+        if(id==='f-hasnote'){ FILTERS.hasNote = (b.getAttribute('aria-pressed')!=='true') ? true : null; }
+        else if(id==='f-nonote'){ FILTERS.hasNote = (b.getAttribute('aria-pressed')!=='true') ? false : null; }
+        else if(id.startsWith('own-')){
+          const ownerLabel=b.textContent.replace('מטפל:','').trim();
+          FILTERS.owner = (b.getAttribute('aria-pressed')!=='true') ? ownerLabel : null;
+        }
+        buildFilters(); // refresh pressed states
+        loadAll();      // refetch with same q
+      };
     }
 
-    function statusColor(st){
-      const s=(st||'').trim();
-      // מיפוי צבעים נעים לעין במובייל
-      if(/לטיפול/.test(s)) return '#f59e0b';   // כתום
-      if(/בעבודה/.test(s)) return '#3b82f6';   // כחול
-      if(/הסתיים|סגור/.test(s)) return '#10b981'; // ירוק
-      if(/תקוע|בעיה|נכשל/.test(s)) return '#ef4444'; // אדום
-      return '#9aa0a6'; // ברירת מחדל
+    // Search
+    const qEl=document.getElementById('q');
+    qEl.addEventListener('input',()=>{ clearTimeout(window.__deb); window.__deb=setTimeout(loadAll,250); });
+    document.getElementById('clearFilters').addEventListener('click',()=>{
+      qEl.value=''; FILTERS={owner:null,hasNote:null}; buildFilters(); loadAll();
+    });
+
+    // Data loaders
+    async function loadColumn(which,q=''){
+      const list=document.getElementById('list-'+which);
+      if(list) list.innerHTML = '<div class="row skeleton" style="height:52px;border-radius:12px"></div>'.repeat(2);
+
+      // Build search params
+      const url = `?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`;
+      const data=await api(url);
+      let items = data.items || [];
+
+      // client-side filters
+      if(FILTERS.owner){
+        items = items.filter(it => (it.fields?.owner||'').trim() === FILTERS.owner);
+      }
+      if(FILTERS.hasNote===true){
+        items = items.filter(it => !!(it.fields?.adminNotes||'').trim());
+      }else if(FILTERS.hasNote===false){
+        items = items.filter(it => !(it.fields?.adminNotes||'').trim());
+      }
+
+      CACHE[which] = items;
+      // Render list view
+      if(list){
+        const html = items.map(renderRow).join('') || '<div class="empty">אין משימות להצגה</div>';
+        list.innerHTML = html;
+        feather.replace(list);
+      }
+      return data.meta?data.meta.total:items.length;
     }
 
-    // === שורה קומפקטית: summary קצר + תוכן בהרחבה ===
-    function renderItem(item){
+    function phoneLink(p){ return p ? `<a href="tel:${p}" title="התקשר" class="pill" style="padding:4px 8px"><i data-feather='phone'></i></a>` : '' }
+
+    // Row renderer (List view)
+    function renderRow(item){
       const f=item.fields||{};
       const owners=META.owners?.length?META.owners:['ריק','חן','בלה','תמרה','ליאור','נטע'];
       const statuses=META.statuses?.length?META.statuses:['לטיפול','בעבודה','הסתיים'];
-
       const createdShort=fmtDate(f.createdAt);
       const statusClr=statusColor(f.status);
 
@@ -248,7 +364,6 @@
         ${statuses.map(s=>`<option${(f.status||'לטיפול')===s?' selected':''}>${s}</option>`).join('')}
       </select>`;
 
-      // שורת הסיכום: נקודת סטטוס, שם + טלפון, מטה קצר, וחץ
       return `
       <details class="row" data-rowid="${item.rowId}">
         <summary>
@@ -257,35 +372,22 @@
             <div class="name">${(f.firstName||'')+' '+(f.lastName||'')}</div>
             <div class="sub" dir="ltr">${f.phone||''}</div>
           </div>
-          <div class="meta">
-            ${createdShort}${f.caseId?` • ${f.caseId}`:''}
-          </div>
+          <div class="meta">${createdShort}${f.caseId?` • ${f.caseId}`:''}</div>
           <i data-feather="chevron-down" class="chev"></i>
         </summary>
 
         <div class="row-body">
           <div class="controls">
-            <label class="pill">מטפל: ${ownerSel}</label>
-            <label class="pill">סטטוס: ${statusSel}</label>
+            <span class="pill">מטפל: ${ownerSel}</span>
+            <span class="pill">סטטוס: ${statusSel}</span>
+            ${phoneLink(f.phone)}
           </div>
 
           <div class="kv">
-            <div class="box">
-              <div class="lbl">שם</div>
-              <div>${(f.firstName||'')+' '+(f.lastName||'')}</div>
-            </div>
-            <div class="box">
-              <div class="lbl">טלפון</div>
-              <div dir="ltr">${f.phone||''}</div>
-            </div>
-            <div class="box">
-              <div class="lbl">תפקיד</div>
-              <div>${f.role||''}</div>
-            </div>
-            <div class="box">
-              <div class="lbl">מקצוע</div>
-              <div>${f.subject||''}</div>
-            </div>
+            <div class="box"><div class="lbl">שם</div><div>${(f.firstName||'')+' '+(f.lastName||'')}</div></div>
+            <div class="box"><div class="lbl">טלפון</div><div dir="ltr">${f.phone||''}</div></div>
+            <div class="box"><div class="lbl">תפקיד</div><div>${f.role||''}</div></div>
+            <div class="box"><div class="lbl">מקצוע</div><div>${f.subject||''}</div></div>
           </div>
 
           <div style="margin-top:10px">
@@ -302,17 +404,16 @@
           </div>
 
           <div class="line-actions">
-            <span class="muted" style="font-size:12px">נוצר: ${f.createdAt||''}</span>
+            <span class="hint" style="font-size:12px">נוצר: ${f.createdAt||''}</span>
             <button class="open-sheet" data-row="${item.rowId}">
               <i data-feather="book-open"></i> לשורה בגליון
             </button>
           </div>
         </div>
-      </details>
-      `;
+      </details>`;
     }
 
-    // שמירה
+    // Save updates
     async function updateField(rowId, updates){
       try{
         const body={action:'updateRow',flowKey,rowId,updates,actor:'WebPanel'};
@@ -322,33 +423,17 @@
       }catch(e){ alert('שגיאה בשמירה: '+e.message); }
     }
 
-    // טעינת עמודת סטטוס (in/work) עם חיפוש
-    async function loadColumn(which,q=''){
-      const list=document.getElementById('list-'+which);
-      list.innerHTML='<div class="row" style="opacity:.6"><summary>טוען…</summary></div>';
-
-      const data=await api(`?action=flow&flowKey=${encodeURIComponent(flowKey)}&status=${which}${q?'&q='+encodeURIComponent(q):''}`);
-      const html=(data.items||[]).map(renderItem).join('') || '<div class="muted" style="padding:8px">אין משימות להצגה</div>';
-      list.innerHTML=html;
-
-      // להחליף איקונים לאחר הזרקה
-      feather.replace(list);
-
-      return data.meta?data.meta.total:0;
-    }
-
-    // האזנה לרשימה – שומרת עריכות באופן ממוזער
+    // Wire list (change/save, jump to sheet)
     function wireList(id){
       const el=document.getElementById(id);
+      if(!el) return;
 
-      // שינוי בעלים/סטטוס
       el.addEventListener('change',async(e)=>{
         const t=e.target; const rowId=parseInt(t.getAttribute('data-rowid'),10); if(!rowId) return;
         if(t.classList.contains('owner'))  await updateField(rowId,{owner:t.value});
         if(t.classList.contains('status')) await updateField(rowId,{status:t.value});
       });
 
-      // דיבאונס להערות
       const timers=new Map();
       el.addEventListener('input',(e)=>{
         const t=e.target; if(!t.classList.contains('admin-notes')) return;
@@ -357,40 +442,109 @@
         timers.set(rowId,setTimeout(()=>updateField(rowId,{adminNotes:t.value}),500));
       });
 
-      // קפיצה לשורה בגליון
       el.addEventListener('click',(e)=>{
         const btn=e.target.closest('.open-sheet'); if(!btn) return;
         const base=document.getElementById('sheetBtn').href; const row=btn.getAttribute('data-row');
         if(base){
-          const u=new URL(base);
-          u.searchParams.set('range','A'+row);
+          const u=new URL(base); u.searchParams.set('range','A'+row);
           window.open(u.toString(),'_blank');
         }
       });
     }
     wireList('list-in'); wireList('list-work');
 
-    // טעינת הכל
+    // ===== Kanban =====
+    function initials(name){ const p=name.trim().split(/\s+/); return (p[0]?.[0]||'')+(p[1]?.[0]||''); }
+    function kbCard(item){
+      const f=item.fields||{};
+      return `
+        <div class="card" draggable="true" data-rowid="${item.rowId}">
+          <div class="mini">
+            <div>
+              <div class="name">${(f.firstName||'')+' '+(f.lastName||'')}</div>
+              <div class="sub" dir="ltr">${f.phone||''}</div>
+            </div>
+            <div class="right">
+              <span class="owner-dot" title="${f.owner||'—'}">${initials(f.owner||'')}</span>
+              <span class="status-dot" style="--c:${statusColor(f.status)}"></span>
+            </div>
+          </div>
+          <div class="sub" style="margin-top:6px">${fmtDate(f.createdAt)}${f.caseId?` • ${f.caseId}`:''}</div>
+        </div>`;
+    }
+    function renderKanban(){
+      const cols={in:document.getElementById('kb-in'), work:document.getElementById('kb-work'), done:document.getElementById('kb-done')};
+      cols.in.innerHTML   = CACHE.in.map(kbCard).join('')   || '<div class="empty">אין</div>';
+      cols.work.innerHTML = CACHE.work.map(kbCard).join('') || '<div class="empty">אין</div>';
+      cols.done.innerHTML = CACHE.done.map(kbCard).join('') || '<div class="empty">—</div>';
+      document.getElementById('kb-in-count').textContent   = CACHE.in.length;
+      document.getElementById('kb-work-count').textContent = CACHE.work.length;
+      document.getElementById('kb-done-count').textContent = CACHE.done.length;
+
+      // DnD
+      document.querySelectorAll('.card[draggable=true]').forEach(card=>{
+        card.addEventListener('dragstart',e=>{ card.classList.add('drag'); e.dataTransfer.setData('text/plain', card.dataset.rowid); });
+        card.addEventListener('dragend',  ()=> card.classList.remove('drag'));
+      });
+      document.querySelectorAll('.col-drop').forEach(drop=>{
+        drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.style.background='rgba(96,165,250,.08)'; });
+        drop.addEventListener('dragleave',()=>{ drop.style.background=''; });
+        drop.addEventListener('drop',async e=>{
+          e.preventDefault(); drop.style.background='';
+          const rowId=parseInt(e.dataTransfer.getData('text/plain'),10);
+          const col=drop.parentElement.getAttribute('data-col'); // in / work / done
+          const status = col==='in' ? 'לטיפול' : (col==='work' ? 'בעבודה' : 'הסתיים');
+          await updateField(rowId,{status}); // שמור בשרת
+          // עדכון לוקלי מהיר
+          ['in','work','done'].forEach(k=>CACHE[k]=CACHE[k].filter(it=>it.rowId!==rowId));
+          const item = {rowId, fields:{...(Object.values(CACHE).flat().find(i=>i.rowId===rowId)?.fields||{}), status}};
+          // אם לא מצאנו שדה מלא – נרענן הכל (fallback)
+          if(!item.fields.firstName){ return loadAll(); }
+          CACHE[col].unshift(item);
+          renderKanban();
+        });
+      });
+    }
+
+    // Load all
     async function loadAll(){
       const err=document.getElementById('err'); err.hidden=true; err.textContent='';
       try{
         if(!flowKey){ err.hidden=false; err.textContent='חסר flowKey ב־URL'; return; }
         await loadMeta(); await loadSheetLink();
-        const q=document.getElementById('q').value.trim();
+        const q=qEl.value.trim();
         const [inCnt,workCnt]=await Promise.all([loadColumn('in',q),loadColumn('work',q)]);
         document.getElementById('cnt-in').textContent=inCnt;
         document.getElementById('cnt-work').textContent=workCnt;
+        // Kanban render from CACHE
+        renderKanban();
       }catch(e){ err.hidden=false; err.textContent='שגיאה בטעינה – '+e.message; }
     }
-
-    // שליטה
     document.getElementById('refresh-btn').addEventListener('click',loadAll);
-    document.getElementById('q').addEventListener('input',()=>{
-      clearTimeout(window.__q); window.__q=setTimeout(loadAll,250);
-    });
 
-    // פתיחה ראשונית
-    loadAll();
+    // View toggle
+    const viewList=document.getElementById('view-list');
+    const viewKanban=document.getElementById('view-kanban');
+    const btnList=document.getElementById('btn-list');
+    const btnKanban=document.getElementById('btn-kanban');
+    function setView(v){
+      if(v==='kanban'){ viewKanban.hidden=false; viewList.hidden=true;
+        btnKanban.setAttribute('aria-pressed','true'); btnKanban.setAttribute('aria-selected','true');
+        btnList.setAttribute('aria-pressed','false');  btnList.setAttribute('aria-selected','false');
+      }else{ viewList.hidden=false; viewKanban.hidden=true;
+        btnList.setAttribute('aria-pressed','true');  btnList.setAttribute('aria-selected','true');
+        btnKanban.setAttribute('aria-pressed','false'); btnKanban.setAttribute('aria-selected','false');
+      }
+      VIEW.set(v);
+    }
+    btnList.addEventListener('click', ()=>setView('list'));
+    btnKanban.addEventListener('click',()=>setView('kanban'));
+    setView(VIEW.get()); // פתיחה לפי זיכרון
+
+    // Build filters then load
+    (async function init(){
+      await loadMeta(); buildFilters(); await loadSheetLink(); await loadAll();
+    })();
   </script>
 </body>
 </html>
